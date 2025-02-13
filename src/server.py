@@ -6,7 +6,7 @@ from db.utils.db import Database
 class Root(Resource):
   def get(self):
     db = Database('public')
-    return db.tables['demo'].select('*')
+    return db.tables['mupp_setup_demo'].select('*')
 
 app = Flask(__name__)
 CORS(app)

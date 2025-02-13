@@ -1,6 +1,12 @@
 # mupp
 Multi-user party planner
 
+## Database
+Initialize a PostgreSQL database with demo seed
+```
+bash config/demo_setup.sh
+```
+
 ## Backend
 Flask server hosted on port `5001`.
 ```python
