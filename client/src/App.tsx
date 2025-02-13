@@ -18,7 +18,7 @@ function App() {
         if (!res.ok) return 'Failed to get response'
         return res.json() 
       })
-      .then(text => setServerText(text))
+      .then(text => setServerText(JSON.stringify(text)))
       .catch(e => {
         console.error(e)
         setServerText('Something broke')

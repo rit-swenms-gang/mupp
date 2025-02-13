@@ -1,10 +1,12 @@
 from flask import Flask
 from flask_restful import Resource, Api
 from flask_cors import CORS
+from db.utils.db import Database
 
 class Root(Resource):
   def get(self):
-    return 'Hello world'
+    db = Database('public')
+    return db.tables['demo'].select('*')
 
 app = Flask(__name__)
 CORS(app)
