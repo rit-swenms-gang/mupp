@@ -4,6 +4,7 @@ Multi-user party planner
 ## Backend
 Flask server hosted on port `5001`.
 ```python
+pip install -r requirements.txt
 python src/server.py
 ```
 
