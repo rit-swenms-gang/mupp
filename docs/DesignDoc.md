@@ -66,7 +66,7 @@ on the guests so that I can use predefined information to generate groups
 This section describes the application architecture.
 
 ### Software Architecture
-> _Place a architectural diagram here._
+![](imgs/party_planner-Architecture.png)
 > _Describe your software architecture._
 
 
