@@ -35,30 +35,30 @@ This section describes the features of the application.
 > _Provide a simple description of the Minimum Viable Product._
 
 ### MVP Features
-1. As an Organizer, I want to generate a grouping of guests for my event so that I can
-better run my event
-2. As an Organizer, I want to be able to tweak the grouping variables so that I can be in full
-control over the grouping before it is made
-3. As an Organizer, I want to be able to adjust groupings manually after they are made, so
-that I can correct mistakes or adapt to changing needs.
-4. As an Organizer, I want to be able to share the groupings that are generated so that I
-can share that information with the Participants of the event
-5. As an Organizer, I want to be able to add Leaders so that the grouping algorithm
-spreads them throughout the groups
-6. As an Organizer, I want to be able to create event forms so that guests can be properly
-grouped according to preference and skill level.
-7. As a Participant, I want to fill out a form so that my preferences can be accounted for
-during an event.
-8. As an Organizer, I want to be able to set the visibility of individual questions so that
-Leaders can selectively view Participants’ answers.
-9. As a Leader, I want to be able to view the preferences of the Participants so that I can
-better plan for the Event’s session(s).
-10. As an Organizer, I want to be able to create an account so that all of my event
-information is saved
+1. As an Organizer, I want to generate a grouping of guests for my event so
+that I can better run my event
+2. As an Organizer, I want to be able to tweak the grouping variables so that I
+can be in full control over the grouping before it is made
+3. As an Organizer, I want to be able to adjust groupings manually after they
+are made, so that I can correct mistakes or adapt to changing needs.
+4. As an Organizer, I want to be able to share the groupings that are generated
+so that I can share that information with the Participants of the event
+5. As an Organizer, I want to be able to add Leaders so that the grouping
+algorithm spreads them throughout the groups
+6. As an Organizer, I want to be able to create event forms so that guests can
+be properly grouped according to preference and skill level.
+7. As a Participant, I want to fill out a form so that my preferences can be
+accounted for during an event.
+8. As an Organizer, I want to be able to set the visibility of individual
+questions so that Leaders can selectively view Participants’ answers.
+9. As a Leader, I want to be able to view the preferences of the Participants
+so that I can better plan for the Event’s session(s).
+10. As an Organizer, I want to be able to create an account so that all of my
+event information is saved
 11. Stretch: As an Organizer, I want to be able to generate a schedule so that
 Participants/Leaders can follow it to their respective groups
-12. Stretch: As an Organizer, I want to be able to upload a file of information on the guests
-so that I can use predefined information to generate groups
+12. Stretch: As an Organizer, I want to be able to upload a file of information
+on the guests so that I can use predefined information to generate groups
 
 
 ## Architecture and Design
@@ -71,6 +71,10 @@ This section describes the application architecture.
 
 
 ### Use Cases
-> _Place a use case diagram here._
-> _Describe your use case diagram._
+![](imgs/party_planner-Use_Case.png)
+
+The primary user of the application will be Event Organizers. They will need
+functionality to generate forms and groups as well as manage other Event
+details like time. Leaders may need to view Participants' preferences, and
+Participants need to fill out an Organizer's form.
 
