@@ -67,6 +67,7 @@ This section describes the application architecture.
 
 ### Software Architecture
 ![](imgs/party_planner-Architecture.png)
+
 The Model for our application will be held in a database, storing information on the
 users of our applcation (Event Organizers), sessions, and events. Our users will interact
 with a React web application front-end, navigating through pages and filling out user forms.
