@@ -67,8 +67,11 @@ This section describes the application architecture.
 
 ### Software Architecture
 ![](imgs/party_planner-Architecture.png)
-> _Describe your software architecture._
-
+The Model for our application will be held in a database, storing information on the
+users of our applcation (Event Organizers), sessions, and events. Our users will interact
+with a React web application front-end, navigating through pages and filling out user forms.
+The data from the React app is sent to our Flask server, which handles interaction with the MUPP API,
+data validation, and the grouping algorithm.
 
 ### Use Cases
 ![](imgs/party_planner-Use_Case.png)
