@@ -27,7 +27,12 @@ generate groups and their meeting times.
 This section describes the features of the application.
 
 ### Definition of MVP
-> _Provide a simple description of the Minimum Viable Product._
+Our MVP is an application that allows a user who wants to organize an event to create
+an account, log in to that account, and create a form for their prospective event
+attendees to fill out. From there, they can send out a link to the form, and people's
+responses are saved to a server. The application can then be used to find the most optimal
+scheduling/arrangement of groups within this event, based on metrics defined and adjusted
+by the event organizer, and give those results to the organizer on command.
 
 ### MVP Features
 1. As an Organizer, I want to generate a grouping of guests for my event so
