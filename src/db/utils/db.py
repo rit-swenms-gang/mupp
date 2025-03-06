@@ -104,7 +104,7 @@ class Database():
     """Read a SQL file into the database"""
     # start from root dir, credit swen610_db_utils.py
     abs_path = path.join(path.dirname(__file__), 
-                         f'../../{file}') 
+                         f'../../../{file}') 
     # TODO: should closed connects raise exception
     # or just work automatically?
     if self._conn.closed != 0: self.open()
