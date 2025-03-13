@@ -62,7 +62,6 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
       run: |
-        psql -h $POSTGRES_HOST -d mupp -f config/demo_db_setup.sql
         bash config/demo_setup.sh
     - name: Set up server
       run: |
