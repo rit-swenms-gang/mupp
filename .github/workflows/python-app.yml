@@ -61,10 +61,13 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
       run: |
+        psql -d mupp -f config/demo_db_setup.sql
         bash config/demo_setup.sh
-    - name: Test with unittest
+    - name: Set up server
       run: |
         python src/server.py &
         sleep 3
+    - name: Test with unittest
+      run: |
         coverage run -m unittest
         coverage report
