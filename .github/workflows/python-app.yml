@@ -62,7 +62,7 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
       run: |
-        bash config/demo_setup.sh
+        bash config/ci_setup.sh
     - name: Set up server
       run: |
         python src/server.py &
