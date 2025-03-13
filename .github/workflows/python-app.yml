@@ -55,6 +55,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unittest
       run: |
+        bash config/demo_setup.sh
         if [ -f src/server.py ]; then python src/server.py; fi
         coverage run -m unittest
         coverage report
