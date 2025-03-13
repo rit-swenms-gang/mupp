@@ -26,6 +26,7 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_DB: mupp
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         # Set health checks to wait until postgres has started
         options: >-
@@ -61,7 +62,7 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
       run: |
-        psql -d mupp -f config/demo_db_setup.sql
+        psql -h $POSTGRES_HOST -d mupp -f config/demo_db_setup.sql
         bash config/demo_setup.sh
     - name: Set up server
       run: |
