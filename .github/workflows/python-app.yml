@@ -63,6 +63,7 @@ jobs:
         bash config/demo_setup.sh
     - name: Test with unittest
       run: |
-        if [ -f src/server.py ]; then python src/server.py; fi
+        python src/server.py &
+        sleep 3
         coverage run -m unittest
         coverage report

@@ -1,5 +1,5 @@
 echo "Testing env vars: $POSTGRES_HOST"
-PGPASSWORD=$POSTGRES_PASSWORD createdb -h $POSTGRES_HOST -U $POSTGRES_USER -w mupp
+PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -f config/mupp_setup.sql
 PGPASSWORD=$POSTGRES_PASSWORD psql -d mupp -U $POSTGRES_USER -f config/demo_db_setup.sql
 echo "database: mupp
 host: $POSTGRES_HOST
