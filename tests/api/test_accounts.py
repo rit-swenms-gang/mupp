@@ -42,3 +42,20 @@ class AccountEnpointTest(TestCase):
       excepted_user_count,
       f"Expected {excepted_user_count} accounts in database"
     )
+
+  def test_post_does_not_add_duplicate_email_to_database(self):
+    """
+    POST requests with duplicate emails to the /accounts endpoint return 409
+    and do not add user to the database
+    """
+    excepted_user_count = 2
+    dup_email = self.db.exec_commit("SELECT email FROM accounts LIMIT 1;")[0]
+    dummy_user = { 'username': 'new_user', 'email': dup_email,'password': 'test'}
+    res_post = test_post(self, base_url + endpoint, json=dummy_user, expected_status=409)
+    self.assertEqual(res_post, 'email already in use')
+    res_accounts = test_get(self, base_url + endpoint)
+    self.assertEqual(
+      len(res_accounts),
+      excepted_user_count,
+      f"Expected {excepted_user_count} accounts in database"
+    )
