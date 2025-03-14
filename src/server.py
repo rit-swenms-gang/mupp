@@ -3,7 +3,7 @@ from flask_restful import Resource, Api
 from flask_cors import CORS
 from db.utils.db import Database
 
-from api.acounts import Accounts
+from api.accounts import Accounts
 
 class Root(Resource):
   def get(self):
