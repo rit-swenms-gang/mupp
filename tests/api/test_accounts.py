@@ -10,6 +10,12 @@ class AccountEnpointTest(TestCase):
     # TODO: use test schema to limit interactions between dev and prod
     self.db = Database('public')
     self.db.exec_sql_file('config/demo_db_setup.sql')
+    self.db.exec_commit(
+      """
+      INSERT INTO accounts (username, email, password)
+      VALUES (%s, %s, %s), (%s, %s, %s);
+      """, (('test', 'test@fake.email.com', 'dummy', 'dummy', 'dummy@fake.email.com', 'password'))
+    )
 
   def test_get_returns_accounts(self):
     """
@@ -20,7 +26,7 @@ class AccountEnpointTest(TestCase):
     self.assertEqual(
       len(res_accounts),
       excepted_user_count,
-      'Expected 2 accounts in database'
+      f"Expected {excepted_user_count} accounts in database"
     )
 
   def test_post_adds_account_to_database(self):
@@ -28,11 +34,11 @@ class AccountEnpointTest(TestCase):
     POST requests to the /accounts endpoint adds an account to the database
     """
     excepted_user_count = 3
-    dummy_user = { 'name': 'test', 'password': 'test'}
+    dummy_user = { 'username': 'new_user', 'email': 'new_user@fake.email.com','password': 'test'}
     test_post(self, base_url + endpoint, json=dummy_user)
     res_accounts = test_get(self, base_url + endpoint)
     self.assertEqual(
       len(res_accounts),
       excepted_user_count,
-      'Expected 3 accounts in database'
+      f"Expected {excepted_user_count} accounts in database"
     )

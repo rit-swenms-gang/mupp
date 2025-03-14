@@ -55,8 +55,10 @@ class Database():
     with self._conn.cursor() as c:
       c.execute('CREATE SCHEMA IF NOT EXISTS %s;' 
                 % self._schema)
-      c.execute('SET search_path TO {},public;'
+      c.execute('SET search_path TO {};'
                 .format(self._schema))
+      # c.execute('SET search_path TO {},public;'
+      #           .format(self._schema))
     self._conn.commit()
     self.fetch_tables()
 
