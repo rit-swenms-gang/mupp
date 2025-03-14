@@ -4,4 +4,5 @@ echo "database: mupp
 host: $POSTGRES_HOST
 user: $POSTGRES_USER
 password: $POSTGRES_PASSWORD
-port: $POSTGRES_PORT" >> config/db.yml
+port: $POSTGRES_PORT" > config/db.yml
+echo "DB_SCHEMA='test'" > .env

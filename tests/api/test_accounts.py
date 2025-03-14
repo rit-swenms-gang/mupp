@@ -7,8 +7,7 @@ endpoint = '/accounts'
 
 class AccountEnpointTest(TestCase):
   def setUp(self):
-    # TODO: use test schema to limit interactions between dev and prod
-    self.db = Database('public')
+    self.db = Database('test')
     self.db.exec_sql_file('config/demo_db_setup.sql')
     self.db.exec_commit(
       """
@@ -16,6 +15,9 @@ class AccountEnpointTest(TestCase):
       VALUES (%s, %s, %s), (%s, %s, %s);
       """, (('test', 'test@fake.email.com', 'dummy', 'dummy', 'dummy@fake.email.com', 'password'))
     )
+
+  def tearDown(self):
+    self.db.cleanup(True)
 
   def test_get_returns_accounts(self):
     """

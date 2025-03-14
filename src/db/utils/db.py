@@ -75,15 +75,17 @@ class Database():
                 'column_name', column_name, 
                 'type', data_type, 
                 'default', column_default, 
-                'nullable', is_nullable != 'NO'
+                'nullable', is_nullable != 'NO',
+                'schema', table_schema
               ))
             FROM information_schema.columns
             WHERE table_name = c1.table_name
+            AND table_schema = %s
             )
           )
         FROM information_schema.columns c1
         WHERE table_schema = %s;
-      """, (self._schema,)
+      """, (self._schema, self._schema)
       )
       tables = c.fetchone()[0]
       if tables is not None:
