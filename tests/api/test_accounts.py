@@ -35,7 +35,7 @@ class AccountEnpointTest(TestCase):
     """
     excepted_user_count = 3
     dummy_user = { 'username': 'new_user', 'email': 'new_user@fake.email.com','password': 'test'}
-    test_post(self, base_url + endpoint, json=dummy_user)
+    test_post(self, base_url + endpoint, json=dummy_user, expected_status=201)
     res_accounts = test_get(self, base_url + endpoint)
     self.assertEqual(
       len(res_accounts),

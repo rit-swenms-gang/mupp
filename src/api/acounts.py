@@ -15,5 +15,6 @@ class Accounts(Resource):
     args = parser.parse_args()
     try:
       Accounts.db.tables['accounts'].insert({ 'username': args['username'], 'email': args['email'], 'password': args['password']})
+      return '', 201
     except UniqueViolation as uv:
       return 'email already in use', 409
