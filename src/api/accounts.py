@@ -8,7 +8,7 @@ class Accounts(Resource):
     return Accounts.db.tables['accounts'].select('*')
   
   def post(self):
-    parser = reqparse.RequestParser()
+    parser = reqparse.RequestParser(bundle_errors=True)
     parser.add_argument('username', type=str, help="'username' must be a string", required=False)
     parser.add_argument('email', type=str, help="'email' is a required property", required=True)
     parser.add_argument('password', type=str, help="'password' is a required property", required=True)

@@ -45,8 +45,7 @@ class AccountEnpointTest(TestCase):
 
   def test_post_does_not_add_duplicate_email_to_database(self):
     """
-    POST requests with duplicate emails to the /accounts endpoint return 409
-    and do not add user to the database
+    POST requests with duplicate emails to the /accounts endpoint return 409 and do not add user to the database
     """
     excepted_user_count = 2
     dup_email = self.db.exec_commit("SELECT email FROM accounts LIMIT 1;")[0]
@@ -59,3 +58,22 @@ class AccountEnpointTest(TestCase):
       excepted_user_count,
       f"Expected {excepted_user_count} accounts in database"
     )
+
+  def test_post_responds_with_missing_attributes(self):
+    """
+    POST requests with missing email or password receive a response with bundled errors
+    """
+    dummy_user = { 'username': 'new_user' }
+    res_post = test_post(self, base_url + endpoint, json=dummy_user, expected_status=400)
+    msg = res_post['message']
+    self.assertEqual(
+      len(msg),
+      2,
+      'Expected 2 bundled errors in message'
+    )
+    missing_attrs = ('email', 'password')
+    for attr in missing_attrs:
+      err = msg[attr]
+      self.assertEqual(err, f"'{attr}' is a required property", f"Expected {attr}")
+
+    
