@@ -4,7 +4,7 @@ class Table():
   def __init__(
     self, name: str, columns: list, 
     # Typing this accurately results in circular import
-    database: 'Database' # type: ignore
+    database #: 'Database'  type: ignore
   ):
     self._name = name
     self._columns = columns

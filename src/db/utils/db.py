@@ -55,8 +55,10 @@ class Database():
     with self._conn.cursor() as c:
       c.execute('CREATE SCHEMA IF NOT EXISTS %s;' 
                 % self._schema)
-      c.execute('SET search_path TO {},public;'
+      c.execute('SET search_path TO {};'
                 .format(self._schema))
+      # c.execute('SET search_path TO {},public;'
+      #           .format(self._schema))
     self._conn.commit()
     self.fetch_tables()
 
@@ -73,15 +75,17 @@ class Database():
                 'column_name', column_name, 
                 'type', data_type, 
                 'default', column_default, 
-                'nullable', is_nullable != 'NO'
+                'nullable', is_nullable != 'NO',
+                'schema', table_schema
               ))
             FROM information_schema.columns
             WHERE table_name = c1.table_name
+            AND table_schema = %s
             )
           )
         FROM information_schema.columns c1
         WHERE table_schema = %s;
-      """, (self._schema,)
+      """, (self._schema, self._schema)
       )
       tables = c.fetchone()[0]
       if tables is not None:
@@ -91,7 +95,7 @@ class Database():
     self._conn.rollback()
 
   @property
-  def tables(self):
+  def tables(self) -> Table | None:
     return self._tables
 
   def close(self):
@@ -104,7 +108,7 @@ class Database():
     """Read a SQL file into the database"""
     # start from root dir, credit swen610_db_utils.py
     abs_path = path.join(path.dirname(__file__), 
-                         f'../../{file}') 
+                         f'../../../{file}') 
     # TODO: should closed connects raise exception
     # or just work automatically?
     if self._conn.closed != 0: self.open()

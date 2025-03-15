@@ -1,4 +1,3 @@
-createdb -h localhost -U postgres mupp
 psql -d mupp -U postgres -f config/demo_db_setup.sql
 echo "database: mupp
 host: localhost
