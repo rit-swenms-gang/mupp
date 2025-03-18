@@ -4,3 +4,4 @@ host: localhost
 user: postgres
 password: does_not_matter
 port: 5432" >> config/db.yml
+echo "DB_SCHEMA='test'" > .env
