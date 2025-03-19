@@ -1,6 +1,7 @@
 from unittest import TestCase
 from src.db.utils.db import Database
 from tests.api.test_req_utils import test_get, test_post, test_put, test_delete
+import hashlib, secrets
 
 base_url = 'http://localhost:5001'
 endpoint = '/accounts'
@@ -9,11 +10,16 @@ class AccountsResourceTest(TestCase):
   def setUp(self):
     self.db = Database('test')
     self.db.exec_sql_file('config/demo_db_setup.sql')
+    salt1 = secrets.token_hex(16)
+    salt2 = secrets.token_hex(16)
+    pw1 = hashlib.sha512((salt1 + 'dummy').encode()).hexdigest()
+    pw2 = hashlib.sha512((salt2 + 'password').encode()).hexdigest()
+
     self.db.exec_commit(
-      """
-      INSERT INTO accounts (username, email, password)
-      VALUES (%s, %s, %s), (%s, %s, %s);
-      """, (('test', 'test@fake.email.com', 'dummy', None, 'dummy@fake.email.com', 'password'))
+        """
+        INSERT INTO accounts (username, email, password, salt)
+        VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
+        """, ('test', 'test@fake.email.com', pw1, salt1, None, 'dummy@fake.email.com', pw2, salt2)
     )
 
   def tearDown(self):
@@ -66,16 +72,21 @@ class AccountsResourceTest(TestCase):
     """
     POST requests with duplicate emails to the /accounts endpoint return 409 and do not add user to the database
     """
-    excepted_user_count = 2
+    expected_user_count = 2
     dup_email = self.db.exec_commit("SELECT email FROM accounts LIMIT 1;")[0]
-    dummy_user = { 'username': 'new_user', 'email': dup_email,'password': 'test'}
+    dummy_user = {
+      'username': 'new_user',
+      'email': dup_email,
+      'password': 'test'
+    }
+
     res_post = test_post(self, base_url + endpoint, json=dummy_user, expected_status=409)
     self.assertEqual({ 'message': 'email already in use' }, res_post, 'Expected error message in JSON format')
     res_accounts = test_get(self, base_url + endpoint)
     self.assertEqual(
-      len(res_accounts),
-      excepted_user_count,
-      f"Expected {excepted_user_count} accounts in database"
+        len(res_accounts),
+        expected_user_count,
+        f"Expected {expected_user_count} accounts in database"
     )
 
   def test_post_responds_with_missing_attributes(self):
@@ -111,11 +122,16 @@ class AccountResourceTest(TestCase):
   def setUp(self):
     self.db = Database('test')
     self.db.exec_sql_file('config/demo_db_setup.sql')
+    salt1 = secrets.token_hex(16)
+    salt2 = secrets.token_hex(16)
+    pw1 = hashlib.sha512((salt1 + 'dummy').encode()).hexdigest()
+    pw2 = hashlib.sha512((salt2 + 'password').encode()).hexdigest()
+
     self.db.exec_commit(
-      """
-      INSERT INTO accounts (username, email, password)
-      VALUES (%s, %s, %s), (%s, %s, %s);
-      """, (('test', 'test@fake.email.com', 'dummy', None, 'dummy@fake.email.com', 'password'))
+        """
+        INSERT INTO accounts (username, email, password, salt)
+        VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
+        """, ('test', 'test@fake.email.com', pw1, salt1, None, 'dummy@fake.email.com', pw2, salt2)
     )
 
   def tearDown(self):
@@ -175,7 +191,8 @@ class AccountResourceTest(TestCase):
     self.assertEqual(account_id, updated_db[0], 'Expected updated id to match update')
     self.assertEqual(update['username'], updated_db[1], 'Expected updated username to match update')
     self.assertEqual(update['email'], updated_db[2], 'Expected updated email to match update')
-    self.assertEqual(update['password'], updated_db[3], 'Expected updated id to match update')
+    self.assertNotEqual(update['password'], updated_db[3], 'Expected stored password to be hashed')
+    self.assertEqual(len(updated_db[3]), 128, 'Expected SHA-512 hash to be 128 characters long')
 
   def test_update_cannot_include_duplicate_email(self):
     """

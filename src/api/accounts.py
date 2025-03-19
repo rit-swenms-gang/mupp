@@ -2,6 +2,8 @@ from os import environ
 from flask_restful import Resource, reqparse
 from db.utils.db import Database
 from psycopg2.errors import UniqueViolation
+import hashlib
+import secrets
 
 class Accounts(Resource):
   def get(self):
@@ -15,8 +17,17 @@ class Accounts(Resource):
     parser.add_argument('email', type=str, help="'email' is a required property", required=True)
     parser.add_argument('password', type=str, help="'password' is a required property", required=True)
     args = parser.parse_args()
+
+    salt = secrets.token_hex(16)
+    hashed_password = hashlib.sha512((salt + args['password']).encode()).hexdigest()
+
     try:
-      db.tables['accounts'].insert({ 'username': args['username'], 'email': args['email'], 'password': args['password']})
+      db.tables['accounts'].insert({
+        'username': args['username'],
+        'email': args['email'],
+        'password': hashed_password,
+        'salt' : salt
+      })
       return '', 201
     except UniqueViolation as uv:
       return { 'message': 'email already in use' }, 409
@@ -39,11 +50,15 @@ class Account(Resource):
     parser.add_argument('email', type=str, help="'email' is a required property", required=True)
     parser.add_argument('password', type=str, help="'password' is a required property", required=True)
     args = parser.parse_args()
+
+    salt = secrets.token_hex(16)
+    hashed_password = hashlib.sha512((salt + args['password']).encode()).hexdigest()
+
     try:
       res = db.tables['accounts'].update({
         'username': args['username'], 
         'email': args['email'], 
-        'password': args['password']
+        'password': hashed_password
       }, { 'id': account_id }, returning=['id'])
       if len(res) == 1: return '', 200
       return { 'message' : 'No account found' }, 404
