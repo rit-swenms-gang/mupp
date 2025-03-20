@@ -7,6 +7,10 @@ from db.utils.db import Database
 
 from api.accounts import Accounts
 
+try:
+  environ.pop('DB_SCHEMA')
+except Exception as e:
+  print('No environment var DB_SCHEMA. Continuing')
 load_dotenv()
 
 class Root(Resource):
