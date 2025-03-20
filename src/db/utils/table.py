@@ -1,5 +1,12 @@
 from datetime import date, datetime
 
+def json_prep(value):
+    # TODO: verify types form col['type']
+    col_type = type(value)
+    if col_type is date or col_type is datetime:
+      return value.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    return value
+
 class Table():
   def __init__(
     self, name: str, columns: list, 
@@ -8,28 +15,32 @@ class Table():
   ):
     self._name = name
     self._columns = columns
+    # self._column_types = {}
+    # for col in columns:
+    #   self._column_types[col['column_name']] = col['type']
     self._database = database
 
-  def parse_obj(self, entity: tuple):
+  def parse_obj(self, entity: tuple, filtered_fields: list):
     """
       Parse database entity tuple into a JSON serializable object
     """
     obj = {}
-    for col in self._columns:
-      obj[col['column_name']] = entity[(col['ordinal_position'] - 1)]
-      # TODO: verify types form col['type']
-      col_type = type(obj[col['column_name']])
-      if col_type is date or col_type is datetime:
-        obj[col['column_name']] = obj[col['column_name']].strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    if len(filtered_fields) == 0:
+      for col in self._columns:
+        obj[col['column_name']] = json_prep(entity[(col['ordinal_position'] - 1)])
+    else:
+      for i in range(len(filtered_fields)):
+        obj[filtered_fields[i]] = json_prep(entity[i])
+
     return obj
   
-  def parse_array_of_ojbs(self, entities: list):
+  def parse_array_of_ojbs(self, entities: list, filtered_fields: list):
     """
       Parse a list of database entity tuples
     """
     arr = []
     for entity in entities:
-      arr.append(self.parse_obj(entity))
+      arr.append(self.parse_obj(entity, filtered_fields))
     return arr
 
   def select(self, fields:list=[], where:dict={}, number:int=None):
@@ -62,8 +73,8 @@ class Table():
     res = self._database.select(query, values, number)
     if res is None: return None
     return (
-      self.parse_obj(res) if type(res) is tuple 
-        else self.parse_array_of_ojbs(res)
+      self.parse_obj(res, filtered_fields) if type(res) is tuple 
+        else self.parse_array_of_ojbs(res, filtered_fields)
     )
   
   def insert(self, fields:dict={}, returning:list=''):
