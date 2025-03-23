@@ -37,11 +37,23 @@ class TableUtilsTest(TestCase):
     self.assertIsNotNone(res, 'Expected response from database')
     self.assertEqual(2, len(res), 'Expected array of 2 entities from database')
 
+  def test_select_turns_in_object_format_with_all_keys(self):
+    res = self.table.select()
+    self.assertIsInstance(res[0], dict, 'Expected a dictionary object to be returned')
+    for column in self.table._columns:
+      name = column['column_name']
+      self.assertIsNotNone(res[0][name], 'Expected object to have have all columns by default, missing {}'.format(name))
+
   def test_select_retrieves_entity_by_WHERE(self):
     res1 = self.table.select(where={ 'id': 1 })
     self.assertEqual({ 'id': 1, 'test_field': 'dummy' }, res1[0], 'Expected to retrieve object by id')
     res2 = self.table.select(where={ 'test_field': 'another dummy' })
     self.assertEqual({ 'id': 2, 'test_field': 'another dummy' }, res2[0], 'Expected to retrieve object by test_field')
+
+  def test_select_LIMIT_one_returns_object(self):
+    limit = 1
+    res = self.table.select(number=limit)
+    self.assertEqual(dict, type(res), f'Expected object to be returned for single object')
 
   def test_insert_adds_entity(self):
     init_cout = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
