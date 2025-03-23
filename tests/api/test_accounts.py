@@ -13,7 +13,7 @@ class AccountEnpointTest(TestCase):
       """
       INSERT INTO accounts (username, email, password)
       VALUES (%s, %s, %s), (%s, %s, %s);
-      """, (('test', 'test@fake.email.com', 'dummy', 'dummy', 'dummy@fake.email.com', 'password'))
+      """, (('test', 'test@fake.email.com', 'dummy', None, 'dummy@fake.email.com', 'password'))
     )
 
   def tearDown(self):
@@ -30,6 +30,19 @@ class AccountEnpointTest(TestCase):
       excepted_user_count,
       f"Expected {excepted_user_count} accounts in database"
     )
+
+  def test_get_accounts_return_username_and_email(self):
+    """
+    GET requests to the /accounts endpoint returns list of usernames and emails
+    Usernames may be None.
+    """
+    valid_keys = {'username', 'email'}
+    res_accounts = test_get(self, base_url + endpoint)
+    for account in res_accounts:
+      self.assertIsNotNone(account['email'], f'Account missing required attribute \'email\': {account}')
+      for key in account:
+        if key in valid_keys: continue
+        self.fail(f'Account with unexpected key \'{key}\', only {', '.join(valid_keys)} allowed: {account}')
 
   def test_post_adds_account_to_database(self):
     """
