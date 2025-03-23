@@ -80,12 +80,31 @@ class TableUtilsTest(TestCase):
   def test_update_all_entities(self):
     original = self.db.exec_commit("SELECT * FROM {} ORDER BY id;".format(self.table_name))
     field_update = 'I was updated'
+    self.table.update({ 'test_field': field_update })
+    update = self.db.exec_commit("SELECT * FROM {} ORDER BY id;".format(self.table_name))
+    self.assertEqual(len(original), len(update), 'Expected update to return same number of entries')
+    self.assertNotEqual(update[0][0], update[1][0], 'Expected different entities to have different ids')
+    self.assertEqual(update[0][1], update[1][1], 'Expected different entities to have same test_field')
+    for i in range(len(update)):
+      self.assertEqual(original[i][0], update[i][0], 'Expected original and update to have same id')
+      self.assertNotEqual(original[i][1], update[i][1], 'Expected original and update to have different test fields')
+
+  def test_update_all_entities_and_return_as_objects(self):
+    original = self.db.exec_commit("SELECT * FROM {} ORDER BY id;".format(self.table_name))
+    field_update = 'I was updated'
     res = self.table.update({ 'test_field': field_update }, returning=['id', 'test_field'])
-    res.sort(key=lambda t: t[0])
+    res.sort(key=lambda t: t['id'])
     self.assertEqual(len(original), len(res), 'Expected update to return same number of entries')
-    self.assertNotEqual(res[0][0], res[1][0], 'Expected different entities to have different ids')
-    self.assertEqual(res[0][1], res[1][1], 'Expected different entities to have same test fields')
+    self.assertNotEqual(res[0]['id'], res[1]['id'], 'Expected different entities to have different ids')
+    self.assertEqual(res[0]['test_field'], res[1]['test_field'], 'Expected different entities to have same test_field')
     for i in range(len(res)):
-      self.assertEqual(original[i][0], res[i][0], 'Expected original and update to have same id')
-      self.assertNotEqual(original[i][1], res[i][1], 'Expected original and update to have different test fields')
+      self.assertEqual(original[i][0], res[i]['id'], 'Expected original and update to have same id')
+      self.assertNotEqual(original[i][1], res[i]['test_field'], 'Expected original and update to have different test fields')
   
+  def test_update_with_WHERE_and_RETURNING(self):
+    id = 1
+    original = self.db.exec_commit("SELECT * FROM {} WHERE id = %s;".format(self.table_name), [id])
+    field_update = 'If I can only go foward, there is nowhere to turn'
+    update = self.table.update({ 'test_field': field_update }, where={'id': id}, returning=['id', 'test_field'])
+    self.assertEqual(original[0], update['id'], 'Expected original and update to have same id')
+    self.assertNotEqual(original[1], update['test_field'], 'Expected original and update to have different test fields')
