@@ -122,4 +122,6 @@ class Table():
       VALUES ({', '.join(value_holder)})
       {generate_return_statement(filtered_returning)};
     """
-    return self._database.exec_commit(query, values)
+    res = self._database.exec_commit(query, values)
+    if res is None: return None
+    return self.parse_obj(res, filtered_returning)
