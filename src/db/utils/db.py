@@ -95,7 +95,7 @@ class Database():
     self._conn.rollback()
 
   @property
-  def tables(self) -> dict | None:
+  def tables(self) -> dict[str, Table] | None:
     return self._tables
 
   def close(self):
