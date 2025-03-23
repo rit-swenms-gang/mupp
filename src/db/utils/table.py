@@ -7,6 +7,17 @@ def json_prep(value):
       return value.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     return value
 
+def generate_where_clause(filtered_where:list) -> str:
+  """
+    Return a Postgres WHERE clause, 
+    or empty string if no fields given.
+    TODO: Should this live on db?
+  """
+  return (
+    'WHERE ' + ' AND '.join(filtered_where) 
+    if len(filtered_where) > 0
+    else '')
+
 def generate_return_statement(filtered_returning:list) -> str:
   """
     Return a Postgres RETURNING statement, 
@@ -29,6 +40,9 @@ class Table():
     # for col in columns:
     #   self._column_types[col['column_name']] = col['type']
     self._database = database
+
+  def __repr__(self):
+    return self._name
 
   def parse_obj(self, entity: tuple, filtered_fields: list):
     """
@@ -75,10 +89,7 @@ class Table():
         else ', '.join(filtered_fields)
       }
       FROM {self._name}
-      {
-        '' if len(filtered_where) == 0
-        else 'WHERE ' + ' AND '.join(filtered_where)
-       };
+      {generate_where_clause(filtered_where)};
     """
     res = self._database.select(query, values, number)
     if res is None: return None
@@ -90,6 +101,7 @@ class Table():
   def insert(self, fields:dict={}, returning:list=[]):
     """
       Insert an object by converting into an entity tuple.
+      Optionally return updated fields if specified in list.
     """
     filtered_fields = []
     value_holder = []
@@ -101,13 +113,13 @@ class Table():
         filtered_fields.append(column['column_name'])
         value_holder.append('%s')
         values.append(fields[column['column_name']])
-      if type(returning) is list and column['column_name'] in returning:
+      if column['column_name'] in returning:
         filtered_returning.append(column['column_name'])
 
     query = f"""
       INSERT INTO {self._name}
       ({', '.join(filtered_fields)})
       VALUES ({', '.join(value_holder)})
-      {generate_return_statement(filtered_returning)}
+      {generate_return_statement(filtered_returning)};
     """
     return self._database.exec_commit(query, values)
