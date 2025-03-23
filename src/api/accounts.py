@@ -6,7 +6,7 @@ from psycopg2.errors import UniqueViolation
 class Accounts(Resource):
   def get(self):
     db = Database(environ.get('DB_SCHEMA', 'public'))
-    return db.tables['accounts'].select()
+    return db.tables['accounts'].select(['username', 'email'])
   
   def post(self):
     db = Database(environ.get('DB_SCHEMA', 'public'))
