@@ -7,6 +7,16 @@ def json_prep(value):
       return value.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     return value
 
+def generate_return_statement(filtered_returning:list) -> str:
+  """
+    Return a Postgres RETURNING statement, 
+    or empty string if no fields given.
+    TODO: Should this live on db?
+  """
+  return ('RETURNING ' + ', '.join(filtered_returning) 
+        if len(filtered_returning) > 0
+        else '')
+
 class Table():
   def __init__(
     self, name: str, columns: list, 
@@ -43,7 +53,7 @@ class Table():
       arr.append(self.parse_obj(entity, filtered_fields))
     return arr
 
-  def select(self, fields:list=[], where:dict={}, number:int=None):
+  def select(self, fields:list=[], where:dict={}, number:int|None=None):
     """
       Select entities from the current table and return them as JSON objects.
     """
@@ -77,7 +87,7 @@ class Table():
         else self.parse_array_of_ojbs(res, filtered_fields)
     )
   
-  def insert(self, fields:dict={}, returning:list=''):
+  def insert(self, fields:dict={}, returning:list=[]):
     """
       Insert an object by converting into an entity tuple.
     """
@@ -89,7 +99,7 @@ class Table():
     for column in self._columns:
       if column['column_name'] in fields:
         filtered_fields.append(column['column_name'])
-        value_holder.append('%s');
+        value_holder.append('%s')
         values.append(fields[column['column_name']])
       if type(returning) is list and column['column_name'] in returning:
         filtered_returning.append(column['column_name'])
@@ -98,10 +108,6 @@ class Table():
       INSERT INTO {self._name}
       ({', '.join(filtered_fields)})
       VALUES ({', '.join(value_holder)})
-      {
-        'RETURNING ' + 
-        ', '.join(filtered_returning) if type(returning) is list
-        else returning
-      };
+      {generate_return_statement(filtered_returning)}
     """
     return self._database.exec_commit(query, values)

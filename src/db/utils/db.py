@@ -95,7 +95,7 @@ class Database():
     self._conn.rollback()
 
   @property
-  def tables(self) -> Table | None:
+  def tables(self) -> dict | None:
     return self._tables
 
   def close(self):
@@ -117,7 +117,7 @@ class Database():
         cursor.execute(file.read())
     self._conn.commit()
 
-  def select(self, query:str, args={}, number: int=None):
+  def select(self, query:str, args:dict={}, number:int|None=None):
     """
     Retrieve results of query from database. 
     Does *not* commit.
@@ -137,7 +137,7 @@ class Database():
     self._conn.rollback()
     return result
   
-  def exec_commit(self, query: str, args={}):
+  def exec_commit(self, query: str, args:dict={}):
     """
     Execute a query, commit to the databse 
     and return the result. On exceptions,
