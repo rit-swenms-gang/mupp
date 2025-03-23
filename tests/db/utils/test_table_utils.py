@@ -56,15 +56,24 @@ class TableUtilsTest(TestCase):
     self.assertEqual(dict, type(res), f'Expected object to be returned for single object')
 
   def test_insert_adds_entity(self):
-    init_cout = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
+    init_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
     self.table.insert({ 'test_field': 'inserted' })
     updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
-    self.assertEqual(init_cout + 1, updated_count, 'Expected count to increase by 1')
+    self.assertEqual(init_count + 1, updated_count, 'Expected count to increase by 1')
     inserted = self.db.exec_commit("SELECT * FROM {} WHERE test_field = %s;".format(self.table_name), ['inserted'])
     self.assertEqual((updated_count, 'inserted'), inserted, 'Expected new entity to be found')
 
-  def test_insert_adds_entity_and_returns(self):
+  def test_insert_adds_entity_and_returns_nothing(self):
+    init_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
+    res = self.table.insert({ 'test_field': 'inserted' })
+    updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
+    self.assertEqual(init_count + 1, updated_count, 'Expected count to increase by 1')
+    self.assertIsNone(res, 'Expected no return with omitted returning parameter')
+
+  def test_insert_adds_entity_and_returns_as_object(self):
+    init_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
     res = self.table.insert({ 'test_field': 'inserted' }, ['id', 'test_field'])
     updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
-    self.assertEqual((updated_count, 'inserted'), res, 'Expected new entity to returned in method call')
+    self.assertEqual(init_count + 1, updated_count, 'Expected count to increase by 1')
+    self.assertEqual({ 'id': updated_count, 'test_field': 'inserted' }, res, 'Expected new entity to returned in method call')
   
