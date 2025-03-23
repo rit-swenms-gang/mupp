@@ -125,3 +125,31 @@ class Table():
     res = self._database.exec_commit(query, values)
     if res is None: return None
     return self.parse_obj(res, filtered_returning)
+
+  def update(self, fields:dict={}, where:dict={}, returning:list=[]):
+    """
+      Update table field value(s) according to WHERE mapping (default all entities).
+      Optionally return updated fields if specified in list.
+    """
+    filtered_fields = []
+    filtered_where = []
+    filtered_returning = []
+    values = []
+
+    for column in self._columns:
+      if column['column_name'] in fields:
+        filtered_fields.append(column['column_name'] + '=%s')
+        values.append(fields[column['column_name']])
+      if column['column_name'] in where:
+        filtered_where.append(column['column_name'] + '=%s')
+        values.append(where[column['column_name']])
+      if column['column_name'] in returning:
+        filtered_returning.append(column['column_name'])
+
+    query = f"""
+      UPDATE {self._name}
+      SET {', '.join(filtered_fields)}
+      {generate_where_clause(filtered_where)}
+      {generate_return_statement(filtered_returning)};
+    """
+    return self._database.exec_commit(query, values)

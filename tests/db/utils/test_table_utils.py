@@ -76,4 +76,16 @@ class TableUtilsTest(TestCase):
     updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
     self.assertEqual(init_count + 1, updated_count, 'Expected count to increase by 1')
     self.assertEqual({ 'id': updated_count, 'test_field': 'inserted' }, res, 'Expected new entity to returned in method call')
+
+  def test_update_all_entities(self):
+    original = self.db.exec_commit("SELECT * FROM {} ORDER BY id;".format(self.table_name))
+    field_update = 'I was updated'
+    res = self.table.update({ 'test_field': field_update }, returning=['id', 'test_field'])
+    res.sort(key=lambda t: t[0])
+    self.assertEqual(len(original), len(res), 'Expected update to return same number of entries')
+    self.assertNotEqual(res[0][0], res[1][0], 'Expected different entities to have different ids')
+    self.assertEqual(res[0][1], res[1][1], 'Expected different entities to have same test fields')
+    for i in range(len(res)):
+      self.assertEqual(original[i][0], res[i][0], 'Expected original and update to have same id')
+      self.assertNotEqual(original[i][1], res[i][1], 'Expected original and update to have different test fields')
   
