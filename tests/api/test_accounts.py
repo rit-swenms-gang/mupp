@@ -42,7 +42,11 @@ class AccountEnpointTest(TestCase):
       self.assertIsNotNone(account['email'], f'Account missing required attribute \'email\': {account}')
       for key in account:
         if key in valid_keys: continue
-        self.fail(f'Account with unexpected key \'{key}\', only {', '.join(valid_keys)} allowed: {account}')
+        self.fail(
+          'Account with unexpected key \'{}\', only {} allowed: {}'.format(
+            key, ', '.join(valid_keys), account
+          )
+        )
 
   def test_post_adds_account_to_database(self):
     """
