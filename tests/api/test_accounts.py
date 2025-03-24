@@ -1,11 +1,11 @@
 from unittest import TestCase
 from src.db.utils.db import Database
-from tests.api.test_req_utils import test_get, test_post
+from tests.api.test_req_utils import test_get, test_post, test_put, test_delete
 
 base_url = 'http://localhost:5001'
 endpoint = '/accounts'
 
-class AccountEnpointTest(TestCase):
+class AccountEndpointTest(TestCase):
   def setUp(self):
     self.db = Database('test')
     self.db.exec_sql_file('config/demo_db_setup.sql')
@@ -95,4 +95,14 @@ class AccountEnpointTest(TestCase):
       err = msg[attr]
       self.assertEqual(err, f"'{attr}' is a required property", f"Expected {attr}")
 
-    
+  def test_update_not_allowed(self):
+    """
+    For now, updates not allowed at account endpoint
+    """
+    test_put(self, base_url + endpoint, expected_status=405)
+
+  def test_delete_not_allowed(self):
+    """
+    For now, deletions not allowed at account endpoint
+    """
+    test_delete(self, base_url + endpoint, expected_status=405)
