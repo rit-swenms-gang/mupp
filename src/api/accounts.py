@@ -19,12 +19,18 @@ class Accounts(Resource):
       db.tables['accounts'].insert({ 'username': args['username'], 'email': args['email'], 'password': args['password']})
       return '', 201
     except UniqueViolation as uv:
-      return 'email already in use', 409
+      return { 'message': 'email already in use' }, 409
     
 class Account(Resource):
   def get(self, account_id):
     db = Database(environ.get('DB_SCHEMA', 'public'))
-    return db.tables['accounts'].select(['username', 'email'], { 'id': account_id })
+    try:
+      accounts = db.tables['accounts'].select(['username', 'email'], { 'id': account_id })
+      if len(accounts) == 1: return accounts[0], 200
+      return { 'message' : 'No account found' }, 404 
+    except Exception as e:
+      print(e)
+      return { 'message' : 'Something went wrong' }, 500
   
   def put(self, account_id):
     db = Database(environ.get('DB_SCHEMA', 'public'))
@@ -41,4 +47,4 @@ class Account(Resource):
       }, { 'id': account_id })
       return '', 200
     except UniqueViolation as uv:
-      return 'email already in use', 409
+      return { 'message': 'email already in use' }, 409

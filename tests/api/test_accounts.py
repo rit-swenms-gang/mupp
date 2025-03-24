@@ -5,7 +5,7 @@ from tests.api.test_req_utils import test_get, test_post, test_put, test_delete
 base_url = 'http://localhost:5001'
 endpoint = '/accounts'
 
-class AccountEndpointTest(TestCase):
+class AccountsResourceTest(TestCase):
   def setUp(self):
     self.db = Database('test')
     self.db.exec_sql_file('config/demo_db_setup.sql')
@@ -70,7 +70,7 @@ class AccountEndpointTest(TestCase):
     dup_email = self.db.exec_commit("SELECT email FROM accounts LIMIT 1;")[0]
     dummy_user = { 'username': 'new_user', 'email': dup_email,'password': 'test'}
     res_post = test_post(self, base_url + endpoint, json=dummy_user, expected_status=409)
-    self.assertEqual(res_post, 'email already in use')
+    self.assertEqual({ 'message': 'email already in use' }, res_post, 'Expected error message in JSON format')
     res_accounts = test_get(self, base_url + endpoint)
     self.assertEqual(
       len(res_accounts),
@@ -106,3 +106,97 @@ class AccountEndpointTest(TestCase):
     For now, deletions not allowed at account endpoint
     """
     test_delete(self, base_url + endpoint, expected_status=405)
+
+class AccountResourceTest(TestCase):
+  def setUp(self):
+    self.db = Database('test')
+    self.db.exec_sql_file('config/demo_db_setup.sql')
+    self.db.exec_commit(
+      """
+      INSERT INTO accounts (username, email, password)
+      VALUES (%s, %s, %s), (%s, %s, %s);
+      """, (('test', 'test@fake.email.com', 'dummy', None, 'dummy@fake.email.com', 'password'))
+    )
+
+  def tearDown(self):
+    self.db.cleanup(True)
+
+  def test_get_returns_account(self):
+    """
+    GET requests to the /accounts/<id> endpoint returns an account
+    """
+    account_id = 1
+    username, email = self.db.select("SELECT username, email FROM accounts WHERE id = %s;", [account_id])[0]
+    res_account = test_get(self, base_url + endpoint + f'/{account_id}')
+    self.assertIsNotNone(res_account, 'Expected object to be returned from database')
+    self.assertEqual(username, res_account['username'], 'Expected returned object to have username of {}'.format(username))
+    self.assertEqual(email, res_account['email'], 'Expected returned object to have email of {}'.format(email))
+
+  def test_get_returns_404_on_invalid_id_endpoint(self):
+    """
+    GET requests to the /accounts/<id> endpoint that is invalid returns 404
+    """
+    count = self.db.exec_commit('SELECT COUNT(*) FROM accounts;')[0]
+    account_id = count + 1
+    res = test_get(self, base_url + endpoint + f'/{account_id}', expected_status=404)
+    self.assertEqual({ 'message': 'No account found' }, res, 'Expected error message in form of JSON')
+
+  def test_post_not_allowed(self):
+    """
+    POST requests not allowed to individual user endpoints
+    """
+    account_id = 2
+    test_post(self, base_url + endpoint + f'/{account_id}', expected_status=405)
+
+  def test_update_sends_error_message_when_missing_required_fields(self):
+    """
+    PUT requests to /accounts/<id> should be fully formed entities
+    """
+    account_id = 1
+    res = test_put(self, base_url + endpoint + f'/{account_id}', expected_status=400)
+    username, email, password = res['message']
+    self.assertIsNotNone(username, 'Expected error message for username')
+    self.assertIsNotNone(email, 'Expected error message for email')
+    self.assertIsNotNone(password, 'Expected error message for password')
+
+  def test_update_is_reflected_in_database(self):
+    """
+    PUT requests to /accounts/<id> are commited to the database
+    """
+    account_id = 1
+    original = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])[0]
+    update = {
+      'username': f'updated {original[0]}',
+      'email': 'new_email@fake.mail.com',
+      'password': f'new_{original[2]}'
+    }
+    test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=200)
+    updated_db = self.db.select('SELECT * FROM accounts WHERE id = %s', [account_id])[0]
+    self.assertEqual(account_id, updated_db[0], 'Expected updated id to match update')
+    self.assertEqual(update['username'], updated_db[1], 'Expected updated username to match update')
+    self.assertEqual(update['email'], updated_db[2], 'Expected updated email to match update')
+    self.assertEqual(update['password'], updated_db[3], 'Expected updated id to match update')
+
+  def test_update_cannot_include_duplicate_email(self):
+    """
+    PUT requests to /accounts/<id> attempting to change to a used email should fail
+    """
+    account_id = 1
+    original = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])[0]
+    taken_email = self.db.select('SELECT email FROM accounts WHERE id = %s', [account_id + 1])[0]
+    update = {
+      'username': original[0],
+      'email': taken_email[0],
+      'password': original[2]
+    }
+    res = test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=409)
+    self.assertEqual({ 'message': 'email already in use' }, res, 'Expected error message in JSON format')
+    updated_db = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])[0]
+    self.assertEqual(original, updated_db, 'Expect no change to take place')
+
+  def test_delete_not_allowed(self):
+    """
+    For now, deletions not allowed at account endpoint
+    """
+    account_id = 2
+    test_delete(self, base_url + endpoint + f'/{account_id}', expected_status=405)
