@@ -5,7 +5,7 @@ from flask_restful import Resource, Api
 from flask_cors import CORS
 from db.utils.db import Database
 
-from api.accounts import Accounts
+from api.accounts import Accounts, Account
 
 try:
   environ.pop('DB_SCHEMA')
@@ -24,6 +24,7 @@ api = Api(app)
 
 api.add_resource(Root, '/')
 api.add_resource(Accounts, '/accounts')
+api.add_resource(Account, '/accounts/<int:account_id>')
 
 if __name__ == '__main__':
   app.run(host='::', port=5001, debug=True)

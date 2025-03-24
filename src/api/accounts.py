@@ -20,3 +20,8 @@ class Accounts(Resource):
       return '', 201
     except UniqueViolation as uv:
       return 'email already in use', 409
+    
+class Account(Resource):
+  def get(self, account_id):
+    db = Database(environ.get('DB_SCHEMA', 'public'))
+    return db.tables['accounts'].select(['username', 'email'], { 'id': account_id })
