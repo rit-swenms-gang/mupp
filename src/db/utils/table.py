@@ -70,6 +70,7 @@ class Table():
   def select(self, fields:list=[], where:dict={}, number:int|None=None):
     """
       Select entities from the current table and return them as JSON objects.
+      TODO: WHERE maps assume comparison. Must expand support.
     """
     filtered_fields = []
     filtered_where = []
@@ -130,6 +131,7 @@ class Table():
     """
       Update table field value(s) according to WHERE mapping (default all entities).
       Optionally return updated fields if specified in list.
+      TODO: WHERE maps assume comparison. Must expand support.
     """
     filtered_fields = []
     filtered_where = []
@@ -152,6 +154,36 @@ class Table():
     query = f"""
       UPDATE {self._name}
       SET {', '.join(filtered_fields)}
+      {generate_where_clause(filtered_where)}
+      {generate_return_statement(filtered_returning)};
+    """
+    res = self._database.exec_commit(query, values)
+    if res is None: return None
+    return (
+      self.parse_obj(res, filtered_returning) 
+      if type(res) is tuple 
+      else self.parse_array_of_ojbs(res, filtered_returning)
+    )
+
+  def delete(self, where:dict={}, returning:list=[]):
+    """
+      Delete table row(s) according to WHERE mapping (deletes all entries when omitted).
+      Optionally return updated fields if specified in list.
+      TODO: WHERE maps assume comparison. Must expand support.
+    """
+    filtered_where = []
+    filtered_returning = []
+    values = []
+
+    for column in self._columns:
+      if column['column_name'] in where:
+        filtered_where.append(column['column_name'] + '=%s')
+        values.append(where[column['column_name']])
+      if column['column_name'] in returning:
+        filtered_returning.append(column['column_name'])
+
+    query = f"""
+      DELETE FROM {self._name}
       {generate_where_clause(filtered_where)}
       {generate_return_statement(filtered_returning)};
     """

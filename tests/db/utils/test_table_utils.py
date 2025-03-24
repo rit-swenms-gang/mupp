@@ -100,7 +100,7 @@ class TableUtilsTest(TestCase):
     for i in range(len(res)):
       self.assertEqual(original[i][0], res[i]['id'], 'Expected original and update to have same id')
       self.assertNotEqual(original[i][1], res[i]['test_field'], 'Expected original and update to have different test fields')
-  
+
   def test_update_with_WHERE_and_RETURNING(self):
     id = 1
     original = self.db.exec_commit("SELECT * FROM {} WHERE id = %s;".format(self.table_name), [id])
@@ -108,3 +108,25 @@ class TableUtilsTest(TestCase):
     update = self.table.update({ 'test_field': field_update }, where={'id': id}, returning=['id', 'test_field'])
     self.assertEqual(original[0], update['id'], 'Expected original and update to have same id')
     self.assertNotEqual(original[1], update['test_field'], 'Expected original and update to have different test fields')
+
+  def test_delete_removes_all_items(self):
+    init_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
+    self.assertGreater(init_count,0)
+    self.table.delete()
+    post_delete_count = self.db.exec_commit("SELECT COUNT(*) FROM {};".format(self.table_name))[0]
+    self.assertEqual(0, post_delete_count, 'Expected no entity to be returned from database')
+
+  def test_delete_removes_item_from_database(self):
+    id = 1
+    original = self.db.exec_commit("SELECT * FROM {} WHERE id = %s;".format(self.table_name), [id])
+    self.assertIsNotNone(original, 'Expected entity to be returned from database')
+    self.table.delete({ 'id': id })
+    post_delete_query = self.db.exec_commit("SELECT * FROM {} WHERE id = %s;".format(self.table_name), [id])
+    self.assertEqual(0, len(post_delete_query), 'Expected no entity to be returned from database')
+
+  def test_delete_with_WHERE_and_returns_as_objects(self):
+    id = 2
+    original = self.db.exec_commit("SELECT * FROM {} WHERE id = %s;".format(self.table_name), [id])
+    deleted = self.table.delete(where={'id': id}, returning=['id', 'test_field'])
+    self.assertEqual(original[0], deleted['id'], 'Expected original and deleted to have same id')
+    self.assertEqual(original[1], deleted['test_field'], 'Expected original and deleted to have same test fields')
