@@ -25,3 +25,20 @@ class Account(Resource):
   def get(self, account_id):
     db = Database(environ.get('DB_SCHEMA', 'public'))
     return db.tables['accounts'].select(['username', 'email'], { 'id': account_id })
+  
+  def put(self, account_id):
+    db = Database(environ.get('DB_SCHEMA', 'public'))
+    parser = reqparse.RequestParser(bundle_errors=True)
+    parser.add_argument('username', type=str, help="'username' must be a string", required=True)
+    parser.add_argument('email', type=str, help="'email' is a required property", required=True)
+    parser.add_argument('password', type=str, help="'password' is a required property", required=True)
+    args = parser.parse_args()
+    try:
+      db.tables['accounts'].update({
+        'username': args['username'], 
+        'email': args['email'], 
+        'password': args['password']
+      }, { 'id': account_id })
+      return '', 200
+    except UniqueViolation as uv:
+      return 'email already in use', 409
