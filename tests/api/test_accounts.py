@@ -136,8 +136,8 @@ class AccountResourceTest(TestCase):
     """
     GET requests to the /accounts/<id> endpoint that is invalid returns 404
     """
-    count = self.db.exec_commit('SELECT COUNT(*) FROM accounts;')[0]
-    account_id = count + 1
+    max_id = self.db.exec_commit('SELECT MAX(id) FROM accounts;')[0]
+    account_id = max_id + 1
     res = test_get(self, base_url + endpoint + f'/{account_id}', expected_status=404)
     self.assertEqual({ 'message': 'No account found' }, res, 'Expected error message in form of JSON')
 
@@ -194,9 +194,39 @@ class AccountResourceTest(TestCase):
     updated_db = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])[0]
     self.assertEqual(original, updated_db, 'Expect no change to take place')
 
-  def test_delete_not_allowed(self):
+  def test_update_returns_404_on_invalid_id_endpoint(self):
     """
-    For now, deletions not allowed at account endpoint
+    PUT requests to the /accounts/<id> endpoint that is invalid returns 404
+    """
+    max_id = self.db.exec_commit('SELECT MAX(id) FROM accounts;')[0]
+    account_id = max_id + 1
+    update = {
+      'username': 'dummy',
+      'email': 'dummmy@mail.com',
+      'password': 'dummy'
+    }
+    res = test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=404)
+    self.assertEqual({ 'message': 'No account found' }, res, 'Expected error message in form of JSON')
+
+  def test_delete_removes_entity_from_database(self):
+    """
+    DELETE requests remove the entity
     """
     account_id = 2
-    test_delete(self, base_url + endpoint + f'/{account_id}', expected_status=405)
+    original = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])
+    original_count = self.db.select('SELECT COUNT(*) FROM accounts;')[0][0]
+    self.assertEqual(1, len(original), 'Expected entity to be in database')
+    test_delete(self, base_url + endpoint + f'/{account_id}', expected_status=200)
+    deleted = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])
+    self.assertEqual(0, len(deleted), 'Expected Entity to no longer be in database')
+    updated_count = self.db.select('SELECT COUNT(*) FROM accounts;')[0][0]
+    self.assertEqual(original_count - 1, updated_count, 'Expected accounts count to be decrement')
+
+  def test_delete_returns_404_on_invalid_id_endpoint(self):
+    """
+    DELETE requests to the /accounts/<id> endpoint that is invalid returns 404
+    """
+    max_id = self.db.exec_commit('SELECT MAX(id) FROM accounts;')[0]
+    account_id = max_id + 1
+    res = test_delete(self, base_url + endpoint + f'/{account_id}', expected_status=404)
+    self.assertEqual({ 'message': 'No account found' }, res, 'Expected error message in form of JSON')

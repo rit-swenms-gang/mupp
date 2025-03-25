@@ -7,7 +7,7 @@ class Accounts(Resource):
   def get(self):
     db = Database(environ.get('DB_SCHEMA', 'public'))
     return db.tables['accounts'].select(['username', 'email'])
-  
+
   def post(self):
     db = Database(environ.get('DB_SCHEMA', 'public'))
     parser = reqparse.RequestParser(bundle_errors=True)
@@ -20,7 +20,7 @@ class Accounts(Resource):
       return '', 201
     except UniqueViolation as uv:
       return { 'message': 'email already in use' }, 409
-    
+
 class Account(Resource):
   def get(self, account_id):
     db = Database(environ.get('DB_SCHEMA', 'public'))
@@ -31,7 +31,7 @@ class Account(Resource):
     except Exception as e:
       print(e)
       return { 'message' : 'Something went wrong' }, 500
-  
+
   def put(self, account_id):
     db = Database(environ.get('DB_SCHEMA', 'public'))
     parser = reqparse.RequestParser(bundle_errors=True)
@@ -40,11 +40,22 @@ class Account(Resource):
     parser.add_argument('password', type=str, help="'password' is a required property", required=True)
     args = parser.parse_args()
     try:
-      db.tables['accounts'].update({
+      res = db.tables['accounts'].update({
         'username': args['username'], 
         'email': args['email'], 
         'password': args['password']
-      }, { 'id': account_id })
-      return '', 200
+      }, { 'id': account_id }, returning=['id'])
+      if len(res) == 1: return '', 200
+      return { 'message' : 'No account found' }, 404
     except UniqueViolation as uv:
       return { 'message': 'email already in use' }, 409
+
+  def delete(self, account_id):
+    db = Database(environ.get('DB_SCHEMA', 'public'))
+    try:
+      res = db.tables['accounts'].delete({ 'id': account_id }, returning=['id'])
+      if len(res) == 1: return '', 200
+      return { 'message' : 'No account found' }, 404
+    except Exception as e:
+      print(e)
+      return { 'message' : 'Something went wrong' }, 500
