@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/rit-swenms-gang/mupp/graph/badge.svg?token=ZK59KMK1BA)](https://codecov.io/gh/rit-swenms-gang/mupp)
 # mupp
 Multi-user party planner
 
