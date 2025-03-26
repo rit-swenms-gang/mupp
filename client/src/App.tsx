@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import { Col, Container, Row } from 'reactstrap';
 
 function App() {
-  const [count, setCount] = useState(0)
   const [serverText, setServerText] = useState('yet to access server');
 
   useEffect(() => {
@@ -27,22 +27,33 @@ function App() {
 
   return (
     <>
-      <h1>Welcome to MUPP: Multi-User Project Planner</h1>
+      <Container>
+        <Row className='flex align'>
+          <Col>
+            <h1>Welcome to MUPP: Multi-User Project Planner</h1>
+            <div className='card'>
+              <p>
+                Plan your next event by splitting your participants into the right groups.
+              </p>
+              <p>
+                Edit <code>src/App.tsx</code> and save to test HMR
+              </p>
+              <p>
+                Communication with port <code>5001</code> server: {serverText}
+              </p>
+            </div>
+          </Col>
+          <Col>
+            <div className='card'>
+              <p>
+                This is the placeholder for the log in form
+              </p>
+            </div>
+          </Col>
+        </Row>
+      </Container>
       
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-        <p>
-          Communication with port <code>5001</code> server: {serverText}
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      
     </>
   )
 }
