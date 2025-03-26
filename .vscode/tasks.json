@@ -4,8 +4,12 @@
     {
       "label": "Run Python Backend",
       "type": "shell",
-      "command": "python",
-      "args": ["src/server.py"],
+      // workaround for Windows python with Git Bash
+      "windows": {
+        "command": "python"
+      },
+      "command": "${command:python.interpreterPath}",
+      "args": ["${workspaceFolder}/src/server.py"],
       "isBackground": true,
       "problemMatcher": {
         "owner": "python",
