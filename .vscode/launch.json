@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "MUPP Fullstack",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/client",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "preLaunchTask": "Run Python Backend",
+      "postDebugTask": "Stop Python Backend",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "MUPP Frontend Only (No Python Server)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/client",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+    },
+    {
+      "name": "MUPP Backend Only (No Web Server)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/server.py",
+      "console": "integratedTerminal",
+      "consoleName": "MUPP Python Server"
+    }
+  ]
+}
