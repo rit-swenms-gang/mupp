@@ -11,6 +11,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     globals: true,
     coverage: {
+      // include: ['src/**', 'tests/**'],
       reporter: ['json', 'text'],
     }
   }
