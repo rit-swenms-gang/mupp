@@ -11,8 +11,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     globals: true,
     coverage: {
-      reporter: ['text', 'json', 'html'],
-      reportsDirectory: '../coverage'
+      reporter: ['json', 'text'],
     }
   }
 })
