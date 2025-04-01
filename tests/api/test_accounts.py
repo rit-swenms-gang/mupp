@@ -277,7 +277,7 @@ class AccountResourceTest(TestCase):
     result = test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=401)
     self.assertEqual({'message': 'Error: Session key is required'}, result)
 
+    """Passing wrong session key"""
     self.headers['session-key'] = "12312"
-
     result = test_put(self, base_url + endpoint + f'/{account_id}', json=update, header=self.headers, expected_status=401)
     self.assertEqual({'message': 'Error: Invalid session key'}, result)
