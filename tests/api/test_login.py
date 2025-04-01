@@ -90,10 +90,11 @@ class LoginResourceTest(TestCase):
         }
         login_res = test_post(self, base_url + '/login', json=login, expected_status=200)
         session_key = login_res['session_key']
+        headers = {
+        'session-key': session_key
+        }
 
-        res = test_get(self, base_url + '/logins', header={
-        'session_key': session_key
-        }, expected_status=200)
+        res = test_get(self, base_url + '/logins', header=headers, expected_status=200)
 
         self.assertIsInstance(res, list, 'Expected list of logins')
         self.assertGreaterEqual(len(res), 1, 'Expected at least one login session in the response')
