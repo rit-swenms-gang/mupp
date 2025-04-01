@@ -260,3 +260,24 @@ class AccountResourceTest(TestCase):
     account_id = max_id + 1
     res = test_delete(self, base_url + endpoint + f'/{account_id}', expected_status=404)
     self.assertEqual({ 'message': 'No account found' }, res, 'Expected error message in form of JSON')
+    
+  def test_puts_call_fails_without_login(self):
+    """
+    Confirms that a puts call into the accounts table will fail for an existing user
+    """
+    account_id = 1
+    original = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])[0]
+    update = {
+      'username': f'updated {original[0]}',
+      'email': 'new_email@fake.mail.com',
+      'password': f'new_{original[2]}'
+    }
+
+    """Passing no session key"""
+    result = test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=401)
+    self.assertEqual({'message': 'Error: Session key is required'}, result)
+
+    self.headers['session-key'] = "12312"
+
+    result = test_put(self, base_url + endpoint + f'/{account_id}', json=update, header=self.headers, expected_status=401)
+    self.assertEqual({'message': 'Error: Invalid session key'}, result)
