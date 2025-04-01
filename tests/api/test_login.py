@@ -27,7 +27,7 @@ class LoginResourceTest(TestCase):
     def test_login_successful(self):
         """POST to /login with valid credentials returns session key and adds to logins table"""
         credentials = {
-        'username': 'testuser',
+        'email': 'login@fake.com',
         'password': 'secure123'
         }
         res = test_post(self, base_url + '/login', json=credentials, expected_status=200)
@@ -40,11 +40,11 @@ class LoginResourceTest(TestCase):
     def test_login_fails_with_wrong_password(self):
         """POST to /login with invalid password returns 401 and does not add to logins table"""
         credentials = {
-        'username': 'testuser',
+        'email': 'login@fake.com',
         'password': 'wrongpassword'
         }
         res = test_post(self, base_url + '/login', json=credentials, expected_status=401)
-        self.assertEqual(res['message'], 'Invalid username or password')
+        self.assertEqual(res['message'], 'Invalid email or password')
 
         logins = self.db.select("SELECT * FROM logins WHERE user_id = %s;", ['1'])
         self.assertEqual(len(logins), 0, "No login entry should be created")
@@ -52,17 +52,18 @@ class LoginResourceTest(TestCase):
     def test_login_fails_with_nonexistent_user(self):
         """POST to /login with nonexistent username returns 401"""
         credentials = {
-        'username': 'doesntexist',
+        'email': 'login@fake.com',
         'password': 'doesntmatter'
         }
         res = test_post(self, base_url + '/login', json=credentials, expected_status=401)
-        self.assertEqual(res['message'], 'Invalid username or password')
+        self.assertEqual(res['message'], 'Invalid email or password')
 
     def test_logout_successful(self):
         """POST to /logout should remove session key and return success"""
 
         login = {
         'username': 'testuser',
+        'email' : 'login@fake.com',
         'password': 'secure123'
         }
         login_res = test_post(self, base_url + '/login', json=login, expected_status=200)
@@ -85,7 +86,7 @@ class LoginResourceTest(TestCase):
     def test_get_login_table_returns_data(self):
         """GET /logins returns data when session key is valid"""
         login = {
-        'username': 'testuser',
+        'email': 'login@fake.com',
         'password': 'secure123'
         }
         login_res = test_post(self, base_url + '/login', json=login, expected_status=200)

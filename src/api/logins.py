@@ -38,38 +38,27 @@ def generateSessionKey():
     """Random 64 character string in hex, secrets library"""
     return secrets.token_hex(32) 
 
-def checkpassword(stored_hash, salt, provided_password):
-    """Checks whether the provided password, when hashed with the salt, matches the stored password hash."""
-    test_hash = hashlib.sha512((salt + provided_password).encode()).hexdigest()
-    return stored_hash == test_hash
-
-"""May need to remove, redundant code"""
-def hash_password(password):
-    """Generates a salt and hashes the password with it"""
-    salt = secrets.token_hex(16)
-    hashed = hashlib.sha512((salt + password).encode()).hexdigest()
-    return salt, hashed
-
 class LoginAPI(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument("username", type=str, required=True)
+        parser.add_argument("email", type=str, required=True)
         parser.add_argument("password", type=str, required=True)
         args = parser.parse_args()
 
         db = Database(environ.get('DB_SCHEMA', 'public'))
 
-        user_result = db.tables['accounts'].select(where={"username": args['username']})
+        user_result = db.tables['accounts'].select(where={"email": args['email']})
         if not user_result:
-            return {"message": "Invalid username or password"}, 401
+            return {"message": "Invalid email or password"}, 401
 
         user = user_result[0] if isinstance(user_result, list) else user_result
         stored_password = user['password']
         salt = user['salt']
 
+        """Checking if password is correct"""
         hashed_attempt = hashlib.sha512((salt + args['password']).encode()).hexdigest()
         if stored_password != hashed_attempt:
-            return {"message": "Invalid username or password"}, 401
+            return {"message": "Invalid email or password"}, 401
 
         existing_session = db.tables['logins'].select(where={"user_id": str(user['id'])})
         if existing_session:
