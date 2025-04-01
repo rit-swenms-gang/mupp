@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import LoginSignup from '../LoginSignup/LoginSignup';
 
 function App() {

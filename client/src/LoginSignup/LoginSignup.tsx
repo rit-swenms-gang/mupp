@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap"
+import { Col, Nav, Row, TabContent, TabPane } from "reactstrap"
 import NavTab from "../NavTab/NavTab";
 
 
