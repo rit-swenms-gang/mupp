@@ -124,6 +124,11 @@ class AccountResourceTest(TestCase):
     self.db.exec_sql_file('config/demo_db_setup.sql')
     salt1 = secrets.token_hex(16)
     salt2 = secrets.token_hex(16)
+    login_user = {
+    'username': 'test',
+    'email': 'test@fake.email.com',
+    'password': 'dummy'
+    }
     pw1 = hashlib.sha512((salt1 + 'dummy').encode()).hexdigest()
     pw2 = hashlib.sha512((salt2 + 'password').encode()).hexdigest()
 
@@ -131,8 +136,16 @@ class AccountResourceTest(TestCase):
         """
         INSERT INTO accounts (username, email, password, salt)
         VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
-        """, ('test', 'test@fake.email.com', pw1, salt1, None, 'dummy@fake.email.com', pw2, salt2)
+        """, (login_user['username'], login_user['email'], pw1, salt1, None, 'dummy@fake.email.com', pw2, salt2)
     )
+
+    
+    login_res = test_post(self, base_url + '/login', json=login_user, expected_status=200)
+    session_key = login_res['session_key']
+    self.headers = {
+    'session-key': session_key
+    }
+
 
   def tearDown(self):
     self.db.cleanup(True)
@@ -169,7 +182,7 @@ class AccountResourceTest(TestCase):
     PUT requests to /accounts/<id> should be fully formed entities
     """
     account_id = 1
-    res = test_put(self, base_url + endpoint + f'/{account_id}', expected_status=400)
+    res = test_put(self, base_url + endpoint + f'/{account_id}', header=self.headers, expected_status=400)
     username, email, password = res['message']
     self.assertIsNotNone(username, 'Expected error message for username')
     self.assertIsNotNone(email, 'Expected error message for email')
@@ -186,7 +199,7 @@ class AccountResourceTest(TestCase):
       'email': 'new_email@fake.mail.com',
       'password': f'new_{original[2]}'
     }
-    test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=200)
+    test_put(self, base_url + endpoint + f'/{account_id}', json=update, header=self.headers, expected_status=200)
     updated_db = self.db.select('SELECT * FROM accounts WHERE id = %s', [account_id])[0]
     self.assertEqual(account_id, updated_db[0], 'Expected updated id to match update')
     self.assertEqual(update['username'], updated_db[1], 'Expected updated username to match update')
@@ -206,7 +219,7 @@ class AccountResourceTest(TestCase):
       'email': taken_email[0],
       'password': original[2]
     }
-    res = test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=409)
+    res = test_put(self, base_url + endpoint + f'/{account_id}', json=update, header=self.headers,expected_status=409)
     self.assertEqual({ 'message': 'email already in use' }, res, 'Expected error message in JSON format')
     updated_db = self.db.select('SELECT username, email, password FROM accounts WHERE id = %s', [account_id])[0]
     self.assertEqual(original, updated_db, 'Expect no change to take place')
@@ -222,7 +235,7 @@ class AccountResourceTest(TestCase):
       'email': 'dummmy@mail.com',
       'password': 'dummy'
     }
-    res = test_put(self, base_url + endpoint + f'/{account_id}', json=update, expected_status=404)
+    res = test_put(self, base_url + endpoint + f'/{account_id}', json=update, header=self.headers, expected_status=404)
     self.assertEqual({ 'message': 'No account found' }, res, 'Expected error message in form of JSON')
 
   def test_delete_removes_entity_from_database(self):

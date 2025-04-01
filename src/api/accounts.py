@@ -4,6 +4,7 @@ from db.utils.db import Database
 from psycopg2.errors import UniqueViolation
 import hashlib
 import secrets
+from api.logins import requireLogin
 
 class Accounts(Resource):
   def get(self):
@@ -43,6 +44,7 @@ class Account(Resource):
       print(e)
       return { 'message' : 'Something went wrong' }, 500
 
+  @requireLogin
   def put(self, account_id):
     db = Database(environ.get('DB_SCHEMA', 'public'))
     parser = reqparse.RequestParser(bundle_errors=True)

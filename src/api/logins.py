@@ -19,9 +19,6 @@ def requireLogin(func):
 
         result = db.tables['logins'].select(where={"session_key": session_key})
 
-        print("Session key from request:", session_key)
-        print("Login table contents:", db.tables['logins'].select(['user_id', 'session_key']))
-
         if not result:
             return {"message": "Error: Invalid session key"}, 401
 
@@ -46,6 +43,7 @@ def checkpassword(stored_hash, salt, provided_password):
     test_hash = hashlib.sha512((salt + provided_password).encode()).hexdigest()
     return stored_hash == test_hash
 
+"""May need to remove, redundant code"""
 def hash_password(password):
     """Generates a salt and hashes the password with it"""
     salt = secrets.token_hex(16)
