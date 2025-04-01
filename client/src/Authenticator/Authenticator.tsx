@@ -1,9 +1,11 @@
 import { useState } from "react"
-import { Col, Nav, Row, TabContent, TabPane } from "reactstrap"
+import { Nav, TabContent, TabPane } from "reactstrap"
 import NavTab from "../NavTab/NavTab";
+import LoginForm from "./LoginForm/LoginForm";
+import RegisterForm from "./RegisterForm/RegisterForm";
 
 
-export default function LoginSignup() {
+export default function Authenticator() {
   const [activeTab, setActiveTab] = useState(1);
 
   const changeTab = (tabId: number) => {
@@ -14,7 +16,7 @@ export default function LoginSignup() {
   }
 
   return <>
-  <Nav tabs>
+  <Nav justified tabs>
     <NavTab
       id={1}
       activeId={activeTab}
@@ -28,22 +30,10 @@ export default function LoginSignup() {
   </Nav>
   <TabContent activeTab={activeTab}>
     <TabPane tabId={1}>
-      <Row>
-        <Col sm="12">
-          <h4>
-            Tab 1 Contents
-          </h4>
-        </Col>
-      </Row>
+      <LoginForm />
     </TabPane>
     <TabPane tabId={2}>
-      <Row>
-        <Col sm="12">
-          <h4>
-            Tab 2 Contents
-          </h4>
-        </Col>
-      </Row>
+      <RegisterForm />
     </TabPane>
   </TabContent>
   </>

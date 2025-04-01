@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Col, Container, Row } from 'reactstrap';
-import LoginSignup from '../LoginSignup/LoginSignup';
+import Authenticator from '../Authenticator/Authenticator';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
@@ -46,10 +46,7 @@ function App() {
           </Col>
           <Col>
             <div className='card'>
-              <p>
-                This is the placeholder for the log in form
-              </p>
-              <LoginSignup />
+              <Authenticator/>
             </div>
           </Col>
         </Row>
