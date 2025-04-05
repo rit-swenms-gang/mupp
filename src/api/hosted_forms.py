@@ -20,7 +20,15 @@ class Forms(Resource):
     
     try:
       generate_form_table(db, form['id'])
-      return { 'form_endpoint': form['id'] }, 200
+      # TODO: Consider returning formatted id
+      return { 'form_endpoint': form['id'] }, 201
     except Exception as e:
       print(e)
       return { 'message': 'Something went wrong' }, 500
+    
+class Form(Resource):
+  def get(self, form_id:str):
+    db = Database(environ.get('DB_SCHEMA', 'public'))
+    if db.tables.get('f' + form_id.replace('-','')) is None:
+      return { 'message': 'Form not found' }, 404
+    return '', 200
