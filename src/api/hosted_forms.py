@@ -1,4 +1,5 @@
 from os import environ
+from flask import request
 from flask_restful import Resource, reqparse
 from psycopg2.errors import ForeignKeyViolation
 from db.utils.db import Database
@@ -32,3 +33,16 @@ class Form(Resource):
     if db.tables.get('f' + form_id.replace('-','')) is None:
       return { 'message': 'Form not found' }, 404
     return '', 200
+  
+  def post(self, form_id:str):
+    db = Database(environ.get('DB_SCHEMA', 'public'))
+    body = request.get_json()
+    table_name = 'f' + form_id.replace('-','')
+    if db.tables.get(table_name) is None:
+      return { 'message': 'Form not found' }, 404
+    try:
+      db.tables[table_name].insert(body)
+      return '', 201
+    except Exception as e:
+      print(e)
+      return { 'message': 'Unable to submit' }, 500

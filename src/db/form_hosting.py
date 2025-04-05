@@ -11,7 +11,8 @@ def generate_form_table(db: Database, uuid: str) -> None:
     # db.set_schema('forms') # Consider additional table schema
     db.exec_commit("""
       CREATE TABLE f{}(
-        id SERIAL PRIMARY KEY
+        id SERIAL PRIMARY KEY,
+        test VARCHAR
       );
     """.format(uuid.replace('-','')))
     db.fetch_tables()
