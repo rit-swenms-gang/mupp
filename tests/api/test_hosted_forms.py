@@ -1,5 +1,5 @@
 from unittest import TestCase
-from src.db.form_hosting import generate_form_table
+from src.db.form_hosting import generate_form_table, format_table_name
 from src.db.utils.db import Database
 from tests.api.test_req_utils import test_get, test_post, test_put, test_delete
 
@@ -132,12 +132,12 @@ class FormResourceTest(TestCase):
     POST requests to the /forms/<string:form_id> endpoint add a new entity to the table
     """
     param_endpoint = '/' + self.endpoints[0][0]
-    formatted_name = self.endpoints[0][0].replace('-','')
-    original_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format('f' + formatted_name))[0]
+    formatted_name = format_table_name(self.endpoints[0][0])
+    original_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format(formatted_name))[0]
     test_post(self, base_url + endpoint + param_endpoint, json={
       'test': 'dummy_data'
     }, expected_status=201)
-    updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format('f' + formatted_name))[0]
+    updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format(formatted_name))[0]
     self.assertEqual(
       original_count + 1,
       updated_count,
@@ -149,12 +149,12 @@ class FormResourceTest(TestCase):
     POST requests to the /forms/<string:form_id> endpoint does not add subbmission when missing data
     """
     param_endpoint = '/' + self.endpoints[0][0]
-    formatted_name = self.endpoints[0][0].replace('-','')
-    original_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format('f' + formatted_name))[0]
+    formatted_name = format_table_name(self.endpoints[0][0])
+    original_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format(formatted_name))[0]
     test_post(self, base_url + endpoint + param_endpoint, json={
       'wrong_field': 'dummy_data'
     }, expected_status=500)
-    updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format('f' + formatted_name))[0]
+    updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format(formatted_name))[0]
     self.assertEqual(
       original_count,
       updated_count,
@@ -166,13 +166,13 @@ class FormResourceTest(TestCase):
     POST requests to the /forms/<string:form_id> omits non-schema fields
     """
     param_endpoint = '/' + self.endpoints[0][0]
-    formatted_name = self.endpoints[0][0].replace('-','')
+    formatted_name = format_table_name(self.endpoints[0][0])
     fields = {
       'test': 'now you see me',
       'wrong_field': 'now you don\'t'
     }
     test_post(self, base_url + endpoint + param_endpoint, json=fields, expected_status=201)
-    expected_field = self.db.tables['f'+formatted_name].select(where={'test': fields['test']})[0]
+    expected_field = self.db.tables[formatted_name].select(where={'test': fields['test']})[0]
     self.assertIsNotNone(expected_field, 'Expected submission to be in table')
     self.assertAlmostEqual(fields.get('test'), expected_field.get('test'), 'Expected fields to match: {} != {}'.format(fields['test'], expected_field.get('test')))
     self.assertIsNone(expected_field.get('wrong_field'), 'Expected attribute to not be present on entity')
