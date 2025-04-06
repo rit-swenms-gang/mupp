@@ -12,17 +12,14 @@ class Forms(Resource):
     parser = reqparse.RequestParser(bundle_errors=True)
     parser.add_argument('account_id', type=int, help="Forms must have an owner 'account_id'", required=True)
     args = parser.parse_args()
-    form = None
 
     try:
       form = db.tables['hosted_forms'].insert({'account_id': args['account_id']}, ['id'])
-    except ForeignKeyViolation:
-      return { 'message': 'Account not found' }, 406
-    
-    try:
       generate_form_table(db, form['id'])
       # TODO: Consider returning formatted id
       return { 'form_endpoint': form['id'] }, 201
+    except ForeignKeyViolation:
+      return { 'message': 'Account not found' }, 406
     except Exception as e:
       print(e)
       return { 'message': 'Something went wrong' }, 500
