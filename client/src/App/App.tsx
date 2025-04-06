@@ -1,29 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useMUPP } from '../useMUPP';
 import './App.css'
 import { Col, Container, Row } from 'reactstrap';
 
 function App() {
+  const [endpoint, setEndpoint] = useState('/')
   const [serverText, setServerText] = useState('yet to access server');
-
-  useEffect(() => {
-    const ac = new AbortController()
-    setServerText('Calling server')
-
-    fetch('http://localhost:5001', {
-      signal: ac.signal
-    })
-      .then(res => {
-        if (!res.ok) return 'Failed to get response'
-        return res.json() 
-      })
-      .then(text => setServerText(JSON.stringify(text)))
-      .catch(e => {
-        console.error(e)
-        setServerText('Something broke')
-      })
-
-    return () => ac.abort()
-  }, [])
+  useMUPP(endpoint, (data: object) => {
+    setServerText(JSON.stringify(data))
+  })
 
   return (
     <>
@@ -52,7 +37,10 @@ function App() {
           </Col>
         </Row>
       </Container>
-      
+      <button onClick={e => {
+        e.preventDefault()
+        setEndpoint('/forms/000b16eb-9909-41b5-a138-2138f548fc65')
+      }}></button>
       
     </>
   )
