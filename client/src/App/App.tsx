@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Col, Container, Row } from 'reactstrap';
+import { Col, Container, Row, Collapse, Button,
+        Card, CardBody, CardTitle, CardSubtitle, CardText,
+        } from 'reactstrap';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
+  const [groups, setGroups] = useState([{}]);
+
+  const [loginFormOpen, setLoginFormOpen] = useState(false);
+  const toggleLoginForm = () => setLoginFormOpen(!loginFormOpen);
 
   useEffect(() => {
     const ac = new AbortController()
@@ -29,27 +35,61 @@ function App() {
     <>
       <Container>
         <Row className='flex align'>
+          <h1>Multi-User Project Planner</h1>
           <Col>
-            <h1>Welcome to MUPP: Multi-User Project Planner</h1>
-            <div className='card'>
-              <p>
-                Plan your next event by splitting your participants into the right groups.
-              </p>
-              <p>
-                Edit <code>src/App.tsx</code> and save to test HMR
-              </p>
-              <p>
-                Communication with port <code>5001</code> server: {serverText}
-              </p>
-            </div>
+            <Card>
+              <CardBody>
+                <p>
+                  Plan your next event by splitting your participants into the right groups.
+                </p>
+                <p>
+                  Edit <code>src/App.tsx</code> and save to test HMR
+                </p>
+                <p>
+                  Communication with port <code>5001</code> server: {serverText}
+                </p>
+              </CardBody>
+            </Card>
           </Col>
           <Col>
-            <div className='card'>
-              <p>
-                This is the placeholder for the log in form
-              </p>
-            </div>
+            <Button color="primary" onClick={toggleLoginForm}>
+              Login
+            </Button>
+            <Collapse isOpen={loginFormOpen}>
+              <Card>
+                <CardBody>
+                  This is the placeholder for the log in form
+                </CardBody>
+              </Card>
+            </Collapse>
           </Col>
+        </Row>
+        <Row>
+
+          {/* TODO: Make this into a template object */}
+          <Card>
+            <CardBody>
+              <Container>
+                <Row>
+                  <Col>
+                    <CardTitle tag="h3">
+                      The MUPPets
+                    </CardTitle>
+                    
+                    <CardSubtitle tag="h6">
+                      SWEN-732 Project Groups
+                    </CardSubtitle>
+                    <CardText>
+                      Some information about your group!
+                    </CardText>
+                  </Col>
+                  <Col>
+                    <img src="src/App/media/the_muppets.jpg" width={214} height={120}/>
+                  </Col>
+                </Row>
+              </Container>
+            </CardBody>
+          </Card>
         </Row>
       </Container>
       

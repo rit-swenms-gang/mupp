@@ -5,6 +5,12 @@
   text-align: center;
 }
 
+body {
+  background-color: aquamarine;
+  /* color: whitesmoke; */
+  font-family: 'Comic Sans';
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
