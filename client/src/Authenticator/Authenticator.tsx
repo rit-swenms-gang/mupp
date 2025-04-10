@@ -1,8 +1,7 @@
 import { useState } from "react"
 import { Nav, TabContent, TabPane } from "reactstrap"
 import NavTab from "../NavTab/NavTab";
-import LoginForm from "./LoginForm/LoginForm";
-import RegisterForm from "./RegisterForm/RegisterForm";
+import AuthForm from "./AuthForm/AuthForm";
 
 
 export default function Authenticator() {
@@ -30,10 +29,54 @@ export default function Authenticator() {
   </Nav>
   <TabContent activeTab={activeTab}>
     <TabPane tabId={1}>
-      <LoginForm />
+      {/* Sign In Form */}
+      <AuthForm 
+        heading="Welcome Back"
+        submitLabel="Sign In"
+        formFields={
+          [
+            {
+              name: "sign-in-username",
+              label: "Username"
+            },
+            {
+              name: "sign-in-password",
+              label: "Password",
+              type: 'password'
+            }
+          ]
+        }
+      />
     </TabPane>
     <TabPane tabId={2}>
-      <RegisterForm />
+      {/* Create Account Form */}
+      <AuthForm 
+        heading="Create an Account"
+        submitLabel="Create Account"
+        formFields={
+          [
+            {
+              name: "sign-up-username",
+              label: "Username"
+            },
+            {
+              name: "sign-up-email",
+              label: "Email",
+              type: 'email'
+            },
+            {
+              name: "sign-up-password",
+              label: "Password",
+              type:'password'
+            },
+            {
+              name: "sign-up-confirm-password",
+              label: "Password",
+              type:'password'
+            }
+          ]
+        }
+      />
     </TabPane>
   </TabContent>
   </>
