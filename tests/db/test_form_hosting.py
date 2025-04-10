@@ -13,7 +13,11 @@ class FormUtilsTest(TestCase):
     self.db.exec_sql_file('config/demo_db_setup.sql')
     test_post(self, 'http://localhost:5001/accounts', json=user_data, expected_status=201)
     account_id = self.db.select("SELECT id FROM accounts WHERE email = %s;", [user_data['email']])[0][0]
-    self.form_id = self.db.exec_commit('INSERT INTO hosted_forms (account_id) VALUES (%s) RETURNING id;', [account_id])[0]
+    form_data = '{ "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : null } }'
+    self.form_id = self.db.exec_commit(
+      'INSERT INTO hosted_forms (account_id, form_structure) VALUES (%s, %s) RETURNING id;', 
+      [account_id, form_data]
+    )[0]
 
   def tearDown(self):
     self.db.cleanup(True)

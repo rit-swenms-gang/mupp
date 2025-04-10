@@ -2,6 +2,7 @@ from unittest import TestCase
 from src.db.form_hosting import generate_form_table, format_table_name
 from src.db.utils.db import Database
 from tests.api.test_req_utils import test_get, test_post, test_put, test_delete
+from json import dumps
 
 base_url = 'http://localhost:5001'
 endpoint = '/forms'
@@ -18,6 +19,7 @@ class FormsResourceTest(TestCase):
         RETURNING id;
         """, ('test', 'test@fake.email.com', 'dummy', 'salt', None, 'dummy@fake.email.com', 'test', 'salt')
     )
+    self.dummy_form_data = { "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : None } }
 
   def tearDown(self):
     self.db.cleanup()
@@ -34,7 +36,8 @@ class FormsResourceTest(TestCase):
     """
     expected_table_count = len(self.db.tables) + 1
     test_post(self, base_url + endpoint, json={
-      'account_id': self.account_ids[0][0]
+      'account_id': self.account_ids[0][0],
+      'form_structure': self.dummy_form_data
     }, expected_status=201)
     self.db.fetch_tables()
     self.assertEqual(
@@ -48,7 +51,8 @@ class FormsResourceTest(TestCase):
     POST requests to the /forms endpoint to return generated table id
     """
     res = test_post(self, base_url + endpoint, json={
-      'account_id': self.account_ids[1][0]
+      'account_id': self.account_ids[1][0],
+      'form_structure': self.dummy_form_data
     }, expected_status=201)
     self.db.fetch_tables()
     self.assertIsNotNone(res.get('form_endpoint'), 'Expected to receive a generated endpoint.')
@@ -59,7 +63,8 @@ class FormsResourceTest(TestCase):
     """
     expected_table_count = len(self.db.tables)
     test_post(self, base_url + endpoint, json={
-      'account_id': 0
+      'account_id': 0,
+      'form_structure': self.dummy_form_data
     }, expected_status=406)
     self.db.fetch_tables()
     self.assertEqual(
@@ -73,7 +78,8 @@ class FormsResourceTest(TestCase):
     POST requests to the /forms endpoint returns 406 with helpful message
     """
     res = test_post(self, base_url + endpoint, json={
-      'account_id': 0
+      'account_id': 0,
+      'form_structure': self.dummy_form_data
     }, expected_status=406)
     self.db.fetch_tables()
     expected_error_message = 'Account not found'
@@ -107,25 +113,28 @@ class FormResourceTest(TestCase):
         RETURNING id;
         """, ('test', 'test@fake.email.com', 'dummy', 'salt', None, 'dummy@fake.email.com', 'test', 'salt')
     )
+    self.dummy_form_data = { "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : None } }
     self.endpoints = self.db.exec_commit("""
       INSERT INTO hosted_forms
-        (account_id)
-      VALUES (%s), (%s)
+        (account_id, form_structure)
+      VALUES (%s, %s), (%s, %s)
       RETURNING id;
-    """, [self.account_ids[0][0], self.account_ids[1][0]])
+    """, [self.account_ids[0][0], dumps(self.dummy_form_data), self.account_ids[1][0], dumps(self.dummy_form_data)])
     for ep in self.endpoints:
       generate_form_table(self.db, ep[0])
 
   def tearDown(self):
     self.db.cleanup()
 
-  def test_get_not_allowed_at_endpoint(self):
+  def test_get_returns_form_data(self):
     """
     GET requests to the /forms/<string:form_id> endpoint returns a 200 status
-    TODO: Return specific data once API is better formed
+    and returns the form_structure in a key-value pair.
     """
     param_endpoint = '/' + self.endpoints[0][0]
-    test_get(self, base_url + endpoint + param_endpoint, expected_status=200)
+    data = test_get(self, base_url + endpoint + param_endpoint, expected_status=200)
+    expected = { 'form_structure': self.dummy_form_data }
+    self.assertDictEqual(expected, data, 'Expected sent form to be retrieved')
 
   def test_post_adds_data_to_correct_table(self):
     """
