@@ -183,7 +183,7 @@ class FormResourceTest(TestCase):
     test_post(self, base_url + endpoint + param_endpoint, json=fields, expected_status=201)
     expected_field = self.db.tables[formatted_name].select(where={'test': fields['test']})[0]
     self.assertIsNotNone(expected_field, 'Expected submission to be in table')
-    self.assertAlmostEqual(fields.get('test'), expected_field.get('test'), 'Expected fields to match: {} != {}'.format(fields['test'], expected_field.get('test')))
+    self.assertEqual(fields.get('test'), expected_field.get('test'), 'Expected fields to match: {} != {}'.format(fields['test'], expected_field.get('test')))
     self.assertIsNone(expected_field.get('wrong_field'), 'Expected attribute to not be present on entity')
     
   def test_put_not_allowed_at_endpoint(self):
