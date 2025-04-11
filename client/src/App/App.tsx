@@ -3,13 +3,35 @@ import './App.css'
 import { Col, Container, Row, Collapse, Button,
         Card, CardBody, CardTitle, CardSubtitle, CardText,
         } from 'reactstrap';
+import GroupBox from './Dashboard/GroupBox';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
   const [groups, setGroups] = useState([{}]);
 
+  useEffect(() => {setGroups(
+    [
+      {
+        name: "The MUPPets",
+        category: "SWEN-732 Project Groups",
+        description: "We are the team behind the Multi-User Party Planner, a.k.a. \"M.U.P.P\"!",
+        members: ["Shahmir Khan", "Christian Ashley", "JoJo Kaler", "Andrew Bradbury", "Tyler Jaafari"]
+      }
+    ]
+  ); }, []);
+
   const [loginFormOpen, setLoginFormOpen] = useState(false);
   const toggleLoginForm = () => setLoginFormOpen(!loginFormOpen);
+
+  const groupBoxes = groups.map(group => 
+    <Row>
+      <GroupBox
+        name={group.name}
+        category={group.category}
+        description={group.description}
+        members={group.members}/>
+    </Row>
+  );
 
   useEffect(() => {
     const ac = new AbortController()
@@ -64,33 +86,7 @@ function App() {
             </Collapse>
           </Col>
         </Row>
-        <Row>
-
-          {/* TODO: Make this into a template object */}
-          <Card>
-            <CardBody>
-              <Container>
-                <Row>
-                  <Col>
-                    <CardTitle tag="h3">
-                      The MUPPets
-                    </CardTitle>
-                    
-                    <CardSubtitle tag="h6">
-                      SWEN-732 Project Groups
-                    </CardSubtitle>
-                    <CardText>
-                      Some information about your group!
-                    </CardText>
-                  </Col>
-                  <Col>
-                    <img src="src/App/media/the_muppets.jpg" width={214} height={120}/>
-                  </Col>
-                </Row>
-              </Container>
-            </CardBody>
-          </Card>
-        </Row>
+        
       </Container>
       
       
