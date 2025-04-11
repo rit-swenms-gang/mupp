@@ -14,6 +14,82 @@ export default function Authenticator() {
     setActiveTab(tabId);
   }
 
+  // TODO: validate sign in and sign up info
+  // TODO: handle sign out
+
+  const handleSignIn = async (formData?: FormData) => {
+    console.log('Handle Sign In');
+
+    const email = formData?.get('sign-in-email')?.toString();
+    const password = formData?.get('sign-in-password')?.toString();
+
+    if(!email || !password) {
+      console.error('Email or password were not found in the Form Data.');
+      return;
+    }
+
+    await login(email, password);
+  }
+
+  const login = async (email: string, password: string) => {
+    const body = {
+      email,
+      password
+    };
+
+    const response = await fetch('http://localhost:5001/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    
+    const resData = await response.json();
+
+    if(!response.ok) {
+      console.error(`Sign up responded with status ${response.status}: ${resData.message || 'Something went wrong'}`);
+      alert(resData.message || 'Something went wrong');
+      return;
+    }
+
+    if(resData.session_key) {
+      document.cookie = `session=${resData.session_key}`;
+    }
+  }
+
+  const handleSignUp = async (formData?: FormData) => {
+    console.log('Handle Sign Up');
+
+    const username = formData?.get('sign-up-username')?.toString();
+    const email = formData?.get('sign-up-email')?.toString();
+    const password = formData?.get('sign-up-password')?.toString();
+
+    if(!username || !email || !password) {
+      console.error('Username, email or password were not found in the Form Data.');
+      return;
+    }
+
+    const body = {
+      username,
+      email,
+      password
+    };
+
+    const response = await fetch('http://localhost:5001/accounts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+      
+    const resData = await response.json();
+
+    if(!response.ok) {
+      console.error(`Error on sign in: Sign up responded with status ${response.status}: ${resData.message || 'Something went wrong'}`);
+      return;
+    }
+
+    await login(email, password);
+  }
+
   return <>
   <Nav justified tabs>
     <NavTab
@@ -33,16 +109,20 @@ export default function Authenticator() {
       <AuthForm 
         heading="Welcome Back"
         submitLabel="Sign In"
+        onSubmit={handleSignIn}
         formFields={
           [
             {
-              name: "sign-in-username",
-              label: "Username"
+              name: "sign-in-email",
+              label: "Email",
+              type: 'email',
+              required: true
             },
             {
               name: "sign-in-password",
               label: "Password",
-              type: 'password'
+              type: 'password',
+              required: true
             }
           ]
         }
@@ -53,26 +133,31 @@ export default function Authenticator() {
       <AuthForm 
         heading="Create an Account"
         submitLabel="Create Account"
+        onSubmit={handleSignUp}
         formFields={
           [
             {
               name: "sign-up-username",
-              label: "Username"
+              label: "Username",
+              required: true
             },
             {
               name: "sign-up-email",
               label: "Email",
-              type: 'email'
+              type: 'email',
+              required: true
             },
             {
               name: "sign-up-password",
               label: "Password",
-              type:'password'
+              type:'password',
+              required: true
             },
             {
               name: "sign-up-confirm-password",
-              label: "Password",
-              type:'password'
+              label: "Confirm Password",
+              type:'password',
+              required: true
             }
           ]
         }

@@ -9,10 +9,12 @@ interface AuthFormProps {
   formFields?: FormField[]
 };
 
+// TODO: add validation callback for each field, determine form feedback
 interface FormField {
   name: string;
   label: string;
   type?: InputType;
+  required?: boolean;
 }
 
 export default function AuthForm({
@@ -27,7 +29,7 @@ export default function AuthForm({
 
     const data = new FormData(event.target as HTMLFormElement)
 
-    alert('Submit Auth Form');
+    console.log('Submit Auth Form');
   
     // handle data on Authenticator
     onSubmit?.(data);
@@ -44,6 +46,7 @@ export default function AuthForm({
               name={field.name}
               placeholder={field.label}
               type={field?.type}
+              required={field.required}
             />
             <Label for={field.name}>
               {field.label}
