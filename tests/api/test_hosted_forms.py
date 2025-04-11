@@ -21,6 +21,25 @@ class FormsResourceTest(TestCase):
     )
     self.dummy_form_data = { "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : None } }
 
+    self.session_headers = {
+      'session-key': 'session_key'
+    }
+
+    self.db.exec_commit(
+        """
+        INSERT INTO logins (user_id, session_key)
+        VALUES (%s, %s);
+        """, (self.account_ids[0][0], self.session_headers.get('session-key'))
+    )
+
+    """
+    CREATE TABLE logins(
+      id SERIAL,
+      user_id VARCHAR,
+      session_key VARCHAR UNIQUE NOT NULL
+    );
+    """
+
   def tearDown(self):
     self.db.cleanup()
 
@@ -38,7 +57,7 @@ class FormsResourceTest(TestCase):
     test_post(self, base_url + endpoint, json={
       'account_id': self.account_ids[0][0],
       'form_structure': self.dummy_form_data
-    }, expected_status=201)
+    }, header=self.session_headers, expected_status=201)
     self.db.fetch_tables()
     self.assertEqual(
       expected_table_count,
@@ -53,7 +72,7 @@ class FormsResourceTest(TestCase):
     res = test_post(self, base_url + endpoint, json={
       'account_id': self.account_ids[1][0],
       'form_structure': self.dummy_form_data
-    }, expected_status=201)
+    }, header=self.session_headers, expected_status=201)
     self.db.fetch_tables()
     self.assertIsNotNone(res.get('form_endpoint'), 'Expected to receive a generated endpoint.')
 
@@ -65,7 +84,7 @@ class FormsResourceTest(TestCase):
     test_post(self, base_url + endpoint, json={
       'account_id': 0,
       'form_structure': self.dummy_form_data
-    }, expected_status=406)
+    }, header=self.session_headers, expected_status=406)
     self.db.fetch_tables()
     self.assertEqual(
       expected_table_count,
@@ -80,7 +99,7 @@ class FormsResourceTest(TestCase):
     res = test_post(self, base_url + endpoint, json={
       'account_id': 0,
       'form_structure': self.dummy_form_data
-    }, expected_status=406)
+    }, header=self.session_headers, expected_status=406)
     self.db.fetch_tables()
     expected_error_message = 'Account not found'
     self.assertEqual(
