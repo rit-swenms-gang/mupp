@@ -41,7 +41,7 @@ class FormsResourceTest(TestCase):
     """
 
   def tearDown(self):
-    self.db.cleanup()
+    self.db.cleanup(True)
 
   def test_get_not_allowed_at_endpoint(self):
     """
