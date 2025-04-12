@@ -1,0 +1,5 @@
+database: mupp
+host: localhost
+user: postgres
+password: sham
+port: 5432
