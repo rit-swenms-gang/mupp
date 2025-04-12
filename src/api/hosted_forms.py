@@ -7,7 +7,6 @@ from db.form_hosting import generate_form_table, format_table_name
 from json import dumps
 from api.logins import requireLogin
 
-
 class Forms(Resource):
   @requireLogin
   def post(self):
