@@ -9,9 +9,9 @@ import secrets
 def requireLogin(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        session_key = request.headers.get('session_key')
+        session_key = request.headers.get('session-key')
 
-        if not session_key:
+        if session_key is None:
             return {"message": "Error: Session key is required"}, 401
 
         schema = environ.get('DB_SCHEMA', 'public')
