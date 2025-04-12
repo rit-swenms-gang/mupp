@@ -9,8 +9,6 @@ totalWeights = 0
 for weight in questionWeights:
     totalWeights+=weight
 
-
-
 class Leader():  #Leader class
   def __init__(self, name, email, preferenceList):
     self.name = name
@@ -22,7 +20,6 @@ class Leader():  #Leader class
     self.schedule = []
     for i in range(rounds):
         self.schedule.append([])
-        
         
     self.matches = []
     for j in range(totalWeights):
@@ -44,7 +41,6 @@ class Leader():  #Leader class
   def scheduleParticipant(self, roundNumber, participant):
     self.schedule[roundNumber].append(participant)
     self.slotsOpen -= 1
-    
     
 class Participant():  #Participant class
 
@@ -130,8 +126,6 @@ def geneEvaluator(gene,weights):
     for participant in schedule:
       totalMatchScore += leader.matchParticipant(participant,weights)
   return(totalMatchScore)
-    
-   
           
 def generateParent(leaders,participants):
   tierListOptimizedGenerator(leaders,participants)
@@ -154,7 +148,6 @@ def geneToSchedule(gene,leaders,participants):
       leader.scheduleParticipant(i,schedule[i])
       participant.scheduleRound(i,leader)
       
-          
 def geneticOptimizer(leaders, participants, weights):
   maxScore = 0
   optimalGene = []

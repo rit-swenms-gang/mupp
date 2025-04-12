@@ -1,11 +1,11 @@
 import unittest
-from MatchingAlgorithms import *
+from src.MatchingAlgorithms import *
 
 class TestMatchingSystem(unittest.TestCase):
     
     def setUp(self):
         self.leader1 = Leader("Andrew", "andrew@example.com", [2, 0, 1, 3, 2])
-        self.leader2 = Leader("Shamir", "shamir@example.com", [1, 3, 0, 2, 1])
+        self.leader2 = Leader("Shahmir", "shahmir@example.com", [1, 3, 0, 2, 1])
         self.leader3 = Leader("JoJo", "jojo@example.com", [3, 2, 3, 0, 1])
         self.leader4 = Leader("Christian", "christian@example.com", [0, 1, 2, 3, 0])
         self.leader5 = Leader("Tyler", "tyler@example.com", [2, 3, 1, 1, 3])
@@ -36,7 +36,6 @@ class TestMatchingSystem(unittest.TestCase):
 
         self.weights = [5, 2, 1, 1, 1]
         
-
     def test_match_scores_are_within_expected_range(self):
         for leader in self.leaders:
             for participant in self.participants:
