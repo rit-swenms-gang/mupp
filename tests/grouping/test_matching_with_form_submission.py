@@ -32,7 +32,7 @@ class TestMatchingWithFormSubmission(TestCase):
         self.form_structure = {
             "name": "text",
             "email": "text",
-            "answers": "json"
+            "answers": "integer[]"
         }
         form_data = {
             'account_id': self.account_id,
