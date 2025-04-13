@@ -2,6 +2,7 @@ from unittest import TestCase
 from tests.api.test_req_utils import test_post
 from src.db.utils.db import Database
 from src.db.form_hosting import generate_form_table, format_table_name
+from json import dumps
 
 class FormUtilsTest(TestCase):
   def setUp(self):
@@ -14,10 +15,11 @@ class FormUtilsTest(TestCase):
     test_post(self, 'http://localhost:5001/accounts', json=user_data, expected_status=201)
     self.db.fetch_tables()
     account_id = self.db.select("SELECT id FROM accounts WHERE email = %s;", [user_data['email']])[0][0]
-    form_data = '{ "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : null } }'
+    #form_data = '{ "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : null } }'
+    form_data = { "key1": "text", "key2": "int", "key3": "json" }
     self.form_id = self.db.exec_commit(
-      'INSERT INTO hosted_forms (account_id, form_structure) VALUES (%s, %s) RETURNING id;', 
-      [account_id, form_data]
+      'INSERT INTO hosted_forms (account_id, form_structure) VALUES (%s, %s) RETURNING id;',
+      [account_id, dumps(form_data)]
     )[0]
 
   def tearDown(self):

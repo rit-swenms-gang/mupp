@@ -67,6 +67,7 @@ class TestMatchingSystem(unittest.TestCase):
         generateMatches(self.leaders, self.participants, self.weights)
         tierListOptimizedGenerator(self.leaders, self.participants)
         for participant in self.participants:
+            print(participant.name)
             self.assertEqual(len([s for s in participant.schedule if s is not None]), rounds)
 
 if __name__ == '__main__':

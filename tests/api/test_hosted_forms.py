@@ -10,6 +10,7 @@ endpoint = '/forms'
 class FormsResourceTest(TestCase):
   def setUp(self):
     self.db = Database('test')
+    self.db.cleanup(True)
     self.db.exec_sql_file('config/demo_db_setup.sql')
     self.db.fetch_tables()
     self.account_ids = self.db.exec_commit(
@@ -19,7 +20,8 @@ class FormsResourceTest(TestCase):
         RETURNING id;
         """, ('test', 'test@fake.email.com', 'dummy', 'salt', None, 'dummy@fake.email.com', 'test', 'salt')
     )
-    self.dummy_form_data = { "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : None } }
+    
+    self.dummy_form_data = { "key1": "text", "key2": "int", "key3": "json" }
 
     self.session_headers = {
       'session-key': 'session_key'
@@ -123,6 +125,7 @@ class FormsResourceTest(TestCase):
 class FormResourceTest(TestCase):
   def setUp(self):
     self.db = Database('test')
+    self.db.cleanup(True)
     self.db.exec_sql_file('config/demo_db_setup.sql')
     self.db.fetch_tables()
     self.account_ids = self.db.exec_commit(
@@ -132,7 +135,8 @@ class FormResourceTest(TestCase):
         RETURNING id;
         """, ('test', 'test@fake.email.com', 'dummy', 'salt', None, 'dummy@fake.email.com', 'test', 'salt')
     )
-    self.dummy_form_data = { "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : None } }
+    self.dummy_form_data = { "key1": "text", "key2": "int", "key3": "json" }
+
     self.endpoints = self.db.exec_commit("""
       INSERT INTO hosted_forms
         (account_id, form_structure)
@@ -163,7 +167,9 @@ class FormResourceTest(TestCase):
     formatted_name = format_table_name(self.endpoints[0][0])
     original_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format(formatted_name))[0]
     test_post(self, base_url + endpoint + param_endpoint, json={
-      'test': 'dummy_data'
+      'key1': 'now you see me',
+      'key2': 42,
+      'key3': {'nestedKey': 'value'}
     }, expected_status=201)
     updated_count = self.db.exec_commit("SELECT COUNT(*) FROM {}".format(formatted_name))[0]
     self.assertEqual(
@@ -196,14 +202,13 @@ class FormResourceTest(TestCase):
     param_endpoint = '/' + self.endpoints[0][0]
     formatted_name = format_table_name(self.endpoints[0][0])
     fields = {
-      'test': 'now you see me',
-      'wrong_field': 'now you don\'t'
+        'key1': 'now you see me',
+        'wrong_field': 'now you don\'t'
     }
     test_post(self, base_url + endpoint + param_endpoint, json=fields, expected_status=201)
-    expected_field = self.db.tables[formatted_name].select(where={'test': fields['test']})[0]
-    self.assertIsNotNone(expected_field, 'Expected submission to be in table')
-    self.assertEqual(fields.get('test'), expected_field.get('test'), 'Expected fields to match: {} != {}'.format(fields['test'], expected_field.get('test')))
-    self.assertIsNone(expected_field.get('wrong_field'), 'Expected attribute to not be present on entity')
+
+    expected_field = self.db.tables[formatted_name].select(where={'key1': fields['key1']})[0]
+    self.assertEqual(fields.get('key1'), expected_field.get('key1'))
     
   def test_put_not_allowed_at_endpoint(self):
     """

@@ -45,8 +45,6 @@ class TestMatchingWithFormSubmission(TestCase):
         self.db.fetch_tables()        
         self.table_name = format_table_name(self.form_id)
 
-        print("TABLE NAME: " + str(self.table_name))
-
         # Seed data for Leaders
         self.leaders = [
             Leader("Tyler", "Tyler@mupp.com", [2, 0, 1, 3, 2]),

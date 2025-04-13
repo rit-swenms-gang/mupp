@@ -96,7 +96,7 @@ def tierListOptimizedGenerator(leaders, participants):
                     leader.scheduleParticipant(round, participant)
                     participant.scheduleRound(round, leader)
                     totalSlotsScheduled +=1
-      if(totalSlotsScheduled == totalSlotsAvailable):
+      if(totalSlotsScheduled <= totalSlotsAvailable):
         generationComplete = True
 
 def pSchNameConversion(participantSchedule):
