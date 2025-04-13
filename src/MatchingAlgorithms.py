@@ -34,7 +34,7 @@ class Leader():  #Leader class
 
   def clearSchedule(self):
     self.schedule = []
-    for i in range(i,rounds):
+    for i in range(rounds):
         self.schedule.append([])
     self.slotsOpen = maxGroupSize * rounds
 
