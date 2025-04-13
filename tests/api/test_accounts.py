@@ -139,7 +139,6 @@ class AccountResourceTest(TestCase):
         """, (login_user['username'], login_user['email'], pw1, salt1, None, 'dummy@fake.email.com', pw2, salt2)
     )
 
-    
     login_res = test_post(self, base_url + '/login', json=login_user, expected_status=200)
     session_key = login_res['session_key']
     self.headers = {
