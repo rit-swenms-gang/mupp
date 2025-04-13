@@ -2,7 +2,7 @@ import random
 
 rounds = 3
 maxGroupSize = 5
-numQuestions = 4
+numQuestions = 5
 questionWeights = [5, 2, 1, 1, 1]
 
 totalWeights = 0
