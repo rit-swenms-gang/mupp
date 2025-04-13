@@ -12,6 +12,7 @@ class FormUtilsTest(TestCase):
     }
     self.db.exec_sql_file('config/demo_db_setup.sql')
     test_post(self, 'http://localhost:5001/accounts', json=user_data, expected_status=201)
+    self.db.fetch_tables()
     account_id = self.db.select("SELECT id FROM accounts WHERE email = %s;", [user_data['email']])[0][0]
     form_data = '{ "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : null } }'
     self.form_id = self.db.exec_commit(
@@ -36,5 +37,6 @@ class FormUtilsTest(TestCase):
     with the correct name.
     """
     generate_form_table(self.db, self.form_id)
+    self.db.fetch_tables()
     formatted_name = 'f' + self.form_id.replace('-','')
     self.assertIsNotNone(self.db.tables[formatted_name], f'Expected form table "{formatted_name}" to be generated.')

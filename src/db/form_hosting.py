@@ -1,10 +1,45 @@
 from .utils.db import Database
+import json
 
 def format_table_name(uuid: str) -> str:
   "Prefix has with 'f' and remove hyphens from uuid for PostgreSQL"
   # TODO: Add more tests to verify name integrity
   return 'f' + uuid.replace('-','')
 
+# def generate_form_table(db: Database, form_id: str) -> None:
+#     table_name = format_table_name(form_id)
+    
+#     form_structure_row = db.select(
+#       "SELECT form_structure FROM hosted_forms WHERE id=%s", (form_id,)
+#     )
+
+#     if not form_structure_row:
+#        raise ValueError(f"Form {form_id} not found")
+    
+#     form_structure = json.loads(form_structure_row[0])
+
+#     columns = []
+#     for field, field_type in form_structure.items():
+#       # changes values passed in to postgreSQL types
+#       item_types = {
+#         'text': "TEXT",
+#         'json': "JSON",
+#         'int': "INTEGER",
+#         'float': "REAL",
+#         'bool': "BOOLEAN"
+#       }.get(field_type, "TEXT") #default to TEXT (or at least it should)
+#       columns.append(f"{field} {item_types}")
+
+#     create_query = f"""
+#       CREATE TABLE {table_name} (
+#       id SERIAL PRIMARY KEY,
+#       {', '.join(columns)}
+#       ); 
+#     """
+       
+#     db.exec_commit(create_query)
+#     db.fetch_tables()
+       
 def generate_form_table(db: Database, uuid: str) -> None:
   """
   Take a uuid representing a hosted_form id in database and add a new table for form data.
@@ -22,3 +57,5 @@ def generate_form_table(db: Database, uuid: str) -> None:
     db.fetch_tables()
   except Exception as e:
     raise e
+
+
