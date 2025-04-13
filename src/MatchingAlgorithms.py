@@ -2,7 +2,7 @@ import random
 
 rounds = 3
 maxGroupSize = 5
-numQuestions = 4
+numQuestions = 5
 questionWeights = [5, 2, 1, 1, 1]
 
 totalWeights = 0
@@ -99,7 +99,7 @@ def tierListOptimizedGenerator(leaders, participants):
                     leader.scheduleParticipant(round, participant)
                     participant.scheduleRound(round, leader)
                     totalSlotsScheduled +=1
-      if(totalSlotsScheduled <= totalSlotsAvailable):
+      if(totalSlotsScheduled >= totalSlotsAvailable):
         print("TOTAL SLOTS SCHEDULED: ", totalSlotsScheduled)
         generationComplete = True
 

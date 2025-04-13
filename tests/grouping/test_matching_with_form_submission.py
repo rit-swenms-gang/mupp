@@ -68,7 +68,7 @@ class TestMatchingWithFormSubmission(TestCase):
             self.db.tables[self.table_name].insert({
                 "name": name,
                 "email": "test@mupp.com",
-                "answers": dumps(answers)
+                "answers": answers
             })
 
         """Get Rows -> Participant objects, and then match using algorithm, test if all participants are matched"""
