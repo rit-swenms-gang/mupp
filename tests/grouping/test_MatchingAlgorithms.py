@@ -54,7 +54,7 @@ class TestMatchingSystem(unittest.TestCase):
         tierListOptimizedGenerator(self.leaders, self.participants)
         total_slots_filled = sum(p.roundsScheduled for p in self.participants)
         expected_slots = len(self.participants) * rounds
-        self.assertEqual(total_slots_filled, expected_slots)
+        self.assertEqual(total_slots_filled, expected_slots) # Sometimes asserts 59 != 60
 
     def test_leader_schedule_constraints(self):
         generateMatches(self.leaders, self.participants, self.weights)
@@ -67,7 +67,7 @@ class TestMatchingSystem(unittest.TestCase):
         generateMatches(self.leaders, self.participants, self.weights)
         tierListOptimizedGenerator(self.leaders, self.participants)
         for participant in self.participants:
-            self.assertEqual(len([s for s in participant.schedule if s is not None]), rounds)
+            self.assertEqual(len([s for s in participant.schedule if s is not None]), rounds) # Sometimes asserts 2 != 3
 
 if __name__ == '__main__':
     unittest.main()

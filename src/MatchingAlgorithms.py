@@ -82,7 +82,10 @@ def tierListOptimizedGenerator(leaders, participants):
       for leader in leaders:
         leader.clearSchedule
           
-      while((k<=totalSlotsAvailable) and (not generationComplete)):
+      while((k < totalSlotsAvailable) and (not generationComplete)):
+        """
+        TODO: FIX LOGIC HERE TO ENSURE THAT GROUPING IS ALWAYS COMPLETED, AND A MISMATCH BETWEEN totalSlotsScheduled AND totalSlotsAvailable NEVER HAPPENS
+        """
         k+=1
         for i in range(totalWeights-1, -1, -1):
           random.shuffle(leaders)
@@ -97,6 +100,7 @@ def tierListOptimizedGenerator(leaders, participants):
                     participant.scheduleRound(round, leader)
                     totalSlotsScheduled +=1
       if(totalSlotsScheduled <= totalSlotsAvailable):
+        print("TOTAL SLOTS SCHEDULED: ", totalSlotsScheduled)
         generationComplete = True
 
 def pSchNameConversion(participantSchedule):
