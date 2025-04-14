@@ -74,21 +74,18 @@ class LoginAPI(Resource):
         return {"message": "Login successful", "session_key": session_key}
 
 class LogoutAPI(Resource):
+    @requireLogin
     def post(self):
         """This will log a user out, and remove the session key from the session table"""
-        parser = reqparse.RequestParser()
-        parser.add_argument("username", type=str, required=True)
-        args = parser.parse_args()
+        session_key = request.headers.get('session-key')
 
         db = Database(environ.get('DB_SCHEMA', 'public'))
-        user_result = db.tables['accounts'].select(where={"username": args['username']})
+        user_result = db.tables['logins'].select(where={"session-key": session_key})
         if not user_result:
-            return {"message": "User not found"}, 404
-
-        user_id = user_result[0]['id'] if isinstance(user_result, list) else user_result['id']
+            return {"message": "Login session not found"}, 404
 
         """Delete the session keys from the logins table to fully log out"""
-        db.tables['logins'].delete(where={"user_id": str(user_id)})
+        db.tables['logins'].delete(where={"session-key": session_key})
         return {"message": "Logout complete"}
     
 def getUsernameByID(user_id):
