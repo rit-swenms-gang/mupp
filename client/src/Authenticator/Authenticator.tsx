@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Nav, TabContent, TabPane } from "reactstrap"
+import { Button, Nav, TabContent, TabPane } from "reactstrap"
 import NavTab from "../NavTab/NavTab";
 import AuthForm from "./AuthForm/AuthForm";
 
@@ -90,6 +90,48 @@ export default function Authenticator() {
     await login(email, password);
   }
 
+  /**
+   * Signs out a user if they have been authenticated.
+   * @returns A promise that is resolved when the user has been signed out or their request has been rejected.
+   */
+  const handleSignOut = async () => {
+    console.log('Handle sign out');
+
+    const cookies = document.cookie.split(';').reduce(
+      (acc: Record<string, string>, cookieStr: string) => {
+        const [key, value] = cookieStr.trim().split('=');
+        acc[key] = value;
+        return acc;
+      }, 
+    {});
+      
+    const sessionKey = cookies.session;
+    
+    if(!sessionKey) {
+      console.error('Log out denied. User does not have an active session.');
+      alert('Log in denied. You are not logged in.');
+      return;
+    }
+    
+    const response = await fetch('http://localhost:5001/login', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'session-key': sessionKey
+      }
+    });
+
+    const resData = await response.json();
+    if(!response.ok) {
+      console.error(`Sign out responded with status ${response.status}: ${resData.message || 'Something went wrong'}`);
+      alert(resData.message || 'Something went wrong');
+      return;
+    }
+    
+    document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+    console.log('User has been logged out.');
+  }
+
   return <>
   <Nav justified tabs>
     <NavTab
@@ -164,5 +206,6 @@ export default function Authenticator() {
       />
     </TabPane>
   </TabContent>
+  <Button onClick={handleSignOut}>Sign Out</Button>
   </>
 }
