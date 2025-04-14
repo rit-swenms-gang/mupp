@@ -15,7 +15,22 @@ export default function Authenticator() {
   }
 
   // TODO: validate sign in and sign up info
-  // TODO: handle sign out
+
+  const handleSignUp = async (formData?: FormData) => {
+    console.log('Handle Sign Up');
+
+    const username = formData?.get('sign-up-username')?.toString();
+    const email = formData?.get('sign-up-email')?.toString();
+    const password = formData?.get('sign-up-password')?.toString();
+
+    if(!username || !email || !password) {
+      console.error('Username, email or password were not found in the Form Data.');
+      return;
+    }
+
+    await makeAuthFetch('http://localhost:5001/accounts', {username, email, password}, 'Error on Sign Up');
+    await login(email, password);
+  }
 
   const handleSignIn = async (formData?: FormData) => {
     console.log('Handle Sign In');
@@ -32,62 +47,11 @@ export default function Authenticator() {
   }
 
   const login = async (email: string, password: string) => {
-    const body = {
-      email,
-      password
-    };
-
-    const response = await fetch('http://localhost:5001/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    
-    const resData = await response.json();
-
-    if(!response.ok) {
-      console.error(`Sign up responded with status ${response.status}: ${resData.message || 'Something went wrong'}`);
-      alert(resData.message || 'Something went wrong');
-      return;
-    }
+    const resData = await makeAuthFetch('http://localhost:5001/login', {email, password}, 'Error on Sign In');
 
     if(resData.session_key) {
       document.cookie = `session=${resData.session_key}`;
     }
-  }
-
-  const handleSignUp = async (formData?: FormData) => {
-    console.log('Handle Sign Up');
-
-    const username = formData?.get('sign-up-username')?.toString();
-    const email = formData?.get('sign-up-email')?.toString();
-    const password = formData?.get('sign-up-password')?.toString();
-
-    if(!username || !email || !password) {
-      console.error('Username, email or password were not found in the Form Data.');
-      return;
-    }
-
-    const body = {
-      username,
-      email,
-      password
-    };
-
-    const response = await fetch('http://localhost:5001/accounts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-      
-    const resData = await response.json();
-
-    if(!response.ok) {
-      console.error(`Error on sign in: Sign up responded with status ${response.status}: ${resData.message || 'Something went wrong'}`);
-      return;
-    }
-
-    await login(email, password);
   }
 
   /**
@@ -127,9 +91,27 @@ export default function Authenticator() {
       alert(resData.message || 'Something went wrong');
       return;
     }
-    
+
     document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;';
     console.log('User has been logged out.');
+  }
+
+  const makeAuthFetch = async (url: string, body?: Record<string, string>, errorContext?: string ) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const resData = await response.json();
+
+    if(!response.ok) {
+      console.error(`${errorContext || 'Error'}: Responded with status ${response.status}: ${resData.message || 'Something went wrong'}`);
+      alert(resData.message || 'Something went wrong');
+      return;
+    }
+
+    return resData;
   }
 
   return <>
