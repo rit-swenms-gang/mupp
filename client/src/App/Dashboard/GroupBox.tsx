@@ -1,6 +1,6 @@
 import { Container, Row, Col, Card, CardBody, CardTitle, CardSubtitle, CardText } from 'reactstrap';
 
-interface GroupBoxProps {
+export interface GroupBoxProps {
 	name: string;
 	category: string;
 	description: string;

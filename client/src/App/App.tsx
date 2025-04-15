@@ -3,7 +3,7 @@ import './App.css'
 import { Col, Container, Row, Collapse, Button,
         Card, CardBody, CardTitle, CardSubtitle, CardText,
         } from 'reactstrap';
-import GroupBox from './Dashboard/GroupBox';
+import GroupBox, { GroupBoxProps } from './Dashboard/GroupBox';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
