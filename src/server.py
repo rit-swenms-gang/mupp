@@ -6,6 +6,8 @@ from flask_cors import CORS
 from db.utils.db import Database
 
 from api.accounts import Accounts, Account
+from api.logins import LoginAPI, LogoutAPI, GetLoginTable
+from api.hosted_forms import Forms, Form
 
 try:
   environ.pop('DB_SCHEMA')
@@ -25,6 +27,11 @@ api = Api(app)
 api.add_resource(Root, '/')
 api.add_resource(Accounts, '/accounts')
 api.add_resource(Account, '/accounts/<int:account_id>')
+api.add_resource(LoginAPI, '/login')
+api.add_resource(LogoutAPI, '/logout')
+api.add_resource(GetLoginTable, '/logins') #This api call is just for testing, and making sure the wrapper function is working correctly
+api.add_resource(Forms, '/forms')
+api.add_resource(Form, '/forms/<string:form_id>')
 
 if __name__ == '__main__':
   app.run(host='::', port=5001, debug=True)
