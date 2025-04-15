@@ -147,11 +147,6 @@ def geneToSchedule(gene,leaders,participants):
   for leader, schedule in gene.items():
     for i in range(len(schedule)):
       for participant in schedule[i]:
-        print("-----------")
-        print(leader)
-        print("~~~~~~~~~~~~~")
-        print(participant)
-        print("--------------")
         leader.scheduleParticipant(i,schedule[i])
         participant.scheduleRound(i,leader)
       
