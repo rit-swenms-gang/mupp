@@ -117,6 +117,9 @@ class Table():
       if column['column_name'] in returning:
         filtered_returning.append(column['column_name'])
 
+    if not filtered_fields:
+      raise ValueError(f"No valid fields provided for insertion into table '{self._name}'. Got: {list(fields.keys())}")
+    
     query = f"""
       INSERT INTO {self._name}
       ({', '.join(filtered_fields)})

@@ -27,11 +27,11 @@ CREATE SCHEMA forms;
 
 DROP TABLE IF EXISTS hosted_forms;
 CREATE TABLE hosted_forms(
-  id UUID DEFAULT gen_random_uuid(),
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   form_structure VARCHAR NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  expires_at TIMESTAMP -- NOT NULL
+  expires_at TIMESTAMP
 );
 
 INSERT INTO mupp_setup_demo (name) VALUES ('test1'), ('test2'), ('test3');
