@@ -133,9 +133,9 @@ export const makeAuthFetch = async (
   const resData = await response.json();
 
   if (!response.ok) {
-    console.error(`${errorContext || 'Error'}: Responded with status ${response.status}: 
-      ${resData.message || 'Something went wrong'}`);
-    throw new Error(resData.message || 'Something went wrong');
+    const message = `${errorContext || 'Error'}: Responded with status ${response.status}: 
+      ${resData.message || 'Something went wrong'}`;
+    throw new Error(message);
   }
 
   return resData;
