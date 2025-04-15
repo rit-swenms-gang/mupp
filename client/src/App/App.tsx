@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Col, Container, Row } from 'reactstrap';
-import Authenticator, { handleSignOut } from '../Authenticator/Authenticator';
+import Authenticator from '../Authenticator/Authenticator';
+import { handleSignOut } from '../services/authService';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
