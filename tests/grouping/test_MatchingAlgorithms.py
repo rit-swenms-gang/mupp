@@ -70,6 +70,62 @@ class TestMatchingSystem(unittest.TestCase):
         for participant in self.participants:
             self.assertEqual(len([s for s in participant.schedule if s is not None]), rounds) 
             
+    def test_pSchNameConversion(self):
+        self.participants[0].schedule = [self.leader1, self.leader2, self.leader3]
+        result = pSchNameConversion(self.participants[0].schedule)
+        self.assertEqual(result, ["Andrew", "Shahmir", "JoJo"])
+
+    def test_lSchNameConversion(self):
+        self.leader1.schedule = [
+            [self.participants[0], self.participants[1]],
+            [self.participants[2]],
+            []
+        ]
+        result = lSchNameConversion(self.leader1.schedule)
+        expected = [
+            ["Kermit", "Miss Piggy"],
+            ["Fozzie"],
+            []
+        ]
+        self.assertEqual(result, expected)
+
+    def test_outputSchedule(self):
+        self.participants[0].schedule = [self.leader1, self.leader2, self.leader3]
+        self.participants[1].schedule = [self.leader2, self.leader3, self.leader4]
+
+        self.leader1.schedule[0].append(self.participants[0])
+        self.leader2.schedule[1].append(self.participants[0])
+        self.leader2.schedule[0].append(self.participants[1])
+        self.leader3.schedule[2].append(self.participants[1])
+
+        result = outputSchedule([self.leader1, self.leader2, self.leader3], self.participants[:2])
+        self.assertIn("Kermit", result)
+        self.assertIn("Miss Piggy", result)
+        self.assertIn("Andrew", result)
+        
+    def test_geneEvaluator(self):
+        leader = self.leader1
+        participant = self.participants[0]
+        score = leader.matchParticipant(participant, self.weights)
+        gene = {leader: [[participant], [], []]}
+        evaluated = geneEvaluator(gene, self.weights)
+        self.assertEqual(evaluated, score)
+        
+    
+    def test_generateParent(self):
+        parent = generateParent(self.leaders, self.participants)
+        self.assertIsInstance(parent, dict)
+        self.assertEqual(set(parent.keys()), set(self.leaders))
+        for schedule in parent.values():
+            self.assertEqual(len(schedule), rounds)
+            
+    def test_geneToSchedule(self):
+        parent = generateParent(self.leaders, self.participants)
+        geneToSchedule(parent, self.leaders, self.participants)
+        for leader in self.leaders:
+            self.assertEqual(leader.schedule, parent[leader])
+
+            
 
 if __name__ == '__main__':
     unittest.main()

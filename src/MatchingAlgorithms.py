@@ -124,12 +124,12 @@ def outputSchedule(leaders,participants):
 def geneEvaluator(gene,weights):
   totalMatchScore = 0
   for leader, schedule in gene.items():
-    for participant in schedule:
-      totalMatchScore += leader.matchParticipant(participant,weights)
+    for round in schedule:
+      for participant in round:
+        totalMatchScore += leader.matchParticipant(participant,weights)
   return(totalMatchScore)
           
 def generateParent(leaders,participants):
-  tierListOptimizedGenerator(leaders,participants)
   parent = {}
   i = 0
   for leader in leaders:
@@ -139,15 +139,21 @@ def generateParent(leaders,participants):
 
 def geneToSchedule(gene,leaders,participants):
   for participant in participants:
-    participant.clearSchedule
+    participant.clearSchedule()
     
   for leader in leaders:
-    leader.clearSchedule
+    leader.clearSchedule()
     
   for leader, schedule in gene.items():
     for i in range(len(schedule)):
-      leader.scheduleParticipant(i,schedule[i])
-      participant.scheduleRound(i,leader)
+      for participant in schedule[i]:
+        print("-----------")
+        print(leader)
+        print("~~~~~~~~~~~~~")
+        print(participant)
+        print("--------------")
+        leader.scheduleParticipant(i,schedule[i])
+        participant.scheduleRound(i,leader)
       
 def geneticOptimizer(leaders, participants, weights):
   maxScore = 0
@@ -159,9 +165,7 @@ def geneticOptimizer(leaders, participants, weights):
   generation = []
   
   for i in range(generationSize):
-    print(type(generateParent(leaders,participants)))
     generation.append(generateParent(leaders,participants))
-    print("whyyyy")
     
   for i in range(iterations):
     for gene in generation:
@@ -173,4 +177,4 @@ def geneticOptimizer(leaders, participants, weights):
       
   geneToSchedule(optimalGene,leaders,participants)
       
-    
+  
