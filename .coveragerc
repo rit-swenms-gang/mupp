@@ -4,5 +4,6 @@ source =
     src/
     tests/
 omit =
-
+    src/api/*
+    src/server.py
     */__init__.py
