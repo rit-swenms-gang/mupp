@@ -53,7 +53,9 @@ export default function Authenticator({ signOut, children }: AuthenticatorProps)
               signOut()
               .then(handleSuccessfulSignOut)
               .catch((error) => {
-                alert(getErrorMessage(error));
+                const message = getErrorMessage(error);
+                console.error(message);
+                alert(message);
               })}
               color="secondary">
               Sign Out
@@ -93,7 +95,9 @@ export default function Authenticator({ signOut, children }: AuthenticatorProps)
               handleSignIn(formData)
               .then(handleSuccessfulSignIn)
               .catch((error) => {
-                alert(getErrorMessage(error));
+                const message = getErrorMessage(error);
+                console.error(message);
+                alert(message);
               });
             }}
             formFields={
@@ -123,7 +127,9 @@ export default function Authenticator({ signOut, children }: AuthenticatorProps)
               handleSignUp(formData)
               .then(handleSuccessfulSignIn)
               .catch((error) => {
-                alert(getErrorMessage(error));
+                const message = getErrorMessage(error);
+                console.error(message);
+                alert(message);
               })
             }}
             validate={(data) => {
