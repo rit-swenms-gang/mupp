@@ -1,4 +1,4 @@
-interface GroupProps {
+export interface GroupProps {
 	id: number;
 	name: string;
 	category: string;
