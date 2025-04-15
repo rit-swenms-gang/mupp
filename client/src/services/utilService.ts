@@ -9,3 +9,14 @@ export const getErrorMessage = (error: unknown): string => {
   }
   return 'An unknown error occurred';
 };
+
+
+/**
+ * Prints a message to the console only if the environment is development.
+ * @param message The message to log.
+ */
+export const printDebugLog = (message: string) => {
+  if (import.meta.env.MODE === 'development') {
+    console.log(message);
+  }
+}

@@ -1,11 +1,11 @@
-import { getErrorMessage } from "./utilService";
+import { printDebugLog } from "./utilService";
 
 /**
  * Signs out a user by invalidating their session on the server and clearing the session cookie.
  * @returns A promise that resolves when the user has been signed out or the request has been rejected.
  */
 export const handleSignOut = async () => {
-  console.log('Handle sign out');
+  printDebugLog('Handle sign out');
 
   const cookies = document.cookie.split(';').reduce(
     (acc: Record<string, string>, cookieStr: string) => {
@@ -18,9 +18,7 @@ export const handleSignOut = async () => {
   const sessionKey = cookies.session;
 
   if (!sessionKey) {
-    console.error('Log out denied. User does not have an active session.');
-    alert('Log in denied. You are not logged in.');
-    return;
+    throw new Error('Log out denied. User does not have an active session.');
   }
 
   try {
@@ -30,11 +28,9 @@ export const handleSignOut = async () => {
     });
 
     document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-    console.log('User has been logged out.');
+    printDebugLog('User has been logged out.');
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    console.error('Sign Out failed:', errorMessage);
-    alert(errorMessage);
+    throw error;
   }
 }
 
@@ -43,15 +39,14 @@ export const handleSignOut = async () => {
  * @param formData The form data containing the username, email, and password for sign-up.
  */
 export const handleSignUp = async (formData?: FormData) => {
-  console.log('Handle Sign Up');
+  printDebugLog('Handle Sign Up');
 
   const username = formData?.get('sign-up-username')?.toString();
   const email = formData?.get('sign-up-email')?.toString();
   const password = formData?.get('sign-up-password')?.toString();
 
   if (!username || !email || !password) {
-    console.error('Username, email or password were not found in the Form Data.');
-    return;
+    throw new Error('Username, email or password were not found in the Form Data.');
   }
 
   try {
@@ -61,9 +56,7 @@ export const handleSignUp = async (formData?: FormData) => {
     });
     await login(email, password);
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    console.error('Sign Up failed:', errorMessage);
-    alert(errorMessage);
+    throw error;
   }
 }
 
@@ -72,22 +65,19 @@ export const handleSignUp = async (formData?: FormData) => {
  * @param formData The form data containing the email and password for sign-in.
  */
 export const handleSignIn = async (formData?: FormData) => {
-  console.log('Handle Sign In');
+  printDebugLog('Handle Sign In');
 
   const email = formData?.get('sign-in-email')?.toString();
   const password = formData?.get('sign-in-password')?.toString();
 
   if (!email || !password) {
-    console.error('Email or password were not found in the Form Data.');
-    return;
+    throw new Error('Email or password were not found in the Form Data.');
   }
 
   try {
     await login(email, password);
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    console.error('Sign In failed:', errorMessage);
-    alert(errorMessage);
+    throw error;
   }
 }
 
@@ -110,11 +100,7 @@ export const login = async (email: string, password: string) => {
       throw new Error('Session key not found in the response.');
     }
   } catch (error) {
-    if (error instanceof Error) {
-      const errorMessage = getErrorMessage(error);
-      console.error('Login failed:', errorMessage);
-      throw new Error(errorMessage);  // rethrow error to be handled in the calling function
-    }
+    throw error;
   }
 }
 
