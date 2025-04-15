@@ -29,7 +29,7 @@ class TestMatchingSystem(unittest.TestCase):
             Participant("Swedish Chef", "chef@themuppets.com", [1, 3, 0, 1, 2]),
             Participant("Lew Zealand", "lew@themuppets.com", [0, 2, 3, 3, 0]),
             Participant("Camilla", "camilla@themuppets.com", [2, 0, 1, 2, 3]),
-            Participant("Dr. Teeth", "dr.teeth@themuppets.com", [3, 1, 0, 0, 2]),
+            Participant("The count", "TheCount@notthemuppets.com", [3, 1, 0, 0, 2]),
             Participant("Zoot", "zoot@themuppets.com", [1, 2, 2, 1, 3]),
             Participant("Janice", "janice@themuppets.com", [0, 3, 1, 3, 2])
         ]
