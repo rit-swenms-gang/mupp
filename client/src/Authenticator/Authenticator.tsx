@@ -7,6 +7,10 @@ import AuthForm from "./AuthForm/AuthForm";
 export default function Authenticator() {
   const [activeTab, setActiveTab] = useState(1);
 
+  /**
+  * Changes the active tab in the authentication UI.
+  * @param tabId The ID of the tab to switch to.
+  */
   const changeTab = (tabId: number) => {
     if(tabId === activeTab)
       return;
@@ -16,6 +20,10 @@ export default function Authenticator() {
 
   // TODO: validate sign in and sign up info
 
+  /**
+  * Handles the sign-up process by validating form data and sending a request to create a new account.
+  * @param formData The form data containing the username, email, and password for sign-up.
+  */
   const handleSignUp = async (formData?: FormData) => {
     console.log('Handle Sign Up');
 
@@ -32,6 +40,10 @@ export default function Authenticator() {
     await login(email, password);
   }
 
+  /**
+  * Handles the sign-in process by validating form data and sending a login request.
+  * @param formData The form data containing the email and password for sign-in.
+  */
   const handleSignIn = async (formData?: FormData) => {
     console.log('Handle Sign In');
 
@@ -46,6 +58,11 @@ export default function Authenticator() {
     await login(email, password);
   }
 
+  /**
+  * Logs in a user by sending their email and password to the server and storing the session key in a cookie.
+  * @param email The user's email address.
+  * @param password The user's password.
+  */
   const login = async (email: string, password: string) => {
     const resData = await makeAuthFetch('http://localhost:5001/login', {email, password}, 'Error on Sign In');
 
@@ -55,9 +72,9 @@ export default function Authenticator() {
   }
 
   /**
-   * Signs out a user if they have been authenticated.
-   * @returns A promise that is resolved when the user has been signed out or their request has been rejected.
-   */
+  * Signs out a user by invalidating their session on the server and clearing the session cookie.
+  * @returns A promise that resolves when the user has been signed out or the request has been rejected.
+  */
   const handleSignOut = async () => {
     console.log('Handle sign out');
 
@@ -96,6 +113,13 @@ export default function Authenticator() {
     console.log('User has been logged out.');
   }
 
+  /**
+  * Sends an authenticated POST request to the specified URL with the provided body.
+  * @param url The URL to send the request to.
+  * @param body The request body as a key-value object.
+  * @param errorContext An optional context message for error logging.
+  * @returns The response data from the server.
+  */
   const makeAuthFetch = async (url: string, body?: Record<string, string>, errorContext?: string ) => {
     const response = await fetch(url, {
       method: 'POST',
