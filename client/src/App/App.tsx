@@ -44,9 +44,6 @@ function App() {
 
   /////////////////////////////////////////////
 
-  const [loginFormOpen, setLoginFormOpen] = useState(false);
-  const toggleLoginForm = () => setLoginFormOpen(!loginFormOpen);
-
   function printGroupMembers(memberList: string []) {
     let members = "";
 
@@ -63,6 +60,7 @@ function App() {
   const groupBoxes = groups.map(group => 
     <Row>
       <GroupBox
+        id={0}
         name={group.name}
         category={group.category}
         description={group.description}
@@ -127,8 +125,6 @@ function App() {
         </Row>
         
       </Container>
-      
-      
     </>
   )
 }
