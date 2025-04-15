@@ -72,7 +72,8 @@ class LoginResourceTest(TestCase):
         before_logout = self.db.select("SELECT * FROM logins WHERE user_id = %s;", ['1'])
         self.assertEqual(len(before_logout), 1, "Logins table should have an entry before logout")
 
-        logout_res = test_post(self, base_url + '/logout', json={'username': 'testuser'}, expected_status=200)
+        session_key = self.db.select("SELECT session_key FROM logins WHERE user_id = %s;", ['1'])
+        logout_res = test_post(self, base_url + '/logout', header={'Session-Key': session_key[0][0]}, expected_status=200)
         self.assertEqual(logout_res['message'], 'Logout complete')
 
         after_logout = self.db.select("SELECT * FROM logins WHERE user_id = %s;", ['1'])

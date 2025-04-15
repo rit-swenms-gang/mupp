@@ -117,43 +117,47 @@ class Database():
         cursor.execute(file.read())
     self._conn.commit()
 
-  def select(self, query:str, args:dict={}, number:int|None=None):
+  def select(self, query: str, args=None, number: int | None = None):
     """
     Retrieve results of query from database. 
+    Supports both dict or tuple/list arguments.
     Does *not* commit.
     """
     result = None
     with self._conn.cursor() as cursor:
-      cursor.execute(query, args)
-      if number is None:
-        result = cursor.fetchall()
-      elif number == 1:
-        result = cursor.fetchone()
-      elif number > 1:
-        result = cursor.fetchmany(number)
-      else:
-        raise ValueError(str(number) 
-                          + ' is not a positive integer.')
+        if args:
+            cursor.execute(query, args)
+        else:
+            cursor.execute(query)
+
+        if number is None:
+            result = cursor.fetchall()
+        elif number == 1:
+            result = cursor.fetchone()
+        elif number > 1:
+            result = cursor.fetchmany(number)
+        else:
+            raise ValueError(f'{number} is not a positive integer.')
     self._conn.rollback()
     return result
   
-  def exec_commit(self, query: str, args:dict={}):
+  def exec_commit(self, query: str, args=None):
     """
-    Execute a query, commit to the databse 
-    and return the result. On exceptions,
-    rollback transaction and raise error.
+    Execute a query, commit to the database, and return the result.
+    Supports both dict or tuple/list arguments.
+    On exceptions, rollback transaction and raise error.
     """
     result = None
     with self._conn.cursor() as c:
-      # TODO: what to do when query throws
-      # error, raise or continue
-      try:
-        c.execute(query, args)
-        result = c.fetchall()
-      except (Exception) as err:
-        if err.args [0] != 'no results to fetch':
-          self._conn.rollback()
-          raise err
+        try:
+            if args:
+                c.execute(query, args)
+            else:
+                c.execute(query)
+            result = c.fetchall()
+        except Exception as err:
+            if err.args[0] != 'no results to fetch':
+                self._conn.rollback()
+                raise err
     self._conn.commit()
-    return (result if result is None or len(result) != 1 
-            else result[0])
+    return (result if result is None or len(result) != 1 else result[0])
