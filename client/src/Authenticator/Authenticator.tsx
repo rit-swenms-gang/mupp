@@ -3,6 +3,7 @@ import { Button, Card, CardHeader, Nav, NavItem, TabContent, TabPane } from "rea
 import NavTab from "../NavTab/NavTab";
 import AuthForm from "./AuthForm/AuthForm";
 import { handleSignIn, handleSignUp } from "../services/authService";
+import { getErrorMessage } from "../services/utilService";
 
 interface AuthenticatorProps {
   signOut: () => Promise<void>;
@@ -49,7 +50,11 @@ export default function Authenticator({ signOut, children }: AuthenticatorProps)
         <Nav className='navbar w-100 p-4 bg-secondary'>
           <NavItem className="ms-auto">
             <Button onClick={() =>
-              signOut().then(handleSuccessfulSignOut)}
+              signOut()
+              .then(handleSuccessfulSignOut)
+              .catch((error) => {
+                alert(getErrorMessage(error));
+              })}
               color="secondary">
               Sign Out
             </Button>
@@ -85,7 +90,11 @@ export default function Authenticator({ signOut, children }: AuthenticatorProps)
             heading="Welcome Back"
             submitLabel="Sign In"
             onSubmit={(formData) => {
-              handleSignIn(formData).then(handleSuccessfulSignIn);
+              handleSignIn(formData)
+              .then(handleSuccessfulSignIn)
+              .catch((error) => {
+                alert(getErrorMessage(error));
+              });
             }}
             formFields={
               [
@@ -111,7 +120,11 @@ export default function Authenticator({ signOut, children }: AuthenticatorProps)
             heading="Create an Account"
             submitLabel="Create Account"
             onSubmit={(formData) => {
-              handleSignUp(formData).then(handleSuccessfulSignIn);
+              handleSignUp(formData)
+              .then(handleSuccessfulSignIn)
+              .catch((error) => {
+                alert(getErrorMessage(error));
+              })
             }}
             validate={(data) => {
               const errors: Record<string, string> = {};

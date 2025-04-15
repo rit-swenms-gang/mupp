@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Button, Card, CardHeader, Form, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
+import { printDebugLog } from "../../services/utilService";
 
 interface AuthFormProps {
   heading?: string;
@@ -10,7 +11,6 @@ interface AuthFormProps {
   validate?: (data: FormData) => Record<string, string>;
 };
 
-// TODO: add validation callback for each field, determine form feedback
 interface FormField {
   name: string;
   label: string;
@@ -39,7 +39,7 @@ export default function AuthForm({
       return; // Stop form submission if there are validation errors
     }
 
-    console.log('Submit Auth Form');
+    printDebugLog('Submit Auth Form');
   
     // handle data on Authenticator
     onSubmit?.(data);
