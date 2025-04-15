@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Button, Card, CardHeader, Form, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
-import { printDebugLog } from "../../services/utilService";
+import { printDebugLog } from "../../services/util";
 
 interface AuthFormProps {
   heading?: string;

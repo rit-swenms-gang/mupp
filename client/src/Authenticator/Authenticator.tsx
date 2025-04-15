@@ -2,8 +2,8 @@ import { useEffect, useState } from "react"
 import { Button, Card, CardHeader, Nav, NavItem, TabContent, TabPane } from "reactstrap"
 import NavTab from "../NavTab/NavTab";
 import AuthForm from "./AuthForm/AuthForm";
-import { handleSignIn, handleSignUp } from "../services/authService";
-import { getErrorMessage } from "../services/utilService";
+import { handleSignIn, handleSignUp } from "../services/auth";
+import { getErrorMessage } from "../services/util";
 
 interface AuthenticatorProps {
   signOut: () => Promise<void>;
