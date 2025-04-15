@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Col, Container, Row } from 'reactstrap';
-import Authenticator from '../Authenticator/Authenticator';
+import Authenticator, { handleSignOut } from '../Authenticator/Authenticator';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
@@ -28,30 +28,26 @@ function App() {
 
   return (
     <>
-      <Container>
-        <Row className='flex align'>
-          <Col>
-            <h1>Welcome to MUPP: Multi-User Project Planner</h1>
-            <div className='card'>
-              <p>
-                Plan your next event by splitting your participants into the right groups.
-              </p>
-              <p>
-                Edit <code>src/App.tsx</code> and save to test HMR
-              </p>
-              <p>
-                Communication with port <code>5001</code> server: {serverText}
-              </p>
-            </div>
-          </Col>
-          <Col>
-            <div className='card'>
-              <Authenticator/>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-      
+      <Authenticator signOut={handleSignOut}>
+        <Container className='my-2'>
+          <Row className='flex align'>
+            <Col>
+              <h1>Welcome to MUPP: Multi-User Project Planner</h1>
+              <div className='card'>
+                <p>
+                  Plan your next event by splitting your participants into the right groups.
+                </p>
+                <p>
+                  Edit <code>src/App.tsx</code> and save to test HMR
+                </p>
+                <p>
+                  Communication with port <code>5001</code> server: {serverText}
+                </p>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </Authenticator>
       
     </>
   )

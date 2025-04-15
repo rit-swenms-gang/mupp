@@ -1,5 +1,5 @@
-import { FormEvent } from "react";
-import { Button, Card, CardHeader, Form, FormGroup, Input, Label } from "reactstrap";
+import { FormEvent, useState } from "react";
+import { Button, Card, CardHeader, Form, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
 
 interface AuthFormProps {
@@ -7,6 +7,7 @@ interface AuthFormProps {
   submitLabel?: string
   onSubmit?: (data?: FormData) => void;
   formFields?: FormField[]
+  validate?: (data: FormData) => Record<string, string>;
 };
 
 // TODO: add validation callback for each field, determine form feedback
@@ -21,13 +22,22 @@ export default function AuthForm({
   heading = "Form Heading", 
   submitLabel = "Submit Form",
   onSubmit = () => {}, 
-  formFields = []
+  formFields = [],
+  validate = () => ({})
 }:AuthFormProps) {
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const data = new FormData(event.target as HTMLFormElement)
+    const newErrors = validate?.(data);
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors); // Update errors state
+      return; // Stop form submission if there are validation errors
+    }
 
     console.log('Submit Auth Form');
   
@@ -47,10 +57,14 @@ export default function AuthForm({
               placeholder={field.label}
               type={field?.type}
               required={field.required}
+              invalid={!!errors[field.name]}
             />
             <Label for={field.name}>
               {field.label}
             </Label>
+            {errors[field.name] && (
+              <FormFeedback>{errors[field.name]}</FormFeedback>
+            )}
           </FormGroup>
         )}
         

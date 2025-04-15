@@ -1,11 +1,7 @@
-import { useState } from "react"
-import { Button, Nav, TabContent, TabPane } from "reactstrap"
+import { useEffect, useState } from "react"
+import { Button, Card, CardHeader, Nav, NavItem, TabContent, TabPane } from "reactstrap"
 import NavTab from "../NavTab/NavTab";
 import AuthForm from "./AuthForm/AuthForm";
-
-interface AuthenticatorProps {
-  signOut: () => void;
-}
 
 /**
  * Signs out a user by invalidating their session on the server and clearing the session cookie.
@@ -19,12 +15,12 @@ export const handleSignOut = async () => {
       const [key, value] = cookieStr.trim().split('=');
       acc[key] = value;
       return acc;
-    }, 
-  {});
-    
+    },
+    {});
+
   const sessionKey = cookies.session;
-  
-  if(!sessionKey) {
+
+  if (!sessionKey) {
     console.error('Log out denied. User does not have an active session.');
     alert('Log in denied. You are not logged in.');
     return;
@@ -56,7 +52,7 @@ const handleSignUp = async (formData?: FormData) => {
   const email = formData?.get('sign-up-email')?.toString();
   const password = formData?.get('sign-up-password')?.toString();
 
-  if(!username || !email || !password) {
+  if (!username || !email || !password) {
     console.error('Username, email or password were not found in the Form Data.');
     return;
   }
@@ -74,17 +70,17 @@ const handleSignUp = async (formData?: FormData) => {
   }
 }
 
- /**
-  * Handles the sign-in process by validating form data and sending a login request.
-  * @param formData The form data containing the email and password for sign-in.
-  */
- const handleSignIn = async (formData?: FormData) => {
+/**
+ * Handles the sign-in process by validating form data and sending a login request.
+ * @param formData The form data containing the email and password for sign-in.
+ */
+const handleSignIn = async (formData?: FormData) => {
   console.log('Handle Sign In');
 
   const email = formData?.get('sign-in-email')?.toString();
   const password = formData?.get('sign-in-password')?.toString();
 
-  if(!email || !password) {
+  if (!email || !password) {
     console.error('Email or password were not found in the Form Data.');
     return;
   }
@@ -145,18 +141,18 @@ const getErrorMessage = (error: unknown): string => {
  * @throws An error if the response is not successful.
  */
 const makeAuthFetch = async (
-  url: string, 
+  url: string,
   options?: {
-    body?: Record<string, string>, 
+    body?: Record<string, string>,
     headers?: Record<string, string>,
     errorContext?: string
-  } 
-  ) => {
+  }
+) => {
   const { body, headers, errorContext } = options || {};
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 
+    headers: {
       'Content-Type': 'application/json',
       ...headers
     },
@@ -165,7 +161,7 @@ const makeAuthFetch = async (
 
   const resData = await response.json();
 
-  if(!response.ok) {
+  if (!response.ok) {
     console.error(`${errorContext || 'Error'}: Responded with status ${response.status}: 
       ${resData.message || 'Something went wrong'}`);
     throw new Error(resData.message || 'Something went wrong');
@@ -174,96 +170,158 @@ const makeAuthFetch = async (
   return resData;
 }
 
-export default function Authenticator() {
+interface AuthenticatorProps {
+  signOut: () => Promise<void>;
+  children?: React.ReactNode;
+}
+
+export default function Authenticator({ signOut, children }: AuthenticatorProps) {
   const [activeTab, setActiveTab] = useState(1);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    if(isAuthenticated === "true") {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   /**
   * Changes the active tab in the authentication UI.
   * @param tabId The ID of the tab to switch to.
   */
   const changeTab = (tabId: number) => {
-    if(tabId === activeTab)
+    if (tabId === activeTab)
       return;
 
     setActiveTab(tabId);
   }
 
-  // TODO: validate sign in and sign up info
+  const handleSuccessfulSignIn = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem("isAuthenticated", "true");
+  }
 
-  return <>
-  <Nav justified tabs>
-    <NavTab
-      id={1}
-      activeId={activeTab}
-      onClick={() => changeTab(1)}
-      label='Log In' />
-    <NavTab
-      id={2}
-      activeId={activeTab}
-      onClick={() => changeTab(2)}
-      label='Register' />
-  </Nav>
-  <TabContent activeTab={activeTab}>
-    <TabPane tabId={1}>
-      {/* Sign In Form */}
-      <AuthForm 
-        heading="Welcome Back"
-        submitLabel="Sign In"
-        onSubmit={handleSignIn}
-        formFields={
-          [
-            {
-              name: "sign-in-email",
-              label: "Email",
-              type: 'email',
-              required: true
-            },
-            {
-              name: "sign-in-password",
-              label: "Password",
-              type: 'password',
-              required: true
+  const handleSuccessfulSignOut = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("isAuthenticated");
+  }
+
+  // render content based on authentication status
+  // if user is authenticated, show sign out button and children components
+  if (isAuthenticated) {
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center vh-100 vw-100">
+        <Nav className='navbar w-100 p-4 bg-secondary'>
+          <NavItem className="ms-auto">
+            <Button onClick={() =>
+              signOut().then(handleSuccessfulSignOut)}
+              color="secondary">
+              Sign Out
+            </Button>
+          </NavItem>
+        </Nav>
+        <div className="flex-grow-1 d-flex flex-column">{ children } </div>
+      </div>
+    );
+  }
+
+  // if user is not authenticated, show sign in and sign up forms
+  return (
+    <div className="d-flex justify-content-center align-items-center vh-100 vw-100">
+    <Card className="w-50">
+      <CardHeader className="p-2 m-2" tag='h2'>Welcome to MUPP</CardHeader>
+
+      <Nav justified tabs>
+        <NavTab
+          id={1}
+          activeId={activeTab}
+          onClick={() => changeTab(1)}
+          label='Log In' />
+        <NavTab
+          id={2}
+          activeId={activeTab}
+          onClick={() => changeTab(2)}
+          label='Register' />
+      </Nav>
+      <TabContent activeTab={activeTab}>
+        <TabPane tabId={1}>
+          {/* Sign In Form */}
+          <AuthForm
+            heading="Welcome Back"
+            submitLabel="Sign In"
+            onSubmit={(formData) => {
+              handleSignIn(formData).then(handleSuccessfulSignIn);
+            }}
+            formFields={
+              [
+                {
+                  name: "sign-in-email",
+                  label: "Email",
+                  type: 'email',
+                  required: true
+                },
+                {
+                  name: "sign-in-password",
+                  label: "Password",
+                  type: 'password',
+                  required: true
+                }
+              ]
             }
-          ]
-        }
-      />
-    </TabPane>
-    <TabPane tabId={2}>
-      {/* Create Account Form */}
-      <AuthForm 
-        heading="Create an Account"
-        submitLabel="Create Account"
-        onSubmit={handleSignUp}
-        formFields={
-          [
-            {
-              name: "sign-up-username",
-              label: "Username",
-              required: true
-            },
-            {
-              name: "sign-up-email",
-              label: "Email",
-              type: 'email',
-              required: true
-            },
-            {
-              name: "sign-up-password",
-              label: "Password",
-              type:'password',
-              required: true
-            },
-            {
-              name: "sign-up-confirm-password",
-              label: "Confirm Password",
-              type:'password',
-              required: true
+          />
+        </TabPane>
+        <TabPane tabId={2}>
+          {/* Create Account Form */}
+          <AuthForm
+            heading="Create an Account"
+            submitLabel="Create Account"
+            onSubmit={(formData) => {
+              handleSignUp(formData).then(handleSuccessfulSignIn);
+            }}
+            validate={(data) => {
+              const errors: Record<string, string> = {};
+          
+              const password = data.get("sign-up-password")?.toString();
+              const confirmPassword = data.get("sign-up-confirm-password")?.toString();
+          
+              if (password !== confirmPassword) {
+                errors["sign-up-confirm-password"] = "Passwords do not match.";
+              }
+          
+              return errors;
+            }}
+            formFields={
+              [
+                {
+                  name: "sign-up-username",
+                  label: "Username",
+                  required: true
+                },
+                {
+                  name: "sign-up-email",
+                  label: "Email",
+                  type: 'email',
+                  required: true
+                },
+                {
+                  name: "sign-up-password",
+                  label: "Password",
+                  type: 'password',
+                  required: true
+                },
+                {
+                  name: "sign-up-confirm-password",
+                  label: "Confirm Password",
+                  type: 'password',
+                  required: true
+                }
+              ]
             }
-          ]
-        }
-      />
-    </TabPane>
-  </TabContent>
-  <Button onClick={handleSignOut}>Sign Out</Button>
-  </>
+          />
+        </TabPane>
+      </TabContent>
+    </Card>
+    </div>
+  );
 }
