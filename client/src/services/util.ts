@@ -16,7 +16,7 @@ export const getErrorMessage = (error: unknown): string => {
  * @param message The message to log.
  */
 export const printDebugLog = (message: string) => {
-  if (import.meta.env.MODE === 'development') {
+  if (import.meta.env.NODE_ENV === 'development' || import.meta.env.MODE === 'development') {
     console.log(message);
   }
 }
