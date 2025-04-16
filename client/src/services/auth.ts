@@ -1,4 +1,4 @@
-import { printDebugLog } from "./util";
+import { printDebugLog } from './util';
 
 /**
  * Signs out a user by invalidating their session on the server and clearing the session cookie.

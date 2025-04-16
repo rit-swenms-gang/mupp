@@ -13,6 +13,7 @@ describe('handleSignOut', () => {
   });
 
   it('should call fetchLogout and clear the session cookie', async () => {
+    // Test that fetchLogout is called with the correct arguments and the session cookie is cleared
     const mockFetchLogout = vi.fn().mockResolvedValue({});
     document.cookie = `session=${testKey}`;
 
@@ -29,7 +30,7 @@ describe('handleSignOut', () => {
   });
 
   it('should throw an error if no session key is found', async () => {
-
+    // Test that an error is thrown when no session key is present in cookies
     await expect(auth.handleSignOut()).rejects.toThrow(
       'Log out denied. User does not have an active session.'
     );
@@ -42,6 +43,7 @@ describe('handleSignUp', () => {
   });
 
   it('should call fetchAccounts and login on successful sign-up', async () => {
+    // Test that fetchAccounts and login are called with the correct arguments during sign-up
     const mockFetchAccounts = vi.fn().mockResolvedValue({});
     const mockLogin = vi.fn().mockResolvedValue({});
 
@@ -67,6 +69,7 @@ describe('handleSignUp', () => {
   });
 
   it('should throw an error if required fields are missing', async () => {
+    // Test that an error is thrown when required fields are missing in the form data
     const formData = new FormData();
     formData.append('sign-up-username', testUsername);
 
@@ -82,6 +85,7 @@ describe('handleSignIn', () => {
   });
 
   it('should call login on successful sign-in', async () => {
+    // Test that login is called with the correct credentials during sign-in
     const mockLogin = vi.fn().mockResolvedValue({});
     const formData = new FormData();
     formData.append('sign-in-email', testEmail);
@@ -93,6 +97,7 @@ describe('handleSignIn', () => {
   });
 
   it('should throw an error if email or password is missing', async () => {
+    // Test that an error is thrown when email or password is missing in the form data
     const formData = new FormData();
     formData.append('sign-in-email', testEmail);
 
@@ -108,6 +113,7 @@ describe('login', () => {
   });
 
   it('should store the session key in a cookie on successful login', async () => {
+    // Test that the session key is stored in a cookie after a successful login
     const mockFetchLogin = vi.fn().mockResolvedValue({ session_key: testKey });
 
     document.cookie = ''; // Clear cookies
@@ -122,6 +128,7 @@ describe('login', () => {
   });
 
   it('should throw an error if the session key is missing', async () => {
+    // Test that an error is thrown when the session key is missing in the response
     const mockFetchLogin = vi.fn().mockResolvedValue({});
 
     await expect(auth.login(testEmail, testPassword, mockFetchLogin)).rejects.toThrow(
@@ -138,6 +145,7 @@ describe('makeAuthFetch', () => {
   });
 
   it('should send a POST request and return response data', async () => {
+    // Test that makeAuthFetch sends a POST request and returns the correct response data
     const mockResponse = { message: 'Success' };
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -157,6 +165,7 @@ describe('makeAuthFetch', () => {
   });
 
   it('should throw an error if the response is not ok', async () => {
+    // Test that makeAuthFetch throws an error when the response is not ok
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 400,
