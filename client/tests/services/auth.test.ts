@@ -163,15 +163,16 @@ describe('makeAuthFetch', () => {
       ok: true,
       json: vi.fn().mockResolvedValue(mockResponse),
     });
+    const body = { key: 'value' };
 
     const result = await makeAuthFetch(testUrl, {
-      body: { key: 'value' },
+      body: body,
     });
 
     expect(fetch).toHaveBeenCalledWith(testUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: 'value' }),
+      body: JSON.stringify(body),
     });
     expect(result).toEqual(mockResponse);
   });
@@ -183,13 +184,53 @@ describe('makeAuthFetch', () => {
       status: 400,
       json: vi.fn().mockResolvedValue({ message: 'Bad Request' }),
     });
+    const body = { key: 'value' };
 
     await expect(
       makeAuthFetch(testUrl, {
-        body: { key: 'value' },
+        body: body,
         errorContext: 'Test Error',
       })
     ).rejects.toThrow('Test Error: Responded with status 400: Bad Request');
+
+    expect(fetch).toHaveBeenCalledWith(testUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  });
+
+  it('handles undefined options gracefully', async () => {
+    // Test that makeAuthFetch handles undefined options gracefully
+    const mockResponse = { success: true };
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValueOnce(mockResponse),
+    });
+  
+    const result = await makeAuthFetch(testUrl);
+  
+    expect(fetch).toHaveBeenCalledWith(testUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: undefined,
+    });
+    expect(result).toEqual(mockResponse);
+  });
+
+  it('throws a generic error when resData.message is missing', async () => {
+    // Test that makeAuthFetch throws a generic error when resData.message is missing
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: vi.fn().mockResolvedValueOnce({}),
+    });
+  
+    await expect(
+      makeAuthFetch(testUrl, {
+        errorContext: 'Server Error',
+      })
+    ).rejects.toThrow('Server Error: Responded with status 500: Something went wrong');
   });
 });
 
