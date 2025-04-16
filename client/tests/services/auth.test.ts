@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as auth from '../../src/services/auth';
+import { handleSignOut, handleSignIn, handleSignUp, login, makeAuthFetch} from '../../src/services/auth';
 
 const testKey = 'test-session-key';
 const testUsername = 'testuser';
@@ -17,7 +17,7 @@ describe('handleSignOut', () => {
     const mockFetchLogout = vi.fn().mockResolvedValue({});
     document.cookie = `session=${testKey}`;
 
-    await auth.handleSignOut(mockFetchLogout);
+    await handleSignOut(mockFetchLogout);
 
     expect(mockFetchLogout).toHaveBeenCalledWith(
       'http://localhost:5001/logout',
@@ -31,7 +31,7 @@ describe('handleSignOut', () => {
 
   it('should throw an error if no session key is found', async () => {
     // Test that an error is thrown when no session key is present in cookies
-    await expect(auth.handleSignOut()).rejects.toThrow(
+    await expect(handleSignOut()).rejects.toThrow(
       'Log out denied. User does not have an active session.'
     );
   });
@@ -52,7 +52,7 @@ describe('handleSignUp', () => {
     formData.append('sign-up-email', testEmail);
     formData.append('sign-up-password', testPassword);
 
-    await auth.handleSignUp(formData, mockFetchAccounts, mockLogin);
+    await handleSignUp(formData, mockFetchAccounts, mockLogin);
 
     expect(mockFetchAccounts).toHaveBeenCalledWith(
       'http://localhost:5001/accounts',
@@ -73,7 +73,7 @@ describe('handleSignUp', () => {
     const formData = new FormData();
     formData.append('sign-up-username', testUsername);
 
-    await expect(auth.handleSignUp(formData)).rejects.toThrow(
+    await expect(handleSignUp(formData)).rejects.toThrow(
       'Username, email or password were not found in the Form Data.'
     );
   });
@@ -91,7 +91,7 @@ describe('handleSignIn', () => {
     formData.append('sign-in-email', testEmail);
     formData.append('sign-in-password', testPassword);
 
-    await auth.handleSignIn(formData, mockLogin);
+    await handleSignIn(formData, mockLogin);
 
     expect(mockLogin).toHaveBeenCalledWith(testEmail, testPassword);
   });
@@ -101,7 +101,7 @@ describe('handleSignIn', () => {
     const formData = new FormData();
     formData.append('sign-in-email', testEmail);
 
-    await expect(auth.handleSignIn(formData)).rejects.toThrow(
+    await expect(handleSignIn(formData)).rejects.toThrow(
       'Email or password were not found in the Form Data.'
     );
   });
@@ -117,7 +117,7 @@ describe('login', () => {
     const mockFetchLogin = vi.fn().mockResolvedValue({ session_key: testKey });
 
     document.cookie = ''; // Clear cookies
-    await auth.login(testEmail, testPassword, mockFetchLogin);
+    await login(testEmail, testPassword, mockFetchLogin);
 
     expect(mockFetchLogin).toHaveBeenCalledWith('http://localhost:5001/login', {
       body: { email: testEmail, password: testPassword },
@@ -131,7 +131,7 @@ describe('login', () => {
     // Test that an error is thrown when the session key is missing in the response
     const mockFetchLogin = vi.fn().mockResolvedValue({});
 
-    await expect(auth.login(testEmail, testPassword, mockFetchLogin)).rejects.toThrow(
+    await expect(login(testEmail, testPassword, mockFetchLogin)).rejects.toThrow(
       'Session key not found in the response.'
     );
   });
@@ -152,7 +152,7 @@ describe('makeAuthFetch', () => {
       json: vi.fn().mockResolvedValue(mockResponse),
     });
 
-    const result = await auth.makeAuthFetch(testUrl, {
+    const result = await makeAuthFetch(testUrl, {
       body: { key: 'value' },
     });
 
@@ -173,7 +173,7 @@ describe('makeAuthFetch', () => {
     });
 
     await expect(
-      auth.makeAuthFetch(testUrl, {
+      makeAuthFetch(testUrl, {
         body: { key: 'value' },
         errorContext: 'Test Error',
       })
