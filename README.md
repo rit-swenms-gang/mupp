@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/rit-swenms-gang/mupp/graph/badge.svg?token=ZK59KMK1BA)](https://codecov.io/gh/rit-swenms-gang/mupp)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=rit-swenms-gang_mupp)](https://sonarcloud.io/summary/new_code?id=rit-swenms-gang_mupp)
 # mupp
 Multi-user party planner
 
