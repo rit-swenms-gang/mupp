@@ -1,7 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Button, Card, CardHeader, Form, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
-import { printDebugLog } from "../../services/util";
 
 /**
  * Props for the AuthForm component.
@@ -11,7 +10,7 @@ import { printDebugLog } from "../../services/util";
  * @param formFields - The fields to display in the form.
  * @param validate - A function to validate the form data.
  */
-interface AuthFormProps {
+export interface AuthFormProps {
   /**
    * The heading to display at the top of the form.
    */
@@ -24,7 +23,7 @@ interface AuthFormProps {
    * A function to handle form submission.
    * It receives the form data as a FormData object.
    */
-  onSubmit?: (data?: FormData) => void;
+  onSubmit?: (data?: FormData) => Promise<void>;
   /**
    * The fields to display in the form.
    * Each field should have a name and label.
@@ -59,6 +58,7 @@ interface FormField {
   type?: InputType;
   /**
    * Whether the field is required.
+   * TODO: Change to check in validate (along with field names)
    */
   required?: boolean;
 }
@@ -76,7 +76,7 @@ interface FormField {
 export default function AuthForm({
   heading = "Form Heading", 
   submitLabel = "Submit Form",
-  onSubmit = () => {}, 
+  onSubmit = () => {return Promise.resolve()}, 
   formFields = [],
   validate = () => ({})
 }:AuthFormProps) {
@@ -86,39 +86,39 @@ export default function AuthForm({
   /**
    * Handles form submission.
    * @param event - The form submission event.
+   * @returns A promise that resolves when the form is submitted.
    */
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const data = new FormData(event.target as HTMLFormElement)
-    const newErrors = validate?.(data);
+    const newErrors = validate?.(data) || {};
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors); // Update errors state
-      return; // Stop form submission if there are validation errors
+      return;
     }
 
-    printDebugLog('Submit Auth Form');
-  
     // handle data on Authenticator
     onSubmit?.(data);
+
   }
 
   return (
     <Card>
       <CardHeader tag='h2'>{heading}</CardHeader>
-      
+
       {/* Form fields */}
       <Form onSubmit={handleSubmit}>
-        {formFields?.map((field, index) =>
-          <FormGroup key={index} floating>
+        {formFields?.map((field) =>
+          <FormGroup key={field.name} floating>
             <Input
               id={field.name}
               name={field.name}
               placeholder={field.label}
               type={field?.type}
-              required={field.required}
               invalid={!!errors[field.name]}
+              data-testid={field.name}
             />
             <Label for={field.name}>
               {field.label}

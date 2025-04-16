@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getErrorMessage, printDebugLog } from '../../src/services/util';
+import { getErrorMessage, printDebugError, printDebugLog } from '../../src/services/util';
 
 describe('getErrorMessage', () => {
   it('should return the message from an Error object', () => {
@@ -45,6 +45,42 @@ describe('printDebugLog', () => {
     printDebugLog('Test debug message');
 
     expect(consoleSpy).not.toHaveBeenCalled();
+
+    // Restore the original environment variables
+    vi.unstubAllEnvs();
+  });
+});
+
+describe('printDebugError', () => {
+  it('should log the error message in development mode', () => {
+    // Test that printDebugError logs the error message when NODE_ENV is set to 'development'
+    vi.stubEnv('MODE', 'development');  // mock environment variable
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    const error = new Error('Test error message');
+    printDebugError(error);
+
+    expect(consoleSpy).toHaveBeenCalledWith('Test error message');
+    expect(alertSpy).toHaveBeenCalledWith('Test error message');
+
+    // Restore the original environment variables
+    vi.unstubAllEnvs();
+  });
+
+  it('should not log or alert in production mode', () => {
+    // Test that printDebugError does not log or alert when NODE_ENV is set to 'production'
+    vi.stubEnv('MODE', 'production');
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    const error = new Error('Test error message');
+    printDebugError(error);
+
+    expect(consoleSpy).not.toHaveBeenCalled();
+    expect(alertSpy).not.toHaveBeenCalled();
 
     // Restore the original environment variables
     vi.unstubAllEnvs();

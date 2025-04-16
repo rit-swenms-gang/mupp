@@ -143,3 +143,59 @@ export const makeAuthFetch = async (
 
   return resData;
 }
+
+/**
+ * Validates the sign-up form data by checking if the password and confirm password fields match.
+ * @param formData The form data containing the password and confirm password fields.
+ * @returns An object containing any validation errors.
+ */
+export const validateSignUp = (formData: FormData) => {
+  const errors: Record<string, string> = {};
+          
+  const username = formData.get('sign-up-username')?.toString();
+  const email = formData.get('sign-up-email')?.toString();
+  const password = formData.get('sign-up-password')?.toString();
+  const confirmPassword = formData.get('sign-up-confirm-password')?.toString();
+
+  if(!username) {
+    errors['sign-up-username'] = 'Username is required.';
+  }
+  if(!email) {
+    errors['sign-up-email'] = 'Email is required.';
+  }
+  if(!password) {
+    errors['sign-up-password'] = 'Password is required.';
+  }
+  if(!confirmPassword) {
+    errors['sign-up-confirm-password'] = 'Confirm Password is required.';
+  }
+  
+  if (password && confirmPassword && password !== confirmPassword) {
+    errors['sign-up-confirm-password'] = 'Passwords do not match.';
+  }
+
+  return errors;
+}
+
+/**
+ * Validates the sign-in form data by checking if the email and password fields are filled.
+ * @param formData The form data containing the email and password fields.
+ * @returns An object containing any validation errors.
+ */
+export const validateSignIn = (formData: FormData) => {
+  const errors: Record<string, string> = {};
+
+  // Required is currently handled by Reactstrap flag
+  const email = formData.get('sign-in-email')?.toString();
+  const password = formData.get('sign-in-password')?.toString();
+
+  if (!email) {
+    errors['sign-in-email'] = 'Email is required.';
+  }
+
+  if (!password) {
+    errors['sign-in-password'] = 'Password is required.';
+  }
+
+  return errors;
+}
