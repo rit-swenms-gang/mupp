@@ -5,6 +5,7 @@ import { Col, Container, Row, Collapse, Button,
         } from 'reactstrap';
 import GroupBox from './Dashboard/GroupBox';
 import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
+import EditDropdown from './Dashboard/EditDropdown';
 
 interface Group {
   name: string;
@@ -21,6 +22,7 @@ function App() {
   const [forms, setForms] = useState(Array<FormPreviewProps>);
 
   ////////// TODO: FETCH FROM SERVER //////////
+
   useEffect(() => {setGroups(
     [
       {
@@ -44,17 +46,12 @@ function App() {
 
   /////////////////////////////////////////////
 
-  function printGroupMembers(memberList: string []) {
-    let members = "";
+  function openEditForm(formId: any) {
+    // TODO: open the edit form page/modal
+  }
 
-    for(let i = 0; i < memberList.length; i++) {
-      members += memberList[i];
-      if(i < memberList.length - 1) {
-        members += ", ";
-      }
-    }
-    
-    return members;
+  function deleteForm(formId: any) {
+    // TODO: delete the form
   }
 
   const groupBoxes = groups.map(group => 
@@ -69,12 +66,19 @@ function App() {
   );
 
   const formList = forms.map(form =>
-    <Row>
-      <FormPreview
-        name={form.name}
-        category={form.category}
-        summary={form.summary}/>
-    </Row>
+    <Card>
+      <Row>
+        <Col>
+          <FormPreview
+            name={form.name}
+            category={form.category}
+            summary={form.summary}/>
+        </Col>
+        <Col>
+          <EditDropdown formId={form.name} editAction={openEditForm} deleteAction={deleteForm}/>
+        </Col>
+      </Row>
+    </Card>
   );
 
   useEffect(() => {
