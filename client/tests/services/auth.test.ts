@@ -223,7 +223,7 @@ describe('makeAuthFetch', () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 500,
-      json: vi.fn().mockResolvedValueOnce({}),
+      json: vi.fn().mockResolvedValue({}),
     });
   
     await expect(
@@ -231,6 +231,25 @@ describe('makeAuthFetch', () => {
         errorContext: 'Server Error',
       })
     ).rejects.toThrow('Server Error: Responded with status 500: Something went wrong');
+  });
+
+  it('throws a default error message when errorContext is missing', async () => {
+    const mockErrorResponse = { message: 'Invalid request' };
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: vi.fn().mockResolvedValue(mockErrorResponse),
+    });
+  
+    await expect(
+      makeAuthFetch(testUrl)
+    ).rejects.toThrow('Error: Responded with status 400: Invalid request');
+  
+    expect(fetch).toHaveBeenCalledWith(testUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: undefined,
+    });
   });
 });
 
