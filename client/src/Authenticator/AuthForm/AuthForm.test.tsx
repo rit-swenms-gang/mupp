@@ -20,6 +20,7 @@ describe('AuthForm Component', () => {
   // Test to ensure the heading is rendered correctly
   it('renders the form with the correct heading and fields', () => {
     render(<AuthForm {...defaultProps} />);
+    
     expect(screen.getByText('Test Form')).toBeInTheDocument();
     expect(screen.getByLabelText('Username')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
