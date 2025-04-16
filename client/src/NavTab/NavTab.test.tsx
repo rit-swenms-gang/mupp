@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import NavTab, {NavTabProps} from './NavTab';
+import NavTab, { NavTabProps } from './NavTab';
 
 describe('NavTab Component', () => {
   const defaultProps: NavTabProps = {
@@ -9,23 +9,27 @@ describe('NavTab Component', () => {
     label: 'Tab 1',
   };
 
+  // Test to ensure the label is rendered correctly
   it('renders the label correctly', () => {
-    render(<NavTab {...defaultProps}/>);
+    render(<NavTab {...defaultProps} />);
     expect(screen.getByText(defaultProps.label)).toBeInTheDocument();
   });
 
+  // Test to ensure the "active" class is applied when the tab is active
   it('applies the "active" class when the tab is active', () => {
     render(<NavTab {...defaultProps} />);
     const tab = screen.getByText('Tab 1');
     expect(tab).toHaveClass('active');
   });
 
+  // Test to ensure the "active" class is not applied when the tab is not active
   it('does not apply the "active" class when the tab is not active', () => {
     render(<NavTab {...defaultProps} activeId={2} />);
     const tab = screen.getByText('Tab 1');
     expect(tab).not.toHaveClass('active');
   });
 
+  // Test to ensure the correct ARIA attributes are set when the tab is active
   it('sets the correct ARIA attributes', () => {
     render(<NavTab {...defaultProps} />);
     const tab = screen.getByText('Tab 1');
@@ -33,6 +37,7 @@ describe('NavTab Component', () => {
     expect(tab).toHaveAttribute('aria-selected', 'true');
   });
 
+  // Test to ensure the correct ARIA attributes are set when the tab is not active
   it('sets aria-selected to false when the tab is not active', () => {
     render(<NavTab {...defaultProps} activeId={2} />);
     const tab = screen.getByText('Tab 1');
