@@ -1,7 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Button, Card, CardHeader, Form, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
-import { printDebugLog } from "../../services/util";
 
 /**
  * Props for the AuthForm component.
@@ -87,6 +86,7 @@ export default function AuthForm({
   /**
    * Handles form submission.
    * @param event - The form submission event.
+   * @returns A promise that resolves when the form is submitted.
    */
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -96,13 +96,12 @@ export default function AuthForm({
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors); // Update errors state
-      console.log('Form validation errors:', newErrors);
-    } else {
-      printDebugLog('Submit Auth Form');
+      return;
+    }
 
-      // handle data on Authenticator
-      await onSubmit?.(data);
-    }  
+    // handle data on Authenticator
+    onSubmit?.(data);
+
   }
 
   return (
