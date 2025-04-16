@@ -102,7 +102,7 @@ export default function Authenticator({
    * Handles sign-in form submission.
    * @param formData The form data from the sign-in form.
    */
-  const handleSignInSubmit = (formData?: FormData) => {
+  const handleSignInSubmit = async (formData?: FormData) => {
     services.handleSignIn?.(formData)
       .then(handleSuccessfulSignIn)
       .catch(services.onError);
@@ -112,7 +112,7 @@ export default function Authenticator({
    * Handles sign-up form submission.
    * @param formData The form data from the sign-up form.
    */
-  const handleSignUpSubmit = (formData?: FormData) => {
+  const handleSignUpSubmit = async (formData?: FormData) => {
     services.handleSignUp?.(formData)
       .then(handleSuccessfulSignIn)
       .catch(services.onError);
@@ -193,13 +193,13 @@ export default function Authenticator({
                   name: 'sign-in-email',
                   label: 'Email',
                   type: 'email',
-                  required: true
+                  
                 },
                 {
                   name: 'sign-in-password',
                   label: 'Password',
                   type: 'password',
-                  required: true
+                  
                 }
               ]
             }
@@ -217,25 +217,21 @@ export default function Authenticator({
                 {
                   name: 'sign-up-username',
                   label: 'Username',
-                  required: true
                 },
                 {
                   name: 'sign-up-email',
                   label: 'Email',
                   type: 'email',
-                  required: true
                 },
                 {
                   name: 'sign-up-password',
                   label: 'Password',
                   type: 'password',
-                  required: true
                 },
                 {
                   name: 'sign-up-confirm-password',
                   label: 'Confirm Password',
                   type: 'password',
-                  required: true
                 }
               ]
             }

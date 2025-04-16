@@ -24,7 +24,7 @@ export interface AuthFormProps {
    * A function to handle form submission.
    * It receives the form data as a FormData object.
    */
-  onSubmit?: (data?: FormData) => void;
+  onSubmit?: (data?: FormData) => Promise<void>;
   /**
    * The fields to display in the form.
    * Each field should have a name and label.
@@ -59,6 +59,7 @@ interface FormField {
   type?: InputType;
   /**
    * Whether the field is required.
+   * TODO: Change to check in validate (along with field names)
    */
   required?: boolean;
 }
@@ -76,7 +77,7 @@ interface FormField {
 export default function AuthForm({
   heading = "Form Heading", 
   submitLabel = "Submit Form",
-  onSubmit = () => {}, 
+  onSubmit = () => {return Promise.resolve()}, 
   formFields = [],
   validate = () => ({})
 }:AuthFormProps) {
@@ -95,13 +96,13 @@ export default function AuthForm({
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors); // Update errors state
-      return; // Stop form submission if there are validation errors
-    }
+      console.log('Form validation errors:', newErrors);
+    } else {
+      printDebugLog('Submit Auth Form');
 
-    printDebugLog('Submit Auth Form');
-  
-    // handle data on Authenticator
-    onSubmit?.(data);
+      // handle data on Authenticator
+      await onSubmit?.(data);
+    }  
   }
 
   return (
@@ -117,7 +118,6 @@ export default function AuthForm({
               name={field.name}
               placeholder={field.label}
               type={field?.type}
-              required={field.required}
               invalid={!!errors[field.name]}
               data-testid={field.name}
             />
