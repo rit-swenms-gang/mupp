@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Authenticator from './Authenticator';
 
-describe.only('Authenticator Component', () => {
+describe('Authenticator Component', () => {
   const defaultProps = {
     services: {
       handleSignIn: vi.fn(),
