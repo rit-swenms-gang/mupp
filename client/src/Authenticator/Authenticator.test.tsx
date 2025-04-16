@@ -56,6 +56,14 @@ describe('Authenticator Component', () => {
     expect(screen.getByText('Welcome Back')).toBeInTheDocument();
   });
 
+  // Test to ensure that clicking the selected tab does not change the view
+  it('does not change view when the selected tab is clicked', () => {
+    render(<Authenticator {...defaultProps} />);
+
+    fireEvent.click(screen.getByText('Log In'));
+    expect(screen.getByText('Welcome Back')).toBeInTheDocument();
+  });
+
   // Test to ensure that handleSignIn is called when the login form is submitted
   it('calls handleSignIn when the login form is submitted', async () => {
     const mockHandleSignIn = vi.fn().mockResolvedValue({});
