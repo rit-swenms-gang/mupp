@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, CardBody, CardTitle, CardSubtitle, CardText } from 'reactstrap';
+import { Container, Row, Card, CardBody, CardTitle, CardSubtitle, CardText } from 'reactstrap';
 
 export interface FormPreviewProps {
 	name: string;

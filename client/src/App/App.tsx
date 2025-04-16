@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Col, Container, Row, Collapse, Button,
-        Card, CardBody, CardTitle, CardSubtitle, CardText,
+import { Col, Container, Row,
+        Card, CardBody
         } from 'reactstrap';
 import GroupBox from './Dashboard/GroupBox';
 import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
@@ -14,7 +14,7 @@ interface Group {
 	members: string [];
 }
 
-const serverUrl = 'http://localhost:5001/';
+// const serverUrl = 'http://localhost:5001/';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
@@ -46,12 +46,14 @@ function App() {
 
   /////////////////////////////////////////////
 
-  function openEditForm(formId: any) {
+  function openEditForm(formId: unknown) {
     // TODO: open the edit form page/modal
+    console.log(formId)
   }
 
-  function deleteForm(formId: any) {
+  function deleteForm(formId: unknown) {
     // TODO: delete the form
+    console.log(formId)
   }
 
   const groupBoxes = groups.map(group => 
