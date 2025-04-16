@@ -152,10 +152,25 @@ export const makeAuthFetch = async (
 export const validateSignUp = (formData: FormData) => {
   const errors: Record<string, string> = {};
           
+  const username = formData.get('sign-up-username')?.toString();
+  const email = formData.get('sign-up-email')?.toString();
   const password = formData.get('sign-up-password')?.toString();
   const confirmPassword = formData.get('sign-up-confirm-password')?.toString();
 
-  if (password !== confirmPassword) {
+  if(!username) {
+    errors['sign-up-username'] = 'Username is required.';
+  }
+  if(!email) {
+    errors['sign-up-email'] = 'Email is required.';
+  }
+  if(!password) {
+    errors['sign-up-password'] = 'Password is required.';
+  }
+  if(!confirmPassword) {
+    errors['sign-up-confirm-password'] = 'Confirm Password is required.';
+  }
+  
+  if (password && confirmPassword && password !== confirmPassword) {
     errors['sign-up-confirm-password'] = 'Passwords do not match.';
   }
 

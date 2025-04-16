@@ -1,10 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleSignOut, handleSignIn, handleSignUp, login, makeAuthFetch} from '../../src/services/auth';
+import { handleSignOut, handleSignIn, handleSignUp, login, makeAuthFetch, validateSignIn, validateSignUp} from '../../src/services/auth';
 
 const testKey = 'test-session-key';
 const testUsername = 'testuser';
 const testEmail = 'test@example.com';
 const testPassword = 'password123';
+
+const signInFields = {
+  email: 'sign-in-email',
+  password: 'sign-in-password'
+};
+
+const signUpFields = {
+  username: 'sign-up-username',
+  email: 'sign-up-email',
+  password: 'sign-up-password',
+  confirmPassword: 'sign-up-confirm-password'
+};
 
 describe('handleSignOut', () => {
   beforeEach(() => {
@@ -48,9 +60,9 @@ describe('handleSignUp', () => {
     const mockLogin = vi.fn().mockResolvedValue({});
 
     const formData = new FormData();
-    formData.append('sign-up-username', testUsername);
-    formData.append('sign-up-email', testEmail);
-    formData.append('sign-up-password', testPassword);
+    formData.append(signUpFields.username, testUsername);
+    formData.append(signUpFields.email, testEmail);
+    formData.append(signUpFields.password, testPassword);
 
     await handleSignUp(formData, mockFetchAccounts, mockLogin);
 
@@ -71,7 +83,7 @@ describe('handleSignUp', () => {
   it('should throw an error if required fields are missing', async () => {
     // Test that an error is thrown when required fields are missing in the form data
     const formData = new FormData();
-    formData.append('sign-up-username', testUsername);
+    formData.append(signUpFields.username, testUsername);
 
     await expect(handleSignUp(formData)).rejects.toThrow(
       'Username, email or password were not found in the Form Data.'
@@ -88,8 +100,8 @@ describe('handleSignIn', () => {
     // Test that login is called with the correct credentials during sign-in
     const mockLogin = vi.fn().mockResolvedValue({});
     const formData = new FormData();
-    formData.append('sign-in-email', testEmail);
-    formData.append('sign-in-password', testPassword);
+    formData.append(signInFields.email, testEmail);
+    formData.append(signInFields.password, testPassword);
 
     await handleSignIn(formData, mockLogin);
 
@@ -99,7 +111,7 @@ describe('handleSignIn', () => {
   it('should throw an error if email or password is missing', async () => {
     // Test that an error is thrown when email or password is missing in the form data
     const formData = new FormData();
-    formData.append('sign-in-email', testEmail);
+    formData.append(signInFields.email, testEmail);
 
     await expect(handleSignIn(formData)).rejects.toThrow(
       'Email or password were not found in the Form Data.'
@@ -178,5 +190,86 @@ describe('makeAuthFetch', () => {
         errorContext: 'Test Error',
       })
     ).rejects.toThrow('Test Error: Responded with status 400: Bad Request');
+  });
+});
+
+describe('validateSignUp', () => {
+  it('should return an error if passwords do not match', () => {
+    // Test that validateSignUp returns an error if passwords do not match
+    const formData = new FormData();
+    formData.append(signUpFields.username, testUsername);
+    formData.append(signUpFields.email, testEmail);
+    formData.append(signUpFields.password, testPassword);
+    formData.append(signUpFields.confirmPassword, testPassword + '1');
+
+    const errors = validateSignUp(formData);
+
+    expect(errors).toEqual({
+      [signUpFields.confirmPassword]: 'Passwords do not match.',
+    });
+  });
+
+  it('should return an error if required fields are missing', () => {
+    // Test that validateSignUp returns errors if required fields are missing
+    const formData = new FormData();
+    formData.append(signUpFields.username, testUsername);
+
+    const errors = validateSignUp(formData);
+
+    expect(errors).toEqual({
+      [signUpFields.email]: 'Email is required.',
+      [signUpFields.password]: 'Password is required.',
+      [signUpFields.confirmPassword]: 'Confirm Password is required.',
+    });
+  });
+
+  it('should return no errors if all fields are valid', () => {
+    // Test that validateSignUp returns no errors if all fields are valid
+    const formData = new FormData();
+    formData.append(signUpFields.username, testUsername);
+    formData.append(signUpFields.email, testEmail);
+    formData.append(signUpFields.password, testPassword);
+    formData.append(signUpFields.confirmPassword, testPassword);
+
+    const errors = validateSignUp(formData);
+
+    expect(errors).toEqual({});
+  });
+});
+
+describe('validateSignIn', () => {
+  // Test that validateSignIn returns an error if email or password is missing
+  it('should return an error if email is missing', () => {
+    const formData = new FormData();
+    formData.append(signInFields.password, testPassword);
+
+    const errors = validateSignIn(formData);
+
+    expect(errors).toEqual({
+      [signInFields.email]: 'Email is required.',
+    });
+  });
+
+  it('should return an error if password is missing', () => {
+    // Test that validateSignIn returns an error if password is missing
+    const formData = new FormData();
+    formData.append(signInFields.email, testEmail);
+
+    const errors = validateSignIn(formData);
+
+    expect(errors).toEqual({
+      [signInFields.password]: 'Password is required.',
+    });
+  });
+
+  it('should return no errors if both email and password are provided', () => {
+    // Test that validateSignIn returns no errors if both email and password are provided
+    const formData = new FormData();
+    formData.append(signInFields.email, testEmail);
+    formData.append(signInFields.password, testPassword);
+
+    const errors = validateSignIn(formData);
+
+    expect(errors).toEqual({});
   });
 });
