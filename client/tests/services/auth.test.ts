@@ -209,16 +209,30 @@ describe('validateSignUp', () => {
     });
   });
 
-  it('should return an error if required fields are missing', () => {
+  it('should return an error if all required fields are missing', () => {
+    // Test that validateSignUp returns errors if required fields are missing
+    const formData = new FormData();
+
+    const errors = validateSignUp(formData);
+
+    expect(errors).toEqual({
+      [signUpFields.username]: 'Username is required.',
+      [signUpFields.email]: 'Email is required.',
+      [signUpFields.password]: 'Password is required.',
+      [signUpFields.confirmPassword]: 'Confirm Password is required.',
+    });
+  });
+
+  it('should return an error if any required fields are missing', () => {
     // Test that validateSignUp returns errors if required fields are missing
     const formData = new FormData();
     formData.append(signUpFields.username, testUsername);
+    formData.append(signUpFields.password, testPassword);
 
     const errors = validateSignUp(formData);
 
     expect(errors).toEqual({
       [signUpFields.email]: 'Email is required.',
-      [signUpFields.password]: 'Password is required.',
       [signUpFields.confirmPassword]: 'Confirm Password is required.',
     });
   });
