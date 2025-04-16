@@ -110,8 +110,8 @@ export default function AuthForm({
 
       {/* Form fields */}
       <Form onSubmit={handleSubmit}>
-        {formFields?.map((field, index) =>
-          <FormGroup key={index} floating>
+        {formFields?.map((field) =>
+          <FormGroup key={field.name} floating>
             <Input
               id={field.name}
               name={field.name}
@@ -119,6 +119,7 @@ export default function AuthForm({
               type={field?.type}
               required={field.required}
               invalid={!!errors[field.name]}
+              data-testid={field.name}
             />
             <Label for={field.name}>
               {field.label}
