@@ -13,6 +13,10 @@ export default function Authenticator({ children }: AuthenticatorProps) {
   const [activeTab, setActiveTab] = useState(1);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  /**
+   * Checks if the user is authenticated when the component mounts.
+   * Authentication determines how the UI is rendered.
+   */
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
     if(isAuthenticated === "true") {
@@ -31,11 +35,17 @@ export default function Authenticator({ children }: AuthenticatorProps) {
     setActiveTab(tabId);
   }
 
+  /**
+   * Handles successful sign-in by updating the authentication state and storing it in local storage.
+   */
   const handleSuccessfulSignIn = () => {
     setIsAuthenticated(true);
     localStorage.setItem("isAuthenticated", "true");
   }
 
+  /**
+   * Handles successful sign-out by updating the authentication state and removing it from local storage.
+   */
   const handleSuccessfulSignOut = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("isAuthenticated");
@@ -71,7 +81,7 @@ export default function Authenticator({ children }: AuthenticatorProps) {
     <div className="d-flex justify-content-center align-items-center vh-100 vw-100">
     <Card className="w-50">
       <CardHeader className="p-2 m-2" tag='h2'>Welcome to MUPP</CardHeader>
-
+      
       <Nav justified tabs>
         <NavTab
           id={1}
