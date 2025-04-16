@@ -2,15 +2,14 @@ import { useEffect, useState } from "react"
 import { Button, Card, CardHeader, Nav, NavItem, TabContent, TabPane } from "reactstrap"
 import NavTab from "../NavTab/NavTab";
 import AuthForm from "./AuthForm/AuthForm";
-import { handleSignIn, handleSignUp } from "../services/auth";
+import { handleSignIn, handleSignOut, handleSignUp } from "../services/auth";
 import { getErrorMessage } from "../services/util";
 
 interface AuthenticatorProps {
-  signOut: () => Promise<void>;
   children?: React.ReactNode;
 }
 
-export default function Authenticator({ signOut, children }: AuthenticatorProps) {
+export default function Authenticator({ children }: AuthenticatorProps) {
   const [activeTab, setActiveTab] = useState(1);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -50,7 +49,7 @@ export default function Authenticator({ signOut, children }: AuthenticatorProps)
         <Nav className='navbar w-100 p-4 bg-secondary'>
           <NavItem className="ms-auto">
             <Button onClick={() =>
-              signOut()
+              handleSignOut()
               .then(handleSuccessfulSignOut)
               .catch((error) => {
                 const message = getErrorMessage(error);

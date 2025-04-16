@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { Col, Container, Row } from 'reactstrap';
 import Authenticator from '../Authenticator/Authenticator';
-import { handleSignOut } from '../services/auth';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
@@ -29,7 +28,7 @@ function App() {
 
   return (
     <>
-      <Authenticator signOut={handleSignOut}>
+      <Authenticator>
         <Container className='my-2'>
           <Row className='flex align'>
             <Col>
