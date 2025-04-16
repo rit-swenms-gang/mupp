@@ -11,7 +11,7 @@ import { printDebugLog } from "../../services/util";
  * @param formFields - The fields to display in the form.
  * @param validate - A function to validate the form data.
  */
-interface AuthFormProps {
+export interface AuthFormProps {
   /**
    * The heading to display at the top of the form.
    */
@@ -91,7 +91,7 @@ export default function AuthForm({
     event.preventDefault();
 
     const data = new FormData(event.target as HTMLFormElement)
-    const newErrors = validate?.(data);
+    const newErrors = validate?.(data) || {};
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors); // Update errors state
@@ -107,7 +107,7 @@ export default function AuthForm({
   return (
     <Card>
       <CardHeader tag='h2'>{heading}</CardHeader>
-      
+
       {/* Form fields */}
       <Form onSubmit={handleSubmit}>
         {formFields?.map((field, index) =>
