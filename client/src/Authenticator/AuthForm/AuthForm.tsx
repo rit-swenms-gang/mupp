@@ -92,7 +92,7 @@ export default function AuthForm({
     event.preventDefault();
 
     const data = new FormData(event.target as HTMLFormElement)
-    const newErrors = validate?.(data) || {};
+    const newErrors = validate?.(data) ?? {};
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors); // Update errors state
