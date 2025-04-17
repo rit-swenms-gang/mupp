@@ -2,8 +2,8 @@
 branch = True
 source =
     src/
-    tests/
 omit =
+    tests/
     src/api/*
     src/server.py
     */__init__.py
