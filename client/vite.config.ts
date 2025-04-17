@@ -14,9 +14,9 @@ export default defineConfig({
       // include: ['src/**', 'tests/**'],
       reporter: ['lcov', 'json', 'text'],
     },
-    reporters: [
-        ['vitest-sonar-reporter', { outputFile: 'sonar-report.xml' }],
-    ],
+    // reporters: [
+    //     ['vitest-sonar-reporter', { outputFile: 'sonar-report.xml' }],
+    // ],
   }
 })
 
