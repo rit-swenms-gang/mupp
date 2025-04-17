@@ -72,7 +72,7 @@ export default function Authenticator({
     validateSignUp
   },
   children 
-}: AuthenticatorProps) {
+}: Readonly<AuthenticatorProps>) {
   const [activeTab, setActiveTab] = useState(1);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 

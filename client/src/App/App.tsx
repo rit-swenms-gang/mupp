@@ -8,6 +8,7 @@ import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
 import EditDropdown from './Dashboard/EditDropdown';
 
 interface Group {
+  id: number
   name: string;
 	category: string;
 	description: string;
@@ -26,6 +27,7 @@ function App() {
   useEffect(() => {setGroups(
     [
       {
+        id: 0,
         name: "The MUPPets",
         category: "SWEN-732 Project Groups",
         description: "We are the team behind the Multi-User Party Planner, a.k.a. \"M.U.P.P.\"!",
@@ -57,9 +59,9 @@ function App() {
   }
 
   const groupBoxes = groups.map(group => 
-    <Row>
+    <Row key={group.id}>
       <GroupBox
-        id={0}
+        id={group.id}
         name={group.name}
         category={group.category}
         description={group.description}
@@ -67,8 +69,8 @@ function App() {
     </Row>
   );
 
-  const formList = forms.map(form =>
-    <Card>
+  const formList = forms.map((form, i) =>
+    <Card key={i}>
       <Row>
         <Col>
           <FormPreview
@@ -104,34 +106,32 @@ function App() {
   }, [])
 
   return (
-    <>
-      <Container>
-        <h1>Multi-User Project Planner</h1>
-        <Row className='flex align'>
-          <Col>
-            <Card>
-              <CardBody>
-                <p>
-                  Plan your next event by splitting your participants into the right groups.
-                </p>
-                <p>
-                  Communication with port <code>5001</code> server: {serverText}
-                </p>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {groupBoxes}
-          </Col>
-          <Col>
-            {formList}
-          </Col>
-        </Row>
-        
-      </Container>
-    </>
+    <Container>
+      <h1>Multi-User Project Planner</h1>
+      <Row className='flex align'>
+        <Col>
+          <Card>
+            <CardBody>
+              <p>
+                Plan your next event by splitting your participants into the right groups.
+              </p>
+              <p>
+                Communication with port <code>5001</code> server: {serverText}
+              </p>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          {groupBoxes}
+        </Col>
+        <Col>
+          {formList}
+        </Col>
+      </Row>
+      
+    </Container>
   )
 }
 

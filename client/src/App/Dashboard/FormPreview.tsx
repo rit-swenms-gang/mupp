@@ -6,7 +6,7 @@ export interface FormPreviewProps {
 	summary: string;
 }
 
-export default function FormPreview({name, category, summary}: FormPreviewProps) {
+export default function FormPreview({name, category, summary}: Readonly<FormPreviewProps>) {
 	return (
 		<Card>
 			<CardBody>

@@ -35,7 +35,7 @@ export interface NavTabProps {
  * @param onClick - A function to handle tab click events.
  * @param label - The label to display for the tab.
  */
-export default function NavTab({ id, activeId, onClick, label }: NavTabProps) {
+export default function NavTab({ id, activeId, onClick, label }: Readonly<NavTabProps>) {
   const isActive = id === activeId;
 
   return (

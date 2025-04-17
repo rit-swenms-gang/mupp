@@ -79,7 +79,7 @@ export default function AuthForm({
   onSubmit = () => {return Promise.resolve()}, 
   formFields = [],
   validate = () => ({})
-}:AuthFormProps) {
+}:Readonly<AuthFormProps>) {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 

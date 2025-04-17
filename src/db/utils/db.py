@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.errors import ConnectionException
 import yaml
 import os.path as path
 from .table import Table
@@ -45,7 +46,7 @@ class Database():
     if self._conn is None or self._conn.closed != 0:
       self._conn = self.connect()
       self.set_schema(schema or self._schema)
-    else: raise Exception('Connection is already open')
+    else: raise ConnectionException('Connection is already open')
 
   def set_schema(self, schema:str=None):
     """Set the Postgres `search_path` to a schema"""
@@ -102,7 +103,7 @@ class Database():
     """Close existing psycopg2 connection"""
     if self._conn.closed == 0:
       self._conn.close()
-    else: raise Exception('Connection is already closed')
+    else: raise ConnectionException('Connection is already closed')
 
   def exec_sql_file(self, file: str): 
     """Read a SQL file into the database"""
