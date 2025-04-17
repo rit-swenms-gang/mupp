@@ -78,6 +78,7 @@ jobs:
       run: |
         coverage run -m unittest
         coverage report
+        coverage xml
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
