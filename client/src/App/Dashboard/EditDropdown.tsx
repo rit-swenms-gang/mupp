@@ -7,7 +7,7 @@ type EditDropdownProps = {
 	deleteAction: (arg0: any) => void;
   };
 
-export default function EditDropdown({formId, editAction, deleteAction}: EditDropdownProps) {
+export default function EditDropdown({formId, editAction, deleteAction}: Readonly<EditDropdownProps>) {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
 	
