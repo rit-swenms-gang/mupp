@@ -20,7 +20,7 @@ export const LabelAttribute = createAttributeComponent(
         <input
           id={id}
           name={id}
-          value={props.attribute.value ?? ""}
+          value={props.attribute.value ?? ''}
           // update value of the entity
           onChange={(e) => props.setValue(e.target.value)}
           required
@@ -49,7 +49,7 @@ export const TextFieldEntity = createEntityComponent(
         <input
           id={props.entity.id}
           name={props.entity.id}
-          value={props.entity.value ?? ""}
+          value={props.entity.value ?? ''}
           onChange={(e) => props.setValue(e.target.value)}
         />
         {props.entity.error instanceof ZodError

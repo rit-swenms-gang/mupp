@@ -1,6 +1,6 @@
-import { createBuilder } from "@coltorapps/builder";
+import { createBuilder } from '@coltorapps/builder';
 
-import { textFieldEntity } from "./entities";
+import { textFieldEntity } from './entities';
 
 // Think of builders as collections of supported entities. 
 // For example, you can have a form builder that allows adding text and select fields to a form, 

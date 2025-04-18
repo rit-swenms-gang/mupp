@@ -1,6 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { createAttribute } from "@coltorapps/builder";
+import { createAttribute } from '@coltorapps/builder';
 
 // Think of attributes as the props of your entities. 
 // For instance, a text field may include attributes such as a label, a requirement flag, a maximum length, and others. 
@@ -11,6 +11,6 @@ import { createAttribute } from "@coltorapps/builder";
  * It must be a non-empty string.
  */
 export const labelAttribute = createAttribute({
-  name: "label",
+  name: 'label',
   validate: (value) => z.string().min(1).parse(value)
 });
