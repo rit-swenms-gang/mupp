@@ -36,9 +36,6 @@ class Table():
   ):
     self._name = name
     self._columns = columns
-    # self._column_types = {}
-    # for col in columns:
-    #   self._column_types[col['column_name']] = col['type']
     self._database = database
 
   def __repr__(self):

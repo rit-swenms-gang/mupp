@@ -15,7 +15,7 @@ function printGroupMembers(memberList: string []) {
     return members;
   }
 
-export default function GroupBox({name, category, description, members}: GroupProps) {
+export default function GroupBox({name, category, description, members}: Readonly<GroupProps>) {
 
 	return (
 		<Card>
