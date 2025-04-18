@@ -1,0 +1,5 @@
+config/db.yml
+**/__pycache__
+.coverage
+coverage.xml
+.env

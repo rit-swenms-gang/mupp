@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Python Backend",
+      "type": "shell",
+      // workaround for Windows python with Git Bash
+      "windows": {
+        "command": "python"
+      },
+      "command": "${command:python.interpreterPath}",
+      "args": ["${workspaceFolder}/src/server.py"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "python",
+        "pattern": [
+          {
+            "regexp": ".*",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "\\* Serving Flask app 'server'"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "group": "MUPP",
+        "panel": "dedicated"
+      },
+      "group": "none"
+    },
+    {
+      "label": "Stop Python Backend",
+      "type": "shell",
+      "command": "echo ${input:stop-python-server}",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "group": "MUPP"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "stop-python-server",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "Run Python Backend"
+    }
+  ]
+}
