@@ -55,7 +55,17 @@ export default function FormBuilderPage() {
   });
 
   const submitFormSchema = async () => {
-    // TODO: Will be completed with server integration.
+    /*
+     * Validate the schema once again on the client
+     * to trigger all the validations and provide the user
+     * with feedback on what needs to be corrected.
+     */
+    const validationResult = await builderStore.validateSchema();
+
+    if(validationResult.success) {
+      // TODO: save form in the server
+      // validationResult.data; // This is the form's schema
+    }
   }
 
   return (
