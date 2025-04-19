@@ -1,9 +1,10 @@
-import { type Schema } from "@coltorapps/builder";
-import { InterpreterEntities, useInterpreterStore } from "@coltorapps/builder-react";
+import { type Schema } from '@coltorapps/builder';
+import { InterpreterEntities, useInterpreterStore } from '@coltorapps/builder-react';
 
-import { TextFieldEntity } from "./Components";
-import { formBuilder } from "./builder";
-import { FormEvent } from "react";
+import { TextFieldEntity } from './Components';
+import { formBuilder } from './builder';
+import { FormEvent } from 'react';
+import { Button, Form } from 'reactstrap';
 
 type FormBuilderSchema = Schema<typeof formBuilder>;
 
@@ -45,12 +46,12 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
       */
       const formData = new FormData(e.currentTarget);
       // const formData = validationResult.data;
-      console.log("Form data: ", formData);
+      console.log('Form data: ', formData);
     }
   }
 
   return (
-    <form
+    <Form
       onSubmit={(e) => {
         e.preventDefault();
 
@@ -69,7 +70,7 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
         interpreterStore={interpreterStore}
         components={{textField: TextFieldEntity}}
       />
-      <button type="submit">Submit</button>
-    </form>
+      <Button type='submit'>Submit</Button>
+    </Form>
   );
 }

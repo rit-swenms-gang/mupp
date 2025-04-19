@@ -1,4 +1,4 @@
-import { FormInterpreter } from "./FormInterpreter";
+import { FormInterpreter } from './FormInterpreter';
 
 export default async function FormPage() {
   // TODO: retrieve form schema from the server
@@ -8,22 +8,22 @@ export default async function FormPage() {
   // THIS IS A MOCKED SCHEMA
   const mockSchema = {
     entities: {
-      "entity1": {
-        type: "textField" as const,
+      'entity1': {
+        type: 'textField' as const,
         attributes: {
-          label: "Name"
+          label: 'Name'
         },
         parentId: undefined
       },
-      "entity2": {
-        type: "textField" as const,
+      'entity2': {
+        type: 'textField' as const,
         attributes: {
-          label: "Email"
+          label: 'Email'
         },
-        parentId: "entity1"
+        parentId: 'entity1'
       }
     },
-    root: ["entity1"]
+    root: ['entity1', 'entity2']
   };
 
   return <FormInterpreter schema={mockSchema} />;

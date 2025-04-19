@@ -4,6 +4,7 @@ import { createAttributeComponent, createEntityComponent } from '@coltorapps/bui
 
 import { labelAttribute } from './attributes';
 import { textFieldEntity } from './entities';
+import { Input, Label } from 'reactstrap';
 
 /**
  * This component renders a label attribute for a form field.
@@ -16,8 +17,8 @@ export const LabelAttribute = createAttributeComponent(
 
     return (
       <div>
-        <label htmlFor={id}>Field Label</label>
-        <input
+        <Label htmlFor={id}>Field Label</Label>
+        <Input
           id={id}
           name={id}
           value={props.attribute.value ?? ''}
@@ -43,10 +44,10 @@ export const TextFieldEntity = createEntityComponent(
   (props) => {
     return (
       <div>
-        <label htmlFor={props.entity.id}>
+        <Label htmlFor={props.entity.id}>
           {props.entity.attributes.label}
-        </label>
-        <input
+        </Label>
+        <Input
           id={props.entity.id}
           name={props.entity.id}
           value={props.entity.value ?? ''}

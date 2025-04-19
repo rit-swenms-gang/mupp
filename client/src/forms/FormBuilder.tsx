@@ -3,6 +3,7 @@ import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@colt
 import { LabelAttribute, TextFieldEntity } from './Components';
 import { formBuilder } from './builder';
 import { useState } from 'react';
+import { Button, Card, CardBody, CardHeader } from 'reactstrap';
 
 /**
  * A `TextFieldAttributes` component 
@@ -76,7 +77,9 @@ export default function FormBuilderPage() {
   }
 
   return (
-    <div>
+    <Card>
+      <CardHeader tag='h2'>Form Builder</CardHeader>
+      <CardBody>
       {/*
         * The `BuilderEntities` component renders the entities
         * tree of the schema of the builder store.
@@ -92,30 +95,43 @@ export default function FormBuilderPage() {
           * wraps each rendered arbitrary entity with additional rendering.
         */}
         {(props) => {
-          <div>
-            {/* Represents each rendered arbitrary entity */}
-            {props.children}
-            {/* 
-              * A button that marks the arbitrary entity as active,
-              * allowing the user to edit its attributes.
-            */}
-            <button
-              type='button'
-              onClick={() => {setActiveEntityId(props.entity.id)}}
-            >
-              Select
-            </button>
-            {/*
-              * A delete button is rendered next to each entity
-              * that removes the entity from the store's schema.
-            */}
-            <button
-              type='button'
-              onClick={() => {builderStore.deleteEntity(props.entity.id)}}
-            >
-              Delete
-              </button>
-          </div>
+          return (
+            <div>
+              {/* Represents each rendered arbitrary entity */}
+              {props.children}
+
+              {/* Render the BuilderEntityAttributes input field if the entity is selected */}
+              {activeEntityId === props.entity.id && (
+                <BuilderEntityAttributes
+                  builderStore={builderStore}
+                  components={{ textField: TextFieldAttribute }}
+                  entityId={props.entity.id}
+                />
+              )}
+
+              {/* A button that marks the arbitrary entity as active, allowing the user to edit its attributes. */}
+              <Button
+                type='button'
+                color='secondary'
+                onClick={() => {
+                  setActiveEntityId(props.entity.id);
+                }}
+              >
+                Select
+              </Button>
+
+              {/* A delete button is rendered next to each entity that removes the entity from the store's schema. */}
+              <Button
+                type='button'
+                color='danger'
+                onClick={() => {
+                  builderStore.deleteEntity(props.entity.id);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          );
         }}
       </BuilderEntities>
 
@@ -123,8 +139,9 @@ export default function FormBuilderPage() {
         * A button that adds a new text field type entity
         * to the store's schema.
       */}
-      <button
+      <Button
         type = 'button'
+        color = 'primary'
         onClick={() => builderStore.addEntity({
           type: 'textField',
           attributes: {
@@ -133,27 +150,16 @@ export default function FormBuilderPage() {
         })}
       >
         Add Text Field
-      </button>
-
-      {/*
-      | Only render the `BuilderEntityAttributes` component when
-      | an entity is active. Provide the components
-      | that render attribute components for each defined
-      | entity type in the builder (currently, it's only the
-      | text field).
-      */}
-      {activeEntityId ? (
-        <BuilderEntityAttributes
-          builderStore={builderStore}
-          components={{ textField: TextFieldAttribute }}
-          entityId={activeEntityId}
-        />
-      ) : null}
-
-      {/* TODO: Server integration . */}
-      <button type='button' onClick={() => void submitFormSchema()}>
+      </Button>
+      
+      <Button 
+        type='button' 
+        onClick={() => void submitFormSchema()}
+        color='success'
+      >
         Save Form
-      </button>
-    </div>
+      </Button>
+      </CardBody>
+    </Card>
   );
 }
