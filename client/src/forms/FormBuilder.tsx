@@ -63,8 +63,15 @@ export default function FormBuilderPage() {
     const validationResult = await builderStore.validateSchema();
 
     if(validationResult.success) {
-      // TODO: save form in the server
+      // TODO: save form in the server 
+      // (i.e. fetch('localhost:5001/forms-endpoint', { method: 'POST', body: JSON.stringify(validationResult.data) }))
+      // the endpoint will have to validate the incoming schema based on the builder used to create it.
+      // a python library like `jsonschema` or `pydantic` can be used to validate the schema.
+      // It should return a 200 status code if the schema is valid and save the form in the DB.
+      // If the schema is invalid send back a 400 code and do not save.
+      
       // validationResult.data; // This is the form's schema
+      console.log('Form schema is valid: ', validationResult.data);
     }
   }
 
