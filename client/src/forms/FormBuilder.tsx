@@ -88,7 +88,16 @@ export default function FormBuilderPage() {
       */}
       <BuilderEntities
         builderStore={builderStore}
-        components={{textField: TextFieldEntity}}
+        components={{
+          textField: (props: any) => (
+            <TextFieldEntity 
+              {...props}
+              onLabelClick={() => {
+                setActiveEntityId(props.entity.id);
+              }}
+            />
+          ),
+        }}
       >
         {/*
           * The render prop of the `BuilderEntities` component
@@ -96,41 +105,50 @@ export default function FormBuilderPage() {
         */}
         {(props) => {
           return (
-            <div>
-              {/* Represents each rendered arbitrary entity */}
-              {props.children}
-
-              {/* Render the BuilderEntityAttributes input field if the entity is selected */}
-              {activeEntityId === props.entity.id && (
-                <BuilderEntityAttributes
-                  builderStore={builderStore}
-                  components={{ textField: TextFieldAttribute }}
-                  entityId={props.entity.id}
-                />
-              )}
-
-              {/* A button that marks the arbitrary entity as active, allowing the user to edit its attributes. */}
-              <Button
-                type='button'
-                color='secondary'
-                onClick={() => {
-                  setActiveEntityId(props.entity.id);
-                }}
+            <Card>
+              <CardBody 
+                onClick={(e) => {
+                    e.preventDefault();
+                    // if(props.entity.id) {
+                    //   setActiveEntityId(undefined);
+                    // }
+                  }}
               >
-                Select
-              </Button>
+                {/* Render the BuilderEntityAttributes input field if the entity is selected */}
+                {activeEntityId === props.entity.id && (
+                  <BuilderEntityAttributes
+                    builderStore={builderStore}
+                    components={{ textField: TextFieldAttribute }}
+                    entityId={props.entity.id}
+                  />
+                )}
 
-              {/* A delete button is rendered next to each entity that removes the entity from the store's schema. */}
-              <Button
-                type='button'
-                color='danger'
-                onClick={() => {
-                  builderStore.deleteEntity(props.entity.id);
-                }}
-              >
-                Delete
-              </Button>
-            </div>
+                {/* Represents each rendered arbitrary entity */}
+                {props.children}
+
+                {/* A button that marks the arbitrary entity as active, allowing the user to edit its attributes. */}
+                {/* <Button
+                  type='button'
+                  color='secondary'
+                  onClick={() => {
+                    setActiveEntityId(props.entity.id);
+                  }}
+                >
+                  Select
+                </Button> */}
+
+                {/* A delete button is rendered next to each entity that removes the entity from the store's schema. */}
+                <Button
+                  type='button'
+                  color='danger'
+                  onClick={() => {
+                    builderStore.deleteEntity(props.entity.id);
+                  }}
+                >
+                  Delete
+                </Button>
+              </CardBody>
+            </Card>
           );
         }}
       </BuilderEntities>

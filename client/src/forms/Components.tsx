@@ -42,9 +42,19 @@ export const LabelAttribute = createAttributeComponent(
 export const TextFieldEntity = createEntityComponent(
   textFieldEntity,
   (props) => {
+    const handleLabelClick = () => {
+      props.onLabelClick?.()
+    }
+
     return (
       <div>
-        <Label htmlFor={props.entity.id}>
+        <Label 
+          htmlFor={props.entity.id}
+          onClick={e => {
+            e.preventDefault();
+            handleLabelClick();
+          }}
+        >
           {props.entity.attributes.label}
         </Label>
         <Input

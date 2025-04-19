@@ -6,6 +6,7 @@ import { Col, Container, Row,
 import GroupBox from './Dashboard/GroupBox';
 import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
 import EditDropdown from './Dashboard/EditDropdown';
+import FormBuilderPage from '../forms/FormBuilder';
 
 interface Group {
   id: number
@@ -108,7 +109,7 @@ function App() {
   return (
     <Container>
       <h1>Multi-User Project Planner</h1>
-      <Row className='flex align'>
+      {/* <Row className='flex align'>
         <Col>
           <Card>
             <CardBody>
@@ -129,7 +130,8 @@ function App() {
         <Col>
           {formList}
         </Col>
-      </Row>
+      </Row> */}
+      <FormBuilderPage />
       
     </Container>
   )
