@@ -11,14 +11,16 @@ export default async function FormPage() {
       'entity1': {
         type: 'textField' as const,
         attributes: {
-          label: 'Name'
+          label: 'Name',
+          required: true
         },
         parentId: undefined
       },
       'entity2': {
         type: 'textField' as const,
         attributes: {
-          label: 'Email'
+          label: 'Email',
+          required: true
         },
         parentId: 'entity1'
       }

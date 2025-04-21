@@ -1,6 +1,6 @@
 import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@coltorapps/builder-react';
 
-import { LabelAttribute, TextFieldEntity } from './Components';
+import { LabelAttribute, RequiredAttribute, TextFieldEntity } from './Components';
 import { formBuilder } from './builder';
 import { useState } from 'react';
 import { Button, Card, CardBody, CardHeader } from 'reactstrap';
@@ -12,8 +12,11 @@ import { Button, Card, CardBody, CardHeader } from 'reactstrap';
  */
 const TextFieldAttribute = () => {
   return (
-    <div>
-      <LabelAttribute />
+    <div className='d-flex justify-content-between'>
+      <div className='flex-grow-1 me-4'>
+        <LabelAttribute />
+      </div>
+      <RequiredAttribute />
     </div>
   )
 }
@@ -88,16 +91,7 @@ export default function FormBuilderPage() {
       */}
       <BuilderEntities
         builderStore={builderStore}
-        components={{
-          textField: (props: any) => (
-            <TextFieldEntity 
-              {...props}
-              onLabelClick={() => {
-                setActiveEntityId(props.entity.id);
-              }}
-            />
-          ),
-        }}
+        components={{ textField: TextFieldEntity }}
       >
         {/*
           * The render prop of the `BuilderEntities` component
@@ -106,22 +100,16 @@ export default function FormBuilderPage() {
         {(props) => {
           return (
             <Card>
-              <CardBody 
-                onClick={(e) => {
-                    e.preventDefault();
-                    // if(props.entity.id) {
-                    //   setActiveEntityId(undefined);
-                    // }
-                  }}
-              >
+              <CardBody>
                 {/* Render the BuilderEntityAttributes input field if the entity is selected */}
-                {activeEntityId === props.entity.id && (
-                  <BuilderEntityAttributes
-                    builderStore={builderStore}
-                    components={{ textField: TextFieldAttribute }}
-                    entityId={props.entity.id}
-                  />
-                )}
+                {/* {activeEntityId === props.entity.id && (
+                  
+                )} */}
+                <BuilderEntityAttributes
+                  builderStore={builderStore}
+                  components={{ textField: TextFieldAttribute }}
+                  entityId={props.entity.id}
+                />
 
                 {/* Represents each rendered arbitrary entity */}
                 {props.children}
@@ -163,7 +151,7 @@ export default function FormBuilderPage() {
         onClick={() => builderStore.addEntity({
           type: 'textField',
           attributes: {
-            label: 'Text Field',
+            label: '',
           },
         })}
       >

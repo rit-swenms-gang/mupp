@@ -14,3 +14,29 @@ export const labelAttribute = createAttribute({
   name: 'label',
   validate: (value) => z.string().min(1).parse(value)
 });
+
+/**
+ * This attribute is used to set whether a form field is required or not.
+ */
+export const requiredAttribute = createAttribute({
+  name: 'required',
+  validate: (value) => z.boolean().optional().parse(value)
+});
+
+/**
+ * This attribute is used to set the maximum value of a form field.
+ * It must be a non-negative integer.
+ */
+export const minNumberAttribute = createAttribute({
+  name: 'minNumber',
+  validate: (value) => z.number().int().nonnegative().parse(value)
+});
+
+/**
+ * This attribute is used to set the maximum value of a form field.
+ * It must be a non-negative integer.
+ */
+export const maxNumberAttribute = createAttribute({
+  name: 'maxNumber',
+  validate: (value) => z.number().int().nonnegative().parse(value)
+});
