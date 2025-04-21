@@ -55,7 +55,15 @@ function App() {
   }
 
   function deleteForm(formId: unknown) {
-    // TODO: delete the form
+    let newFormList = [];
+    for(const f in forms) {
+      if(forms[f].name != formId) {
+        newFormList.push(forms[f]);
+      }
+    }
+    setForms(newFormList);
+
+    // TODO: delete the form on the server
     console.log(formId)
   }
 
