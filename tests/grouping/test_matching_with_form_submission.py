@@ -5,12 +5,22 @@ from src.MatchingAlgorithms import (
     Participant,
     tier_list_optimized_generator,
     generate_matches,
+    output_schedule,
 )
 from tests.api.test_req_utils import test_post
 from src.db.utils.db import Database
 from src.db.form_hosting import generate_form_table, format_table_name
 from json import dumps
 import random
+from pprint import pprint
+
+MOCK_UUIDS = {
+    "name_uuid": "name-uuid",
+    "email_uuid": "email-uuid",
+    "leader_uuid": "leader-uuid",
+    "competitive_uuid": "competitive-uuid",
+    "difficulty_uuid": "difficulty-uuid"
+}
 
 class TestMatchingWithDynamicForm(TestCase):
     def setUp(self):
@@ -18,7 +28,6 @@ class TestMatchingWithDynamicForm(TestCase):
         self.db.cleanup(True)
         self.db.exec_sql_file("config/demo_db_setup.sql")
 
-        # Create account + session
         self.account_id = self.db.exec_commit(
             "INSERT INTO accounts (username, email, password, salt) VALUES (%s, %s, %s, %s) RETURNING id;",
             ("formadmin", "formadmin@test.com", "pass", "salt")
@@ -29,12 +38,11 @@ class TestMatchingWithDynamicForm(TestCase):
             (self.account_id, self.session_key)
         )
 
-        # Create dynamic form with label-based answers
-        self.name_qid = "name-uuid"
-        self.email_qid = "email-uuid"
-        self.leader_qid = "leader-uuid"
-        self.q_competitive = "competitive-uuid"
-        self.q_difficulty = "difficulty-uuid"
+        self.name_qid = MOCK_UUIDS["name_uuid"]
+        self.email_qid = MOCK_UUIDS["email_uuid"]
+        self.leader_qid = MOCK_UUIDS["leader_uuid"]
+        self.q_competitive = MOCK_UUIDS["competitive_uuid"]
+        self.q_difficulty = MOCK_UUIDS["difficulty_uuid"]
         self.answers_qid = [self.q_competitive, self.q_difficulty]
 
         form_structure = {
@@ -69,7 +77,6 @@ class TestMatchingWithDynamicForm(TestCase):
             ]
         }
 
-        # Add form to DB
         self.form_id = self.db.exec_commit(
             "INSERT INTO hosted_forms (account_id, form_structure) VALUES (%s, %s) RETURNING id;",
             [self.account_id, dumps(form_structure)]
@@ -82,23 +89,22 @@ class TestMatchingWithDynamicForm(TestCase):
         self.db.cleanup(True)
 
     def test_submission_to_matching(self):
-        """This will test if the matching algorithm generates the correct number of sessions"""
         leaders, _ = self.run_matching_pipeline()
         for leader in leaders:
             for session in leader.schedule:
                 self.assertLessEqual(len(session), max_group_size)
 
     def test_groupings_are_valid(self):
+        """This will test if the groupings are valid, and if the requirements of a 'successful' grouping has been reached
+            This means that all participants are grouped for 3 sessions, no participant is grouped with the same leader twice, and the group sizes are within the bounds for each round"""
         leaders, participants = self.run_matching_pipeline()
 
-        # All participants are scheduled in all 3 rounds
         for p in participants:
             self.assertEqual(
                 p.rounds_scheduled, 3,
                 f"{p.name} is not scheduled in all rounds."
             )
 
-        # No participant is matched with the same leader more than once
         for p in participants:
             unique_leaders = set(p.schedule)
             self.assertEqual(
@@ -106,7 +112,6 @@ class TestMatchingWithDynamicForm(TestCase):
                 f"{p.name} has duplicate leader assignments: {p.schedule}"
             )
 
-        # No leader has more than max_group_size per round
         for l in leaders:
             for i, group in enumerate(l.schedule):
                 self.assertLessEqual(
@@ -114,7 +119,6 @@ class TestMatchingWithDynamicForm(TestCase):
                     f"{l.name} has an oversized group in round {i}: {[p.name for p in group]}"
                 )
 
-        # No leader has the same participant multiple times
         for l in leaders:
             all_participants = [p.name for round in l.schedule for p in round]
             self.assertEqual(
@@ -122,31 +126,31 @@ class TestMatchingWithDynamicForm(TestCase):
                 f"{l.name} has duplicate participants in their schedule: {all_participants}"
             )
 
-
     def run_matching_pipeline(self):
-        """Added this so we can reuse the same mock data"""
-        names = [
-            ("Tyler", True), ("Shahmir", True), ("JoJo", True), ("Christian", True),
-            ("Andrew", True), ("Evan", True),
-        ]
+        form_responses = []
+        """Generating the Leaders' responses"""
+        for i in range(1, 8):
+            form_responses.append({
+                self.name_qid: f"Leader{i}",
+                self.email_qid: f"leader{i}@game.com",
+                self.leader_qid: True,
+                self.q_competitive: random.randint(1, 10),
+                self.q_difficulty: random.randint(1, 10),
+            })
 
-        for i in range(1, 20):
-            names.append((f"Participant{i}", False))
-
-        for name, is_leader in names:
-            response_data = {
-                self.name_qid: name,
-                self.email_qid: f"{name.lower()}@test.com",
-                self.leader_qid: is_leader,
-            }
-
-            response_data[self.q_competitive] = random.randint(1, 10)
-            response_data[self.q_difficulty] = random.randint(1, 10)
-
-            sanitized_row = {
-                self.uuid_to_col[k]: v for k, v in response_data.items() if k in self.uuid_to_col
-            }
-            self.db.tables[self.table_name].insert(sanitized_row)
+        """Generating the participants"""
+        for i in range(1, 21):
+            form_responses.append({
+                self.name_qid: f"Participant{i}",
+                self.email_qid: f"participant{i}@game.com",
+                self.leader_qid: False,
+                self.q_competitive: random.randint(1, 10),
+                self.q_difficulty: random.randint(1, 10),
+            })
+        
+        for response in form_responses:
+            sanitized = {self.uuid_to_col[k]: v for k, v in response.items() if k in self.uuid_to_col}
+            self.db.tables[self.table_name].insert(sanitized)
 
         rows = self.db.tables[self.table_name].select()
         leaders, participants = [], []
@@ -154,8 +158,9 @@ class TestMatchingWithDynamicForm(TestCase):
         for row in rows:
             name = row[self.uuid_to_col[self.name_qid]]
             email = row[self.uuid_to_col[self.email_qid]]
-            answers = [row[self.uuid_to_col[qid]] for qid in self.answers_qid]
             is_leader = row[self.uuid_to_col[self.leader_qid]]
+            answers = [row[self.uuid_to_col[self.q_competitive]],
+                       row[self.uuid_to_col[self.q_difficulty]]]
 
             if is_leader:
                 leaders.append(Leader(name, email, answers))
@@ -165,8 +170,7 @@ class TestMatchingWithDynamicForm(TestCase):
         weights = [5, 2]
         generate_matches(leaders, participants, weights)
         tier_list_optimized_generator(leaders, participants)
-        return leaders, participants
-
         
-       
-
+        # groupings = output_schedule(leaders, participants)
+        # pprint(groupings)
+        return leaders, participants
