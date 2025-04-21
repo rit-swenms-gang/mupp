@@ -57,16 +57,16 @@ export const RequiredAttribute = createAttributeComponent(
     const id = `${props.entity.id}-${props.attribute.name}`;
 
     return (
-      <div>
+      <div className='input-container'>
+        <Input
+          id={id}
+          name={id}
+          type="checkbox"
+          checked={props.attribute.value ?? false}
+          onChange={(e) => props.setValue(e.target.checked)}
+        />
         <Label htmlFor={id}>
-          <Input
-            id={id}
-            name={id}
-            type="checkbox"
-            checked={props.attribute.value ?? false}
-            onChange={(e) => props.setValue(e.target.checked)}
-          />
-          Required
+          Required?
         </Label>
         <ZodErrorMessage error={props.attribute.error} />
       </div>
@@ -85,7 +85,7 @@ export const MinNumberAttribute = createAttributeComponent(
 
     return (
       <div>
-        <div className='number-input-container'>
+        <div className='input-container'>
           <Label htmlFor={id}>
             Min
           </Label>
@@ -115,7 +115,7 @@ export const MaxNumberAttribute = createAttributeComponent(
 
     return (
       <div>
-        <div className='number-input-container'>
+        <div className='input-container'>
           <Label htmlFor={id}>
             Max
           </Label>
@@ -145,7 +145,7 @@ export const WeightAttribute = createAttributeComponent(
 
     return (
       <div className='my-1'>
-        <div className='number-input-container'>
+        <div className='input-container justify-content-end'>
           <Label htmlFor={id}>
             Weight
           </Label>
@@ -157,7 +157,7 @@ export const WeightAttribute = createAttributeComponent(
             step={1}
             onChange={(e) => props.setValue(Number(e.target.value))}
             placeholder='Weight'
-            style={{maxWidth: '5rem'}}
+            className='number-input'
           />
         </div>
         <ZodErrorMessage error={props.attribute.error} />

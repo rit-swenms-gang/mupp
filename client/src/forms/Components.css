@@ -1,9 +1,13 @@
-.number-input-container {
+.input-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
+.input-container > label, .input-container > input {
+  margin: 0;
+}
+
 .number-input {
-  max-width: 5rem;
+  max-width: 4rem;
 }
