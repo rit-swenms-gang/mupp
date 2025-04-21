@@ -1,6 +1,6 @@
 import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@coltorapps/builder-react';
 
-import { CheckboxEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
+import { IsLeaderEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
 import { formBuilder } from './builder';
 import { Button, Card, CardBody, CardHeader, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 
@@ -46,14 +46,9 @@ const NumberScaleAttribute = () => {
   )
 }
 
-const CheckboxAttribute = () => {
+const IsLeaderAttribute = () => {
   return (
-    <div className='d-flex justify-content-between'>
-      <div className='flex-grow-1 me-4'>
-        <LabelAttribute />
-      </div>
-      {/* <CheckboxAttribute /> */}
-    </div>
+    <></>
   )
 }
 
@@ -71,10 +66,8 @@ export default function FormBuilderPage() {
       schema: {
        entities: {
           '51324b32-adc3-4d17-a90e-66b5453935bd': {
-            type: 'checkbox',
-            attributes: {
-              label: 'Are you a leader?',
-            }
+            type: 'isLeader',
+            attributes: {}
           }
         },
         root: ['51324b32-adc3-4d17-a90e-66b5453935bd']
@@ -141,7 +134,7 @@ export default function FormBuilderPage() {
         components={{ 
           textField: TextFieldEntity,
           numberScale: NumberScaleEntity,
-          checkbox: CheckboxEntity,
+          isLeader: IsLeaderEntity,
         }}
       >
         {/*
@@ -158,7 +151,7 @@ export default function FormBuilderPage() {
                   components={{ 
                     textField: TextFieldAttribute,
                     numberScale: NumberScaleAttribute,
-                    checkbox: CheckboxAttribute,
+                    isLeader: IsLeaderAttribute,
                   }}
                   entityId={props.entity.id}
                 />

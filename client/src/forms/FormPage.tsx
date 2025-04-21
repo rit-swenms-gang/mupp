@@ -9,10 +9,8 @@ export default function FormPage() {
   const mockSchema = {
     entities: {
       '51324b32-adc3-4d17-a90e-66b5453935bd': {
-        type: 'checkbox' as const,
-        'attributes': {
-          'label': 'Are you a leader?',
-        }
+        type: 'isLeader' as const,
+        'attributes': {}
       },
       '7a77959a-eb84-447c-9ed7-200e2a674eea': {
         type: 'textField' as const,
