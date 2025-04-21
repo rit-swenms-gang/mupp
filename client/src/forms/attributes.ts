@@ -47,5 +47,5 @@ export const maxValueAttribute = createAttribute({
  */
 export const weightAttribute = createAttribute({
   name: 'weight',
-  validate: (value) => z.number().int().nonnegative().min(1).max(5).parse(value)
+  validate: (value) => z.number().int().min(1).max(5).parse(value)
 });

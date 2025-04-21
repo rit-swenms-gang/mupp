@@ -1,6 +1,6 @@
 import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@coltorapps/builder-react';
 
-import { LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity } from './Components';
+import { LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
 import { formBuilder } from './builder';
 import { useState } from 'react';
 import { Button, Card, CardBody, CardHeader, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
@@ -29,22 +29,28 @@ const TextFieldAttribute = () => {
   )
 }
 
+/**
+ * A `NumberScaleAttributes` component 
+ * is responsible for rendering the attributes 
+ * of a number scale (the label, weight, min, and max attributes).
+ */
 const NumberScaleAttribute = () => {
   return (
     <>
-      <LabelRequiredSection />
+      <LabelAttribute />
+      <WeightAttribute />
       <div className='d-flex justify-content-between'>
-        <div style={{flexGrow: 1}}>
-          <MinNumberAttribute />
-        </div>
-        <div style={{flexGrow: 0}}>
-          <MaxNumberAttribute />
-        </div>
+        <MinNumberAttribute />
+        <MaxNumberAttribute />
       </div>
     </>
   )
 }
 
+/**
+ * The `FormBuilderPage` component is a form builder page that allows users to create forms using a schema builder.
+ * It provides a user interface for adding, editing, and deleting form fields and their attributes.
+ */
 export default function FormBuilderPage() {
   /**
    * The `activeEntityId` state variable holds an optional reference to the currently active entity ID.
@@ -185,6 +191,7 @@ export default function FormBuilderPage() {
                 type: 'numberScale',
                 attributes: {
                   label: '',
+                  weight: 0,
                   min: 1,
                   max: 10,
                 },

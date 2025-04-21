@@ -20,7 +20,6 @@ export default function FormPage() {
         type: 'numberScale' as const,
         attributes: {
           label: 'Age',
-          required: true,
           weight: 1,
           min: 1,
           max: 100

@@ -44,8 +44,8 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
        * Alternatively you can use `validationResult.data`
        * instead of sending `FormData`.
       */
-      const formData = new FormData(e.currentTarget);
-      // const formData = validationResult.data;
+      // const formData = new FormData(e.currentTarget);
+      const formData = validationResult.data;
       console.log('Form data: ', formData);
     }
   }

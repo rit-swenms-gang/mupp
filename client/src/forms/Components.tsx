@@ -2,7 +2,7 @@ import { ZodError } from 'zod';
 
 import { createAttributeComponent, createEntityComponent } from '@coltorapps/builder-react';
 
-import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute } from './attributes';
+import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute, weightAttribute } from './attributes';
 import { numberScaleEntity, textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
@@ -89,7 +89,7 @@ export const MinNumberAttribute = createAttributeComponent(
           type='number'
           value={props.attribute.value ?? ''}
           onChange={(e) => props.setValue(Number(e.target.value))}
-          placeholder='Min'
+          style={{maxWidth: '5rem'}}
         />
         <ZodErrorMessage error={props.attribute.error} />
       </div>
@@ -114,8 +114,39 @@ export const MaxNumberAttribute = createAttributeComponent(
           type='number'
           value={props.attribute.value ?? ''}
           onChange={(e) => props.setValue(Number(e.target.value))}
-          placeholder='Max'
+          style={{maxWidth: '5rem'}}
         />
+        <ZodErrorMessage error={props.attribute.error} />
+      </div>
+    );
+  }
+);
+
+/**
+ * This component renders a weight attribute for a form field.
+ * It is used to create a number input field for the user to enter the weight of the field.
+ */
+export const WeightAttribute = createAttributeComponent(
+  weightAttribute,
+  (props) => {
+    const id = `${props.entity.id}-${props.attribute.name}`;
+
+    return (
+      <div>
+        <div className='d-flex align-items-center'>
+          <Label htmlFor={id}>
+            Weight
+          </Label>
+          <Input
+            id={id}
+            name={id}
+            type='number'
+            value={props.attribute.value ?? ''}
+            step={1}
+            onChange={(e) => props.setValue(Number(e.target.value))}
+            placeholder='Weight'
+          />
+        </div>
         <ZodErrorMessage error={props.attribute.error} />
       </div>
     );
@@ -156,7 +187,7 @@ export const NumberScaleEntity = createEntityComponent(
     const max = props.entity.attributes.max ?? 10;
 
     let minMaxError = min >= max ? 'Minimum value must be less than maximum value.' : null;
-
+    const value = props.entity.value ?? Math.floor((max - min) / 2) + min;
 
     return (
       <div>
@@ -165,12 +196,15 @@ export const NumberScaleEntity = createEntityComponent(
           id={props.entity.id}
           name={props.entity.id}
           type='range'
-          value={(Math.floor((max - min) / 2))  + min}
+          defaultValue={value}
           onChange={(e) => props.setValue(Number(e.target.value))}
           min={min}
           max={max}
           step={1}
         />
+        <Label htmlFor={props.entity.id}>
+          {value}
+        </Label>
         <ZodErrorMessage error={props.entity.error} />
       </div>
     )
