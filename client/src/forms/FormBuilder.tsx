@@ -1,9 +1,20 @@
 import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@coltorapps/builder-react';
 
-import { LabelAttribute, RequiredAttribute, TextFieldEntity } from './Components';
+import { LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity } from './Components';
 import { formBuilder } from './builder';
 import { useState } from 'react';
-import { Button, Card, CardBody, CardHeader } from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
+
+const LabelRequiredSection = () => {
+  return (
+    <div className='d-flex justify-content-between'>
+      <div className='flex-grow-1 me-4'>
+        <LabelAttribute />
+      </div>
+      <RequiredAttribute />
+    </div>
+  )
+}
 
 /**
  * A `TextFieldAttributes` component 
@@ -12,12 +23,25 @@ import { Button, Card, CardBody, CardHeader } from 'reactstrap';
  */
 const TextFieldAttribute = () => {
   return (
-    <div className='d-flex justify-content-between'>
-      <div className='flex-grow-1 me-4'>
-        <LabelAttribute />
+    <>
+      <LabelRequiredSection />
+    </>
+  )
+}
+
+const NumberScaleAttribute = () => {
+  return (
+    <>
+      <LabelRequiredSection />
+      <div className='d-flex justify-content-between'>
+        <div style={{flexGrow: 1}}>
+          <MinNumberAttribute />
+        </div>
+        <div style={{flexGrow: 0}}>
+          <MaxNumberAttribute />
+        </div>
       </div>
-      <RequiredAttribute />
-    </div>
+    </>
   )
 }
 
@@ -76,6 +100,9 @@ export default function FormBuilderPage() {
       
       // validationResult.data; // This is the form's schema
       console.log('Form schema is valid: ', validationResult.data);
+    } else {
+      console.error('Form schema is invalid: ', validationResult.reason);
+      alert('Please correct the errors in the form before saving it.');
     }
   }
 
@@ -87,11 +114,14 @@ export default function FormBuilderPage() {
         * The `BuilderEntities` component renders the entities
         * tree of the schema of the builder store.
         * Each of the entity components for each defined entity type is passed to
-        * the form builder (currently, it's only the text field).
+        * the form builder.
       */}
       <BuilderEntities
         builderStore={builderStore}
-        components={{ textField: TextFieldEntity }}
+        components={{ 
+          textField: TextFieldEntity,
+          numberScale: NumberScaleEntity
+        }}
       >
         {/*
           * The render prop of the `BuilderEntities` component
@@ -101,29 +131,18 @@ export default function FormBuilderPage() {
           return (
             <Card>
               <CardBody>
-                {/* Render the BuilderEntityAttributes input field if the entity is selected */}
-                {/* {activeEntityId === props.entity.id && (
-                  
-                )} */}
+                {/* Render the BuilderEntityAttributes input field */}
                 <BuilderEntityAttributes
                   builderStore={builderStore}
-                  components={{ textField: TextFieldAttribute }}
+                  components={{ 
+                    textField: TextFieldAttribute,
+                    numberScale: NumberScaleAttribute
+                  }}
                   entityId={props.entity.id}
                 />
 
                 {/* Represents each rendered arbitrary entity */}
                 {props.children}
-
-                {/* A button that marks the arbitrary entity as active, allowing the user to edit its attributes. */}
-                {/* <Button
-                  type='button'
-                  color='secondary'
-                  onClick={() => {
-                    setActiveEntityId(props.entity.id);
-                  }}
-                >
-                  Select
-                </Button> */}
 
                 {/* A delete button is rendered next to each entity that removes the entity from the store's schema. */}
                 <Button
@@ -142,29 +161,49 @@ export default function FormBuilderPage() {
       </BuilderEntities>
 
       {/*
-        * A button that adds a new text field type entity
-        * to the store's schema.
+        * A button that adds a new entity to the store's schema.
       */}
-      <Button
-        type = 'button'
-        color = 'primary'
-        onClick={() => builderStore.addEntity({
-          type: 'textField',
-          attributes: {
-            label: '',
-          },
-        })}
-      >
-        Add Text Field
-      </Button>
+      <div className='d-flex justify-content-around'>
+        <UncontrolledDropdown>
+          <DropdownToggle caret>
+            Add
+          </DropdownToggle>
+          <DropdownMenu>
+            <DropdownItem
+              onClick={() => builderStore.addEntity({
+                type: 'textField',
+                attributes: {
+                  label: '',
+                },
+              })}
+            >
+              Text Field
+            </DropdownItem>
+            <DropdownItem divider />
+            <DropdownItem
+              onClick={() => builderStore.addEntity({
+                type: 'numberScale',
+                attributes: {
+                  label: '',
+                  minNumber: 1,
+                  maxNumber: 10,
+                },
+              })}
+            >
+              Number Scale
+            </DropdownItem>
+          </DropdownMenu>
+        </UncontrolledDropdown>
+
+        <Button 
+          type='button' 
+          onClick={() => void submitFormSchema()}
+          color='success'
+        >
+          Save Form
+        </Button>
+      </div>
       
-      <Button 
-        type='button' 
-        onClick={() => void submitFormSchema()}
-        color='success'
-      >
-        Save Form
-      </Button>
       </CardBody>
     </Card>
   );

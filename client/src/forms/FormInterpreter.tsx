@@ -1,7 +1,7 @@
 import { type Schema } from '@coltorapps/builder';
 import { InterpreterEntities, useInterpreterStore } from '@coltorapps/builder-react';
 
-import { TextFieldEntity } from './Components';
+import { NumberScaleEntity, TextFieldEntity } from './Components';
 import { formBuilder } from './builder';
 import { FormEvent } from 'react';
 import { Button, Form } from 'reactstrap';
@@ -68,7 +68,10 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
       */}
       <InterpreterEntities
         interpreterStore={interpreterStore}
-        components={{textField: TextFieldEntity}}
+        components={{
+          textField: TextFieldEntity, 
+          numberScale: NumberScaleEntity
+        }}
       />
       <Button type='submit'>Submit</Button>
     </Form>

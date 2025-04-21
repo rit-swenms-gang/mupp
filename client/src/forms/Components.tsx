@@ -6,6 +6,18 @@ import { labelAttribute, maxNumberAttribute, minNumberAttribute, requiredAttribu
 import { numberScaleEntity, textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
+interface ZodErrorMessageProps {
+  error: unknown; // The error object to check
+}
+
+const ZodErrorMessage: React.FC<ZodErrorMessageProps> = ({ error }) => {
+  if (error instanceof ZodError) {
+    const errorMessage = error.format()._errors[0];
+    return <p className="text-danger mt-2">{errorMessage}</p>;
+  }
+  return null; // No error to display
+};
+
 /**
  * This component renders a label attribute for a form field.
  * It is used to create a label input field for the user to enter the label text.
@@ -27,9 +39,7 @@ export const LabelAttribute = createAttributeComponent(
           placeholder='Question label'
         />
         {/* Catch errors from Zod validation and render them */}
-        {props.attribute.error instanceof ZodError
-          ? props.attribute.error.format()._errors[0]
-          : null}
+        <ZodErrorMessage error={props.attribute.error} />
       </div>
     );
   }
@@ -56,9 +66,7 @@ export const RequiredAttribute = createAttributeComponent(
           />
           Required
         </Label>
-        {props.attribute.error instanceof ZodError
-          ? props.attribute.error.format()._errors[0]
-          : null}
+        <ZodErrorMessage error={props.attribute.error} />
       </div>
     );
   }
@@ -81,11 +89,9 @@ export const MinNumberAttribute = createAttributeComponent(
           type='number'
           value={props.attribute.value ?? ''}
           onChange={(e) => props.setValue(Number(e.target.value))}
-          placeholder='0'
+          placeholder='Min'
         />
-        {props.attribute.error instanceof ZodError
-          ? props.attribute.error.format()._errors[0]
-          : null}
+        <ZodErrorMessage error={props.attribute.error} />
       </div>
     );
   }
@@ -108,11 +114,9 @@ export const MaxNumberAttribute = createAttributeComponent(
           type='number'
           value={props.attribute.value ?? ''}
           onChange={(e) => props.setValue(Number(e.target.value))}
-          placeholder='10'
+          placeholder='Max'
         />
-        {props.attribute.error instanceof ZodError
-          ? props.attribute.error.format()._errors[0]
-          : null}
+        <ZodErrorMessage error={props.attribute.error} />
       </div>
     );
   }
@@ -135,9 +139,7 @@ export const TextFieldEntity = createEntityComponent(
           onChange={(e) => props.setValue(e.target.value)}
           placeholder='Answer goes here...'
         />
-        {props.entity.error instanceof ZodError
-          ? props.entity.error.format()._errors[0]
-          : null}
+        <ZodErrorMessage error={props.entity.error} />
       </div>
     )
   },
@@ -153,29 +155,23 @@ export const NumberScaleEntity = createEntityComponent(
     const min = props.entity.attributes.minNumber ?? 1;
     const max = props.entity.attributes.maxNumber ?? 10;
 
-    const minMaxError = min > max ?
-      'The minimum value cannot be greater than the maximum value.' :
-      max < min ? 
-      'The maximum value cannot be less than the minimum value.' :
-      null;
+    let minMaxError = min >= max ? 'Minimum value must be less than maximum value.' : null;
+
 
     return (
       <div>
+        {minMaxError && <p className='text-danger mt-2'>{minMaxError}</p>}
         <Input
           id={props.entity.id}
           name={props.entity.id}
           type='range'
-          value={props.entity.value ?? ''}
+          value={(Math.floor((max - min) / 2))  + min}
           onChange={(e) => props.setValue(Number(e.target.value))}
           min={min}
           max={max}
           step={1}
         />
-        {minMaxError && <p className='text-danger mt-2'>{minMaxError}</p>}
-
-        {props.entity.error instanceof ZodError
-          ? <p className='text-danger mt-2'>{props.entity.error.format()._errors[0]}</p>
-          : null}
+        <ZodErrorMessage error={props.entity.error} />
       </div>
     )
   },

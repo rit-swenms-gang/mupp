@@ -34,16 +34,31 @@ export const numberScaleEntity = createEntity({
   name: 'numberScale',
   attributes: [labelAttribute, requiredAttribute, minNumberAttribute, maxNumberAttribute],
   validate: (value, context) => {
+    const min = context.entity.attributes.minNumber ?? 1;
+    const max = context.entity.attributes.maxNumber ?? 10;
+
     const schema = z.number()
       .int()
       .nonnegative()
-      .min(context.entity.attributes.minNumber ?? 1)
-      .max(context.entity.attributes.maxNumber ?? 10);
+      .min(min)
+      .max(max);
 
     if(!context.entity.attributes.required) {
       return schema.optional().parse(value);
     }
 
     return schema.parse(value);
+  },
+  attributesExtensions: {
+    minNumber: {
+      validate(value, context) {
+        const minValue = context.validate(value);
+
+        if(minValue >= context.entity.attributes.maxNumber) {
+          throw new Error('Minimum value must be less than maximum value.');
+        }
+        return minValue;
+      }
+    }
   }
 });
