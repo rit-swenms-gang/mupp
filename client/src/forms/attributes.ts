@@ -49,3 +49,12 @@ export const weightAttribute = createAttribute({
   name: 'weight',
   validate: (value) => z.number().int().min(1).max(5).parse(value)
 });
+
+/**
+ * This attribute is used to set the default value of a form field.
+ * It can be any value, including null or undefined.
+ */
+export const defaultValueAttribute = createAttribute({
+  name: 'defaultValue',
+  validate: (value) => z.any().optional().parse(value)
+});

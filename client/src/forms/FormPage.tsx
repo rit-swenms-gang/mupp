@@ -12,7 +12,8 @@ export default function FormPage() {
         type: 'boolean' as const,
         'attributes': {
           label: 'Are you a leader?',
-          required: true
+          required: true,
+          defaultValue: false
         }
       },
       '7a77959a-eb84-447c-9ed7-200e2a674eea': {
@@ -29,7 +30,8 @@ export default function FormPage() {
           label: 'Age',
           weight: 1,
           min: 1,
-          max: 100
+          max: 100,
+          defaultValue: 50
         },
         
       }

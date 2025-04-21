@@ -72,6 +72,7 @@ export default function FormBuilderPage() {
             attributes: {
               label: 'Are you a leader?',
               required: true,
+              defaultValue: false,
             }
           }
         },
@@ -212,10 +213,24 @@ export default function FormBuilderPage() {
                   weight: 0,
                   min: 1,
                   max: 10,
+                  defaultValue: 5,
                 },
               })}
             >
               Number Scale
+            </DropdownItem>
+            <DropdownItem divider />
+            <DropdownItem
+              onClick={() => builderStore.addEntity({
+                type: 'boolean',
+                attributes: {
+                  label: '',
+                  required: false,
+                  defaultValue: false,
+                },
+              })}
+            >
+              Boolean (Checkbox)
             </DropdownItem>
           </DropdownMenu>
         </UncontrolledDropdown>

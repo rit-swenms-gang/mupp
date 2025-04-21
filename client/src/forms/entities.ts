@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { createEntity } from '@coltorapps/builder';
 
-import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute, weightAttribute } from './attributes';
+import { defaultValueAttribute, labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute, weightAttribute } from './attributes';
 
 // Think of entities with attributes as components with props. 
 // For example, you can define a text field entity, and users can later add multiple instances of text fields to a form.
@@ -13,7 +13,7 @@ import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute
  */
 export const textFieldEntity = createEntity({
   name: 'textField',
-  attributes: [labelAttribute, requiredAttribute], // like a prop to the entity
+  attributes: [labelAttribute, requiredAttribute, defaultValueAttribute], // like a prop to the entity
   validate: (value, context) => {
     const schema = z.string();
 
@@ -32,7 +32,7 @@ export const textFieldEntity = createEntity({
  */
 export const numberScaleEntity = createEntity({
   name: 'numberScale',
-  attributes: [labelAttribute, weightAttribute, minValueAttribute, maxValueAttribute],
+  attributes: [labelAttribute, weightAttribute, minValueAttribute, maxValueAttribute, defaultValueAttribute],
   validate: (value, context) => {
     const min = context.entity.attributes.min ?? 1;
     const max = context.entity.attributes.max ?? 10;
@@ -43,6 +43,13 @@ export const numberScaleEntity = createEntity({
       .min(min)
       .max(max)
       .parse(value);
+  },
+  defaultValue(context) {
+    const min = context.entity.attributes.min ?? 0;
+    const max = context.entity.attributes.max ?? 10;
+
+    // Return the default value or the midpoint of min and max
+    return context.entity.attributes.defaultValue ?? (Math.floor((min + max) / 2) + min);
   },
   attributesExtensions: {
     min: {
@@ -64,7 +71,7 @@ export const numberScaleEntity = createEntity({
  */
 export const booleanEntity = createEntity({
   name: 'boolean',
-  attributes: [labelAttribute, requiredAttribute],
+  attributes: [labelAttribute, requiredAttribute, defaultValueAttribute],
   validate: (value, context) => {
     const schema = z.boolean();
 
@@ -73,5 +80,8 @@ export const booleanEntity = createEntity({
     }
 
     return schema.parse(value);
-  }
+  },
+  defaultValue(context) {
+    return context.entity.attributes.defaultValue ?? false;
+  },
 });

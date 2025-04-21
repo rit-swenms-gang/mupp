@@ -209,7 +209,7 @@ export const NumberScaleEntity = createEntityComponent(
           id={props.entity.id}
           name={props.entity.id}
           type='range'
-          defaultValue={value}
+          defaultValue={props.entity.attributes.defaultValue ?? min}
           onChange={(e) => props.setValue(Number(e.target.value))}
           min={min}
           max={max}
@@ -235,12 +235,13 @@ export const BooleanEntity = createEntityComponent(
     return (
       <div className='input-container justify-content-center'>
         <Label htmlFor={props.entity.id}>
-          Are you a leader?
+          {props.entity.attributes.label}
         </Label>
         <Input
           id={props.entity.id}
           name={props.entity.id}
           type='checkbox'
+          defaultChecked={props.entity.attributes.defaultValue ?? false}
           checked={props.entity.value ?? false}
           onChange={(e) => props.setValue(e.target.checked)}
         />
