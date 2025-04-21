@@ -110,7 +110,7 @@ function App() {
   return (
     <Container>
       <h1>Multi-User Project Planner</h1>
-      {/* <Row className='flex align'>
+      <Row className='flex align'>
         <Col>
           <Card>
             <CardBody>
@@ -131,9 +131,7 @@ function App() {
         <Col>
           {formList}
         </Col>
-      </Row> */}
-      <FormBuilderPage />
-      {/* <FormPage /> */}
+      </Row>
     </Container>
   )
 }
