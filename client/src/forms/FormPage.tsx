@@ -8,6 +8,12 @@ export default function FormPage() {
   // THIS IS A MOCKED SCHEMA
   const mockSchema = {
     entities: {
+      '51324b32-adc3-4d17-a90e-66b5453935bd': {
+        type: 'checkbox' as const,
+        'attributes': {
+          'label': 'Are you a leader?',
+        }
+      },
       '7a77959a-eb84-447c-9ed7-200e2a674eea': {
         type: 'textField' as const,
         attributes: {
@@ -27,7 +33,7 @@ export default function FormPage() {
         
       }
     },
-    root: ['7a77959a-eb84-447c-9ed7-200e2a674eea', '7a49f550-5966-4c8c-89eb-a0797940fff3']
+    root: ['51324b32-adc3-4d17-a90e-66b5453935bd', '7a77959a-eb84-447c-9ed7-200e2a674eea', '7a49f550-5966-4c8c-89eb-a0797940fff3']
   };
 
   return <FormInterpreter schema={mockSchema} />;

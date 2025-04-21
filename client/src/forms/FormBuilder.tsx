@@ -1,8 +1,7 @@
 import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@coltorapps/builder-react';
 
-import { LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
+import { CheckboxEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
 import { formBuilder } from './builder';
-import { useState } from 'react';
 import { Button, Card, CardBody, CardHeader, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 
 const LabelRequiredSection = () => {
@@ -47,21 +46,40 @@ const NumberScaleAttribute = () => {
   )
 }
 
+const CheckboxAttribute = () => {
+  return (
+    <div className='d-flex justify-content-between'>
+      <div className='flex-grow-1 me-4'>
+        <LabelAttribute />
+      </div>
+      {/* <CheckboxAttribute /> */}
+    </div>
+  )
+}
+
 /**
  * The `FormBuilderPage` component is a form builder page that allows users to create forms using a schema builder.
  * It provides a user interface for adding, editing, and deleting form fields and their attributes.
  */
 export default function FormBuilderPage() {
   /**
-   * The `activeEntityId` state variable holds an optional reference to the currently active entity ID.
-   */
-  const [activeEntityId, setActiveEntityId] = useState<string>();
-
-  /**
    * The `useBuilderStore` hook creates a builder store. 
    * This store is responsible for building a schema based on a builder definition.
    */
   const builderStore = useBuilderStore(formBuilder, {
+    initialData: {
+      schema: {
+       entities: {
+          '51324b32-adc3-4d17-a90e-66b5453935bd': {
+            type: 'checkbox',
+            attributes: {
+              label: 'Are you a leader?',
+            }
+          }
+        },
+        root: ['51324b32-adc3-4d17-a90e-66b5453935bd']
+      },
+    },
     events: {
       /*
        * We use the `onEntityAttributeUpdated` event callback
@@ -73,17 +91,6 @@ export default function FormBuilderPage() {
           payload.entity.id,
           payload.attributeName
         );
-      },
-
-      /*
-       * We use the `onEntityDeleted` event callback to unset the
-       * `activeEntityId` state variable when the currently active
-       * entity is deleted.
-       */
-      onEntityDeleted(payload) {
-        if(payload.entity.id === activeEntityId) {
-          setActiveEntityId(undefined);
-        }
       },
     },
   });
@@ -99,7 +106,7 @@ export default function FormBuilderPage() {
     if(validationResult.success) {
 
       // check if schema is empty
-      if(Object.keys(validationResult.data.entities).length === 0) {
+      if(Object.keys(validationResult.data.entities).length <= 1) {
         alert('Please add at least one entity to the form.');
         return;
       }
@@ -133,7 +140,8 @@ export default function FormBuilderPage() {
         builderStore={builderStore}
         components={{ 
           textField: TextFieldEntity,
-          numberScale: NumberScaleEntity
+          numberScale: NumberScaleEntity,
+          checkbox: CheckboxEntity,
         }}
       >
         {/*
@@ -149,7 +157,8 @@ export default function FormBuilderPage() {
                   builderStore={builderStore}
                   components={{ 
                     textField: TextFieldAttribute,
-                    numberScale: NumberScaleAttribute
+                    numberScale: NumberScaleAttribute,
+                    checkbox: CheckboxAttribute,
                   }}
                   entityId={props.entity.id}
                 />
@@ -164,6 +173,7 @@ export default function FormBuilderPage() {
                   onClick={() => {
                     builderStore.deleteEntity(props.entity.id);
                   }}
+                  hidden={props.entity.id === builderStore.getSchema().root[0]}
                 >
                   Delete
                 </Button>

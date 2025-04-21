@@ -57,3 +57,15 @@ export const numberScaleEntity = createEntity({
     }
   }
 });
+
+/**
+ * This entity represents a checkbox in a form.
+ * It has a label attribute and can be used to create a checkbox input field.
+ */
+export const checkboxEntity = createEntity({
+  name: 'checkbox',
+  attributes: [labelAttribute],
+  validate: (value) => {
+    return z.boolean().parse(value);
+  }
+});

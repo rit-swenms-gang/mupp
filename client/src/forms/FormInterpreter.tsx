@@ -1,7 +1,7 @@
 import { type Schema } from '@coltorapps/builder';
 import { InterpreterEntities, useInterpreterStore } from '@coltorapps/builder-react';
 
-import { NumberScaleEntity, TextFieldEntity } from './Components';
+import { CheckboxEntity, NumberScaleEntity, TextFieldEntity } from './Components';
 import { formBuilder } from './builder';
 import { FormEvent } from 'react';
 import { Button, Form } from 'reactstrap';
@@ -29,7 +29,7 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
     },
   });
 
-  const submitForm = async (e: FormEvent<HTMLFormElement>) => {
+  const submitForm = async () => {
     // TODO: server integration to save the form
     /*
      * Validate the values once again on the client
@@ -57,7 +57,7 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
 
         // fire the submitForm function without gettting return value
         // we only care about the function's side effects
-        void submitForm(e);
+        void submitForm();
       }}
     >
       {/*
@@ -69,7 +69,8 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
         interpreterStore={interpreterStore}
         components={{
           textField: TextFieldEntity, 
-          numberScale: NumberScaleEntity
+          numberScale: NumberScaleEntity,
+          checkbox: CheckboxEntity,
         }}
       />
       <Button type='submit'>Submit</Button>
