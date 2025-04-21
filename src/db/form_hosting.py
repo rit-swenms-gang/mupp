@@ -9,6 +9,7 @@ def format_table_name(uuid: str) -> str:
 
 
 def generate_form_table(db: Database, form_id: str) -> None:
+    """This will generate a form table based on the form_structure"""
     table_name = format_table_name(form_id)
 
     form_structure_row = db.select(
@@ -21,24 +22,25 @@ def generate_form_table(db: Database, form_id: str) -> None:
     form_structure = json.loads(form_structure_row[0][0])
 
     columns = []
-    for field, field_type in form_structure.items():
-        if isinstance(field_type, str):
-            pg_type = {
-                "text": "TEXT",
-                "json": "JSON",
-                "int": "INTEGER",
-                "float": "REAL",
-                "bool": "BOOLEAN",
-            }.get(field_type, "TEXT")
+    for entity in form_structure['entities'].values():
+        type = entity['type']
+        label = entity['attributes']['label']
+        required = entity['attributes'].get('required',False)
+        if type == 'textField':
+            pg_type = 'VARCHAR'
+        elif type == 'boolean':
+            pg_type = 'BOOLEAN'
+        elif type == 'numberScale':
+            pg_type = 'INT'
         else:
-            pg_type = "TEXT"
+            pg_type = "VARCHAR"
 
-        columns.append(f"{field} {pg_type}")
+        columns.append(f"{label.lower()} {pg_type}{" NOT NULL" if required else ""}")
 
     create_query = f"""
         CREATE TABLE {table_name} (
             id SERIAL PRIMARY KEY,
-            {', '.join(columns)}
+            {',\n'.join(columns)}
         );
     """
 
