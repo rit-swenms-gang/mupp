@@ -6,6 +6,7 @@ import { Col, Container, Row,
 import GroupBox from './Dashboard/GroupBox';
 import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
 import EditDropdown from './Dashboard/EditDropdown';
+import Authenticator from '../Authenticator/Authenticator';
 
 interface Group {
   id: number
@@ -106,32 +107,34 @@ function App() {
   }, [])
 
   return (
-    <Container>
-      <h1>Multi-User Project Planner</h1>
-      <Row className='flex align'>
-        <Col>
-          <Card>
-            <CardBody>
-              <p>
-                Plan your next event by splitting your participants into the right groups.
-              </p>
-              <p>
-                Communication with port <code>5001</code> server: {serverText}
-              </p>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          {groupBoxes}
-        </Col>
-        <Col>
-          {formList}
-        </Col>
-      </Row>
-      
-    </Container>
+    <Authenticator>
+      <Container>
+        <h1>Multi-User Project Planner</h1>
+        <Row className='flex align'>
+          <Col>
+            <Card>
+              <CardBody>
+                <p>
+                  Plan your next event by splitting your participants into the right groups.
+                </p>
+                <p>
+                  Communication with port <code>5001</code> server: {serverText}
+                </p>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {groupBoxes}
+          </Col>
+          <Col>
+            {formList}
+          </Col>
+        </Row>
+        
+      </Container>
+    </Authenticator>
   )
 }
 
