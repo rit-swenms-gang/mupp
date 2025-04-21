@@ -130,6 +130,7 @@ function App() {
           {formList}
         </Col>
       </Row>
+      
     </Container>
   )
 }
