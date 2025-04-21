@@ -17,10 +17,13 @@ export default function FormPage() {
         
       },
       '7a49f550-5966-4c8c-89eb-a0797940fff3': {
-        type: 'textField' as const,
+        type: 'numberScale' as const,
         attributes: {
-          label: 'Email',
-          required: true
+          label: 'Age',
+          required: true,
+          weight: 1,
+          min: 1,
+          max: 100
         },
         
       }
