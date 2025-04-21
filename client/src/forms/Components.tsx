@@ -2,7 +2,7 @@ import { ZodError } from 'zod';
 
 import { createAttributeComponent, createEntityComponent } from '@coltorapps/builder-react';
 
-import { labelAttribute, requiredAttribute } from './attributes';
+import { labelAttribute, maxNumberAttribute, minNumberAttribute, requiredAttribute } from './attributes';
 import { textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
@@ -56,6 +56,52 @@ export const RequiredAttribute = createAttributeComponent(
           />
           Required
         </Label>
+        {props.attribute.error instanceof ZodError
+          ? props.attribute.error.format()._errors[0]
+          : null}
+      </div>
+    );
+  }
+);
+
+export const MinNumberAttribute = createAttributeComponent(
+  minNumberAttribute,
+  (props) => {
+    const id = `${props.entity.id}-${props.attribute.name}`;
+
+    return (
+      <div>
+        <Input
+          id={id}
+          name={id}
+          type='number'
+          value={props.attribute.value ?? ''}
+          onChange={(e) => props.setValue(Number(e.target.value))}
+          placeholder='0'
+        />
+        {props.attribute.error instanceof ZodError
+          ? props.attribute.error.format()._errors[0]
+          : null}
+      </div>
+    );
+  }
+);
+
+export const MaxNumberAttribute = createAttributeComponent(
+  maxNumberAttribute,
+  (props) => {
+    const id = `${props.entity.id}-${props.attribute.name}`;
+
+    return (
+      <div>
+        <Input
+          id={id}
+          name={id}
+          type='number'
+          value={props.attribute.value ?? ''}
+          onChange={(e) => props.setValue(Number(e.target.value))}
+          placeholder='10'
+        />
         {props.attribute.error instanceof ZodError
           ? props.attribute.error.format()._errors[0]
           : null}
