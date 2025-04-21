@@ -40,3 +40,12 @@ export const maxValueAttribute = createAttribute({
   name: 'max',
   validate: (value) => z.number().int().nonnegative().parse(value)
 });
+
+/**
+ * This attribute is used to set the weight of a form field.
+ * It must be a non-negative integer between 1 and 5.
+ */
+export const weightAttribute = createAttribute({
+  name: 'weight',
+  validate: (value) => z.number().int().nonnegative().min(1).max(5).parse(value)
+});
