@@ -5,14 +5,12 @@ from src.MatchingAlgorithms import (
     Participant,
     tier_list_optimized_generator,
     generate_matches,
-    output_schedule,
 )
 from tests.api.test_req_utils import test_post
 from src.db.utils.db import Database
 from src.db.form_hosting import generate_form_table, format_table_name
 from json import dumps
 import random
-from pprint import pprint
 
 class TestMatchingWithDynamicForm(TestCase):
     def setUp(self):
@@ -89,7 +87,6 @@ class TestMatchingWithDynamicForm(TestCase):
         for leader in leaders:
             for session in leader.schedule:
                 self.assertLessEqual(len(session), max_group_size)
-        #pprint(output_schedule(leaders, _))
 
     def test_groupings_are_valid(self):
         leaders, participants = self.run_matching_pipeline()
@@ -125,8 +122,6 @@ class TestMatchingWithDynamicForm(TestCase):
                 f"{l.name} has duplicate participants in their schedule: {all_participants}"
             )
 
-        groupings = output_schedule(leaders, participants)
-        pprint(groupings)
 
     def run_matching_pipeline(self):
         """Added this so we can reuse the same mock data"""
@@ -170,8 +165,6 @@ class TestMatchingWithDynamicForm(TestCase):
         weights = [5, 2]
         generate_matches(leaders, participants, weights)
         tier_list_optimized_generator(leaders, participants)
-        print("Leaders:", [l.name for l in leaders])
-        print("Participants:", [p.name for p in participants])
         return leaders, participants
 
         
