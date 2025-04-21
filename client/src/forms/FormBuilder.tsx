@@ -97,6 +97,13 @@ export default function FormBuilderPage() {
     const validationResult = await builderStore.validateSchema();
 
     if(validationResult.success) {
+
+      // check if schema is empty
+      if(Object.keys(validationResult.data.entities).length === 0) {
+        alert('Please add at least one entity to the form.');
+        return;
+      }
+
       // TODO: save form in the server 
       // (i.e. fetch('localhost:5001/forms-endpoint', { method: 'POST', body: JSON.stringify(validationResult.data) }))
       // the endpoint will have to validate the incoming schema based on the builder used to create it.
@@ -169,7 +176,10 @@ export default function FormBuilderPage() {
       {/*
         * A button that adds a new entity to the store's schema.
       */}
-      <div className='d-flex justify-content-around'>
+      <div 
+        className='d-flex justify-content-end'
+        style={{ gap: '1rem' }}
+      >
         <UncontrolledDropdown>
           <DropdownToggle caret>
             Add
