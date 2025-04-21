@@ -41,12 +41,12 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
     if(validationResult.success) {
       /*
        * The schema is valid and can be sent to the server.
-       * Alternatively you can use `validationResult.data`
-       * instead of sending `FormData`.
       */
-      // const formData = new FormData(e.currentTarget);
       const formData = validationResult.data;
       console.log('Form data: ', formData);
+    } else {
+      console.error('Form data is invalid: ', validationResult.entitiesErrors);
+      alert('Please correct the errors in the form before saving it.');
     }
   }
 
