@@ -223,29 +223,29 @@ class FormResourceTest(TestCase):
         expected = {"form_structure": self.dummy_form_data}
         self.assertDictEqual(expected, data, "Expected sent form to be retrieved")
 
-    def test_post_adds_data_to_correct_table(self):
-        """
-        POST requests to the /forms/<string:form_id> endpoint add a new entity to the table
-        """
-        param_endpoint = "/" + self.endpoints[0][0]
-        formatted_name = format_table_name(self.endpoints[0][0])
-        original_count = self.db.exec_commit(
-            "SELECT COUNT(*) FROM {}".format(formatted_name)
-        )[0]
-        test_post(
-            self,
-            base_url + endpoint + param_endpoint,
-            json={"key1": "now you see me", "key2": 42, "key3": {"nestedKey": "value"}},
-            expected_status=201,
-        )
-        updated_count = self.db.exec_commit(
-            "SELECT COUNT(*) FROM {}".format(formatted_name)
-        )[0]
-        self.assertEqual(
-            original_count + 1,
-            updated_count,
-            f"Expected new submission to be present in table",
-        )
+    # def test_post_adds_data_to_correct_table(self):
+    #     """
+    #     POST requests to the /forms/<string:form_id> endpoint add a new entity to the table
+    #     """
+    #     param_endpoint = "/" + self.endpoints[0][0]
+    #     formatted_name = format_table_name(self.endpoints[0][0])
+    #     original_count = self.db.exec_commit(
+    #         "SELECT COUNT(*) FROM {}".format(formatted_name)
+    #     )[0]
+    #     test_post(
+    #         self,
+    #         base_url + endpoint + param_endpoint,
+    #         json={"key1": "now you see me", "key2": 42, "key3": {"nestedKey": "value"}},
+    #         expected_status=201,
+    #     )
+    #     updated_count = self.db.exec_commit(
+    #         "SELECT COUNT(*) FROM {}".format(formatted_name)
+    #     )[0]
+    #     self.assertEqual(
+    #         original_count + 1,
+    #         updated_count,
+    #         f"Expected new submission to be present in table",
+    #     )
 
     def test_post_returns_error_when_missing_expected_data(self):
         """

@@ -113,20 +113,25 @@ def tier_list_optimized_generator(leaders, participants):
             generation_complete = True
 
 
-def p_sch_name_conversion(participant_schedule):
-    name_schedule = []
-    for leader in participant_schedule:
-        name_schedule.append(leader.name)
-    return name_schedule
+# def p_sch_name_conversion(participant_schedule):
+#     name_schedule = []
+#     for leader in participant_schedule:
+#         name_schedule.append(leader.name)
+#     return name_schedule
 
+
+# def l_sch_name_conversion(leader_schedule):
+#     name_schedule = leader_schedule
+#     for i in range(len(name_schedule)):
+#         for j in range(len(name_schedule[i])):
+#             name_schedule[i][j] = name_schedule[i][j].name
+#     return name_schedule
+
+def p_sch_name_conversion(participant_schedule):
+    return [leader.name if leader else None for leader in participant_schedule]
 
 def l_sch_name_conversion(leader_schedule):
-    name_schedule = leader_schedule
-    for i in range(len(name_schedule)):
-        for j in range(len(name_schedule[i])):
-            name_schedule[i][j] = name_schedule[i][j].name
-    return name_schedule
-
+    return [[p.name for p in round_group] for round_group in leader_schedule]
 
 def output_schedule(leaders, participants):
     schedule_dict = {}

@@ -1,5 +1,6 @@
 from .utils.db import Database
 import json
+import re
 
 
 def format_table_name(uuid: str) -> str:
@@ -22,9 +23,13 @@ def generate_form_table(db: Database, form_id: str) -> None:
     form_structure = json.loads(form_structure_row[0][0])
 
     columns = []
-    for entity in form_structure['entities'].values():
+    uuid_to_col = {}
+
+    for uuid, entity in form_structure['entities'].items():
         type = entity['type']
         label = entity['attributes']['label']
+        safe_label = re.sub(r'\W+', '_', label.lower()).strip('_')  # sanitize to valid SQL identifier
+        uuid_to_col[uuid] = safe_label
         required = entity['attributes'].get('required',False)
         if type == 'textField':
             pg_type = 'VARCHAR'
@@ -35,8 +40,7 @@ def generate_form_table(db: Database, form_id: str) -> None:
         else:
             pg_type = "VARCHAR"
 
-        columns.append(f"{label.lower()} {pg_type}{" NOT NULL" if required else ""}")
-
+        columns.append(f"{safe_label} {pg_type}{' NOT NULL' if required else ''}")
     create_query = f"""
         CREATE TABLE {table_name} (
             id SERIAL PRIMARY KEY,
@@ -46,3 +50,4 @@ def generate_form_table(db: Database, form_id: str) -> None:
 
     db.exec_commit(create_query)
     db.fetch_tables()
+    return uuid_to_col
