@@ -6,6 +6,8 @@ import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute
 import { numberScaleEntity, textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
+import './Components.css';
+
 interface ZodErrorMessageProps {
   error: unknown; // The error object to check
 }
@@ -83,14 +85,19 @@ export const MinNumberAttribute = createAttributeComponent(
 
     return (
       <div>
-        <Input
-          id={id}
-          name={id}
-          type='number'
-          value={props.attribute.value ?? ''}
-          onChange={(e) => props.setValue(Number(e.target.value))}
-          style={{maxWidth: '5rem'}}
-        />
+        <div className='number-input-container'>
+          <Label htmlFor={id}>
+            Min
+          </Label>
+          <Input
+            id={id}
+            name={id}
+            type='number'
+            value={props.attribute.value ?? ''}
+            onChange={(e) => props.setValue(Number(e.target.value))}
+            className='number-input'
+          />
+        </div>
         <ZodErrorMessage error={props.attribute.error} />
       </div>
     );
@@ -108,14 +115,19 @@ export const MaxNumberAttribute = createAttributeComponent(
 
     return (
       <div>
-        <Input
-          id={id}
-          name={id}
-          type='number'
-          value={props.attribute.value ?? ''}
-          onChange={(e) => props.setValue(Number(e.target.value))}
-          style={{maxWidth: '5rem'}}
-        />
+        <div className='number-input-container'>
+          <Label htmlFor={id}>
+            Max
+          </Label>
+          <Input
+            id={id}
+            name={id}
+            type='number'
+            value={props.attribute.value ?? ''}
+            onChange={(e) => props.setValue(Number(e.target.value))}
+            className='number-input'
+          />
+        </div>
         <ZodErrorMessage error={props.attribute.error} />
       </div>
     );
@@ -132,8 +144,8 @@ export const WeightAttribute = createAttributeComponent(
     const id = `${props.entity.id}-${props.attribute.name}`;
 
     return (
-      <div>
-        <div className='d-flex align-items-center'>
+      <div className='my-1'>
+        <div className='number-input-container'>
           <Label htmlFor={id}>
             Weight
           </Label>
@@ -145,6 +157,7 @@ export const WeightAttribute = createAttributeComponent(
             step={1}
             onChange={(e) => props.setValue(Number(e.target.value))}
             placeholder='Weight'
+            style={{maxWidth: '5rem'}}
           />
         </div>
         <ZodErrorMessage error={props.attribute.error} />

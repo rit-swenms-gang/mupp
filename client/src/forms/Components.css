@@ -1,0 +1,9 @@
+.number-input-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.number-input {
+  max-width: 5rem;
+}
