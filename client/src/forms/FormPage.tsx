@@ -1,6 +1,6 @@
 import { FormInterpreter } from './FormInterpreter';
 
-export default async function FormPage() {
+export default function FormPage() {
   // TODO: retrieve form schema from the server
   // i.e. const form = await fetch('localhost:5001/forms-endpoint', { method: 'GET' })
   // the endpoint must return a JSON object with a similar structure to the mocked one below
@@ -8,24 +8,24 @@ export default async function FormPage() {
   // THIS IS A MOCKED SCHEMA
   const mockSchema = {
     entities: {
-      'entity1': {
+      '7a77959a-eb84-447c-9ed7-200e2a674eea': {
         type: 'textField' as const,
         attributes: {
           label: 'Name',
           required: true
         },
-        parentId: undefined
+        
       },
-      'entity2': {
+      '7a49f550-5966-4c8c-89eb-a0797940fff3': {
         type: 'textField' as const,
         attributes: {
           label: 'Email',
           required: true
         },
-        parentId: 'entity1'
+        
       }
     },
-    root: ['entity1', 'entity2']
+    root: ['7a77959a-eb84-447c-9ed7-200e2a674eea', '7a49f550-5966-4c8c-89eb-a0797940fff3']
   };
 
   return <FormInterpreter schema={mockSchema} />;

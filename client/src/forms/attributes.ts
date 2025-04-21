@@ -27,8 +27,8 @@ export const requiredAttribute = createAttribute({
  * This attribute is used to set the maximum value of a form field.
  * It must be a non-negative integer.
  */
-export const minNumberAttribute = createAttribute({
-  name: 'minNumber',
+export const minValueAttribute = createAttribute({
+  name: 'min',
   validate: (value) => z.number().int().nonnegative().parse(value)
 });
 
@@ -36,7 +36,7 @@ export const minNumberAttribute = createAttribute({
  * This attribute is used to set the maximum value of a form field.
  * It must be a non-negative integer.
  */
-export const maxNumberAttribute = createAttribute({
-  name: 'maxNumber',
+export const maxValueAttribute = createAttribute({
+  name: 'max',
   validate: (value) => z.number().int().nonnegative().parse(value)
 });

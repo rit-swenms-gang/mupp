@@ -7,6 +7,7 @@ import GroupBox from './Dashboard/GroupBox';
 import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
 import EditDropdown from './Dashboard/EditDropdown';
 import FormBuilderPage from '../forms/FormBuilder';
+import FormPage from '../forms/FormPage';
 
 interface Group {
   id: number
@@ -132,7 +133,7 @@ function App() {
         </Col>
       </Row> */}
       <FormBuilderPage />
-      
+      {/* <FormPage /> */}
     </Container>
   )
 }

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { createEntity } from '@coltorapps/builder';
 
-import { labelAttribute, maxNumberAttribute, minNumberAttribute, requiredAttribute } from './attributes';
+import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute } from './attributes';
 
 // Think of entities with attributes as components with props. 
 // For example, you can define a text field entity, and users can later add multiple instances of text fields to a form.
@@ -32,10 +32,10 @@ export const textFieldEntity = createEntity({
  */
 export const numberScaleEntity = createEntity({
   name: 'numberScale',
-  attributes: [labelAttribute, requiredAttribute, minNumberAttribute, maxNumberAttribute],
+  attributes: [labelAttribute, requiredAttribute, minValueAttribute, maxValueAttribute],
   validate: (value, context) => {
-    const min = context.entity.attributes.minNumber ?? 1;
-    const max = context.entity.attributes.maxNumber ?? 10;
+    const min = context.entity.attributes.min ?? 1;
+    const max = context.entity.attributes.max ?? 10;
 
     const schema = z.number()
       .int()
@@ -50,11 +50,11 @@ export const numberScaleEntity = createEntity({
     return schema.parse(value);
   },
   attributesExtensions: {
-    minNumber: {
+    min: {
       validate(value, context) {
         const minValue = context.validate(value);
 
-        if(minValue >= context.entity.attributes.maxNumber) {
+        if(minValue >= context.entity.attributes.max) {
           throw new Error('Minimum value must be less than maximum value.');
         }
         return minValue;

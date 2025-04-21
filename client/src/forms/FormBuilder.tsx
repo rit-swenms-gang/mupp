@@ -185,8 +185,8 @@ export default function FormBuilderPage() {
                 type: 'numberScale',
                 attributes: {
                   label: '',
-                  minNumber: 1,
-                  maxNumber: 10,
+                  min: 1,
+                  max: 10,
                 },
               })}
             >

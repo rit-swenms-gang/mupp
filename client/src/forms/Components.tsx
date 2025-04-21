@@ -2,7 +2,7 @@ import { ZodError } from 'zod';
 
 import { createAttributeComponent, createEntityComponent } from '@coltorapps/builder-react';
 
-import { labelAttribute, maxNumberAttribute, minNumberAttribute, requiredAttribute } from './attributes';
+import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute } from './attributes';
 import { numberScaleEntity, textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
@@ -77,7 +77,7 @@ export const RequiredAttribute = createAttributeComponent(
  * It is used to create a number input field for the user to enter the minimum value.
  */
 export const MinNumberAttribute = createAttributeComponent(
-  minNumberAttribute,
+  minValueAttribute,
   (props) => {
     const id = `${props.entity.id}-${props.attribute.name}`;
 
@@ -102,7 +102,7 @@ export const MinNumberAttribute = createAttributeComponent(
  * It is used to create a number input field for the user to enter the maximum value.
  */
 export const MaxNumberAttribute = createAttributeComponent(
-  maxNumberAttribute,
+  maxValueAttribute,
   (props) => {
     const id = `${props.entity.id}-${props.attribute.name}`;
 
@@ -152,8 +152,8 @@ export const TextFieldEntity = createEntityComponent(
 export const NumberScaleEntity = createEntityComponent(
   numberScaleEntity,
   (props) => {
-    const min = props.entity.attributes.minNumber ?? 1;
-    const max = props.entity.attributes.maxNumber ?? 10;
+    const min = props.entity.attributes.min ?? 1;
+    const max = props.entity.attributes.max ?? 10;
 
     let minMaxError = min >= max ? 'Minimum value must be less than maximum value.' : null;
 

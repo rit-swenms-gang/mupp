@@ -63,8 +63,7 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
       {/*
         * The `InterpreterEntities` component renders the entities tree
         * of the schema of our interpreter store. We pass the entity
-        * components for each defined entity type in our form builder
-        * (currently, it's only the text field).
+        * components for each defined entity type in our form builder.
       */}
       <InterpreterEntities
         interpreterStore={interpreterStore}
