@@ -62,10 +62,16 @@ export const numberScaleEntity = createEntity({
  * This entity represents a checkbox in a form.
  * It has a label attribute and can be used to create a checkbox input field.
  */
-export const isLeaderEntity = createEntity({
-  name: 'isLeader',
-  attributes: [],
-  validate: (value) => {
-    return z.boolean().parse(value);
+export const booleanEntity = createEntity({
+  name: 'boolean',
+  attributes: [labelAttribute, requiredAttribute],
+  validate: (value, context) => {
+    const schema = z.boolean();
+
+    if(!context.entity.attributes.required) {
+      return schema.optional().parse(value);
+    }
+
+    return schema.parse(value);
   }
 });

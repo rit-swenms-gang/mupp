@@ -9,8 +9,11 @@ export default function FormPage() {
   const mockSchema = {
     entities: {
       '51324b32-adc3-4d17-a90e-66b5453935bd': {
-        type: 'isLeader' as const,
-        'attributes': {}
+        type: 'boolean' as const,
+        'attributes': {
+          label: 'Are you a leader?',
+          required: true
+        }
       },
       '7a77959a-eb84-447c-9ed7-200e2a674eea': {
         type: 'textField' as const,
@@ -31,7 +34,11 @@ export default function FormPage() {
         
       }
     },
-    root: ['51324b32-adc3-4d17-a90e-66b5453935bd', '7a77959a-eb84-447c-9ed7-200e2a674eea', '7a49f550-5966-4c8c-89eb-a0797940fff3']
+    root: [
+      '51324b32-adc3-4d17-a90e-66b5453935bd', 
+      '7a77959a-eb84-447c-9ed7-200e2a674eea', 
+      '7a49f550-5966-4c8c-89eb-a0797940fff3'
+    ]
   };
 
   return <FormInterpreter schema={mockSchema} />;

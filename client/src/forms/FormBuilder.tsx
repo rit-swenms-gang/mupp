@@ -1,6 +1,6 @@
 import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@coltorapps/builder-react';
 
-import { IsLeaderEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
+import { BooleanEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
 import { formBuilder } from './builder';
 import { Button, Card, CardBody, CardHeader, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 
@@ -46,9 +46,11 @@ const NumberScaleAttribute = () => {
   )
 }
 
-const IsLeaderAttribute = () => {
+const BooleanAttribute = () => {
   return (
-    <></>
+    <>
+      <LabelRequiredSection />  
+    </>
   )
 }
 
@@ -66,8 +68,11 @@ export default function FormBuilderPage() {
       schema: {
        entities: {
           '51324b32-adc3-4d17-a90e-66b5453935bd': {
-            type: 'isLeader',
-            attributes: {}
+            type: 'boolean',
+            attributes: {
+              label: 'Are you a leader?',
+              required: true,
+            }
           }
         },
         root: ['51324b32-adc3-4d17-a90e-66b5453935bd']
@@ -134,7 +139,7 @@ export default function FormBuilderPage() {
         components={{ 
           textField: TextFieldEntity,
           numberScale: NumberScaleEntity,
-          isLeader: IsLeaderEntity,
+          boolean: BooleanEntity,
         }}
       >
         {/*
@@ -151,7 +156,7 @@ export default function FormBuilderPage() {
                   components={{ 
                     textField: TextFieldAttribute,
                     numberScale: NumberScaleAttribute,
-                    isLeader: IsLeaderAttribute,
+                    boolean: BooleanAttribute,
                   }}
                   entityId={props.entity.id}
                 />

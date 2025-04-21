@@ -3,7 +3,7 @@ import { ZodError } from 'zod';
 import { createAttributeComponent, createEntityComponent } from '@coltorapps/builder-react';
 
 import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute, weightAttribute } from './attributes';
-import { isLeaderEntity, numberScaleEntity, textFieldEntity } from './entities';
+import { booleanEntity, numberScaleEntity, textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
 import './Components.css';
@@ -228,8 +228,8 @@ export const NumberScaleEntity = createEntityComponent(
  * This component renders a checkbox entity for a form.
  * It is used to create a checkbox input field with a label for the user to check or uncheck.
  */
-export const IsLeaderEntity = createEntityComponent(
-  isLeaderEntity,
+export const BooleanEntity = createEntityComponent(
+  booleanEntity,
   (props) => {
 
     return (
