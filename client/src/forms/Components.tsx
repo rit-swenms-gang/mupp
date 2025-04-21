@@ -3,7 +3,7 @@ import { ZodError } from 'zod';
 import { createAttributeComponent, createEntityComponent } from '@coltorapps/builder-react';
 
 import { labelAttribute, maxNumberAttribute, minNumberAttribute, requiredAttribute } from './attributes';
-import { textFieldEntity } from './entities';
+import { numberScaleEntity, textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
 /**
@@ -64,6 +64,10 @@ export const RequiredAttribute = createAttributeComponent(
   }
 );
 
+/**
+ * This component renders a min number attribute for a form field.
+ * It is used to create a number input field for the user to enter the minimum value.
+ */
 export const MinNumberAttribute = createAttributeComponent(
   minNumberAttribute,
   (props) => {
@@ -87,6 +91,10 @@ export const MinNumberAttribute = createAttributeComponent(
   }
 );
 
+/**
+ * This component renders a max number attribute for a form field.
+ * It is used to create a number input field for the user to enter the maximum value.
+ */
 export const MaxNumberAttribute = createAttributeComponent(
   maxNumberAttribute,
   (props) => {
@@ -129,6 +137,44 @@ export const TextFieldEntity = createEntityComponent(
         />
         {props.entity.error instanceof ZodError
           ? props.entity.error.format()._errors[0]
+          : null}
+      </div>
+    )
+  },
+);
+
+/**
+ * This component renders a number scale entity for a form.
+ * It is used to create a number input field with a label for the user to enter a number.
+ */
+export const NumberScaleEntity = createEntityComponent(
+  numberScaleEntity,
+  (props) => {
+    const min = props.entity.attributes.minNumber ?? 1;
+    const max = props.entity.attributes.maxNumber ?? 10;
+
+    const minMaxError = min > max ?
+      'The minimum value cannot be greater than the maximum value.' :
+      max < min ? 
+      'The maximum value cannot be less than the minimum value.' :
+      null;
+
+    return (
+      <div>
+        <Input
+          id={props.entity.id}
+          name={props.entity.id}
+          type='range'
+          value={props.entity.value ?? ''}
+          onChange={(e) => props.setValue(Number(e.target.value))}
+          min={min}
+          max={max}
+          step={1}
+        />
+        {minMaxError && <p className='text-danger mt-2'>{minMaxError}</p>}
+
+        {props.entity.error instanceof ZodError
+          ? <p className='text-danger mt-2'>{props.entity.error.format()._errors[0]}</p>
           : null}
       </div>
     )
