@@ -8,7 +8,7 @@ describe('App', () => {
     render(<App />);
 
     // act
-    const headline = screen.getByText(/Multi-User Project Planner/i);
+    const headline = screen.getByText(/Welcome to MUPP/i);
 
     //assert
     expect(headline).toBeInTheDocument();
