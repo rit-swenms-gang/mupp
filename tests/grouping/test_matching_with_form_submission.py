@@ -11,7 +11,6 @@ from src.db.utils.db import Database
 from src.db.form_hosting import format_table_name
 import random
 
-
 class TestMatchingWithFormSubmission(TestCase):
     def setUp(self):
         self.db = Database("test")
@@ -97,9 +96,6 @@ class TestMatchingWithFormSubmission(TestCase):
 
         generate_matches(self.leaders, participants, self.weights)
         tier_list_optimized_generator(self.leaders, participants)
-
-        # for p in participants:
-        #     print(p.schedule)
 
         for leader in self.leaders:
             for session in leader.schedule:
