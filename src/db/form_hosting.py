@@ -41,12 +41,12 @@ def generate_form_table(db: Database, form_id: str) -> None:
             pg_type = "VARCHAR"
 
         columns.append(f"{safe_label} {pg_type}{' NOT NULL' if required else ''}")
-    create_query = f"""
-        CREATE TABLE {table_name} (
+    create_query = """
+        CREATE TABLE {} (
             id SERIAL PRIMARY KEY,
-            {',\n'.join(columns)}
+            {}
         );
-    """
+    """.format(table_name, ',\n'.join(columns))
 
     db.exec_commit(create_query)
     db.fetch_tables()
