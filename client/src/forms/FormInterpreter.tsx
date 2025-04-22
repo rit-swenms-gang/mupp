@@ -13,7 +13,7 @@ interface FormInterpreterProps {
   onSubmit?: () => void;
 }
 
-export function FormInterpreter({schema, formId, onSubmit}: FormInterpreterProps) {
+export function FormInterpreter({schema, formId, onSubmit}: Readonly<FormInterpreterProps>) {
   /*
    * The `useInterpreterStore` hook creates an interpreter store for us. 
    * This store is used for filling entities values based on a schema and builder definition.

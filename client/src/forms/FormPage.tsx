@@ -35,13 +35,12 @@ export default function FormPage() {
   }, [formId]); // Re-run the effect if formId changes
 
   if (loading) {
-    return <>
+    return (
       <div className='d-flex flex-column align-items-center'>
         <Spinner color='secondary'>Loading the form...</Spinner>
         <p>Loading your form...</p>
       </div>
-      
-      </>;
+    );
   }
 
   if (error) {

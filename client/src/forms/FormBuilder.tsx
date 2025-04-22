@@ -63,7 +63,7 @@ const IsLeaderAttribute = () => {
  * The `FormBuilderPage` component is a form builder page that allows users to create forms using a schema builder.
  * It provides a user interface for adding, editing, and deleting form fields and their attributes.
  */
-export default function FormBuilderPage({ onFormSaved }: { onFormSaved?: () => void }) {
+export default function FormBuilderPage({ onFormSaved }: Readonly<{ onFormSaved?: () => void }>) {
   
   /**
    * The `useBuilderStore` hook creates a builder store. 
