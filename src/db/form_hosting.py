@@ -1,7 +1,7 @@
 from .utils.db import Database
 import json
 import re
-from src.MatchingAlgorithms import Leader, Participant, generate_matches, tier_list_optimized_generator, output_schedule
+from MatchingAlgorithms import Leader, Participant, generate_matches, tier_list_optimized_generator, output_schedule
 from json import loads
 
 
