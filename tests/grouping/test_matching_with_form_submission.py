@@ -1,5 +1,5 @@
 from unittest import TestCase
-from src.MatchingAlgorithms import (
+from src.db.MatchingAlgorithms import (
     max_group_size,
     Leader,
     Participant,

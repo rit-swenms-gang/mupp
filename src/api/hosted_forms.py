@@ -32,7 +32,7 @@ class Forms(Resource):
         args = parser.parse_args()
 
         account_id = get_user_id_from_session_key(request.headers.get('Session-Key'))
-        print(account_id, args.get('form_structure'))
+        # print(account_id, args.get('form_structure'))
 
         try:
             # print("Parsed args:", args)
@@ -67,8 +67,8 @@ class Form(Resource):
 
         # Delete from hosted_forms
         try:
-            result = db.tables["hosted_forms"].delete(where={"id": form_id})
-            if result == 0:
+            result = db.tables["hosted_forms"].delete({"id": form_id}, ['id'])
+            if result is None:
                 return {"message": "Form not found"}, 404
             return "", 204
         except Exception as e:
