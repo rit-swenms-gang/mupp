@@ -49,9 +49,7 @@ function App() {
     ]
   ); }, []);
 
-
   const [groupings, setGroupings] = useState<Record<string, any>>({});
-
   const fetchGroupings = async (formId: string) => {
     try {
       const cookies = getCookies();
@@ -130,6 +128,7 @@ function App() {
   
       if (res.ok) {
         const data = await res.json();
+        console.log("Fetched groupings for", formId, data);
         setResponses(prev => ({ ...prev, [formId]: data }));
       } else {
         console.error('Failed to fetch responses:', await res.json());
@@ -188,7 +187,7 @@ function App() {
   );
 
   const formList = forms.map((form, i) => (
-    <Card key={i} className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '700px' }}>
+    <Card key={`${form.id}`} className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '700px' }}>
       <CardBody>
         <h5 className="fw-bold text-center">Form {i + 1}</h5>
         <p className="text-muted text-center mb-1">{form.category}</p>
@@ -201,68 +200,100 @@ function App() {
             Shareable Link →
           </Link>
         </div>
-              <div className="text-center">
-        <Button
-          color="danger"
-          size="sm"
-          onClick={() => deleteForm(form.id)}
-        >
-          Delete Form
-        </Button>
-        <Button
-          color="info"
-          size="sm"
-          className="ms-2"
-          onClick={() => fetchResponses(String(form.id))}
-        >
-          Show Responses
-        </Button>
-        {groupings[String(form.id)] && (
+        <div className="text-center">
+          <Button
+            color="danger"
+            size="sm"
+            onClick={() => deleteForm(form.id)}
+          >
+            Delete Form
+          </Button>
+          <Button
+            color="info"
+            size="sm"
+            className="ms-2"
+            onClick={() => fetchResponses(String(form.id))}
+          >
+            Show Responses
+          </Button>
+          {groupings[String(form.id)] && (() => {
+            const groupingsData = groupings[String(form.id)];
+            const leaders = [];
+            const participants = [];
+  
+            for (const [name, schedule] of Object.entries(groupingsData)) {
+              if (Array.isArray(schedule[0])) {
+                leaders.push({ name, schedule });
+              } else {
+                participants.push({ name, schedule });
+              }
+            }
+  
+            return (
+              <div className="mt-3 text-start">
+                <strong>Generated Groups:</strong>
+  
+                <h6 className="mt-3">Leaders:</h6>
+                <ul className="list-unstyled">
+                  {leaders.map(({ name, schedule }) => (
+                    <li key={name} className="mb-3">
+                      <strong>{name}</strong>
+                      <ul className="ps-3">
+                        {schedule.map((roundGroup, idx) => (
+                          <li key={idx}>
+                            Round {idx + 1}: {roundGroup.join(', ')}
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+  
+                <h6 className="mt-4">Participants:</h6>
+                <ul className="list-unstyled">
+                  {participants.map(({ name, schedule }) => (
+                    <li key={name} className="mb-3">
+                      <strong>{name}</strong>
+                      <ul className="ps-3">
+                        {schedule.map((leaderName, idx) => (
+                          <li key={idx}>
+                            {idx === 0 ? "Group leader order" : `Round ${idx + 1}`}: {leaderName || "—"}
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()}
+          <Button
+            color="success"
+            size="sm"
+            className="ms-2"
+            onClick={() => fetchGroupings(String(form.id))}
+          >
+            Generate Groupings
+          </Button>
+        </div>
+  
+        {responses[String(form.id)] && (
           <div className="mt-3 text-start">
-            <strong>Generated Groups:</strong>
+            <strong>Responses:</strong>
             <ul className="list-unstyled">
-              {Object.entries(groupings[String(form.id)]).map(([name, schedule]) => (
-                <li key={name} className="mb-3">
-                  <strong>{name}</strong>
-                  <ul className="ps-3">
-                    {(Array.isArray(schedule[0]) ? schedule : [schedule]).map((roundGroup, idx) => (
-                      <li key={idx}>
-                        Round {idx + 1}: {Array.isArray(roundGroup) ? roundGroup.join(', ') : roundGroup}
-                      </li>
-                    ))}
-                  </ul>
+              {responses[String(form.id)].map((resp, idx) => (
+                <li key={idx} className="mb-3 p-2 border rounded">
+                  {Object.entries(resp).map(([key, value]) => (
+                    <div key={key}>
+                      <strong>{key}:</strong> {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                    </div>
+                  ))}
                 </li>
               ))}
             </ul>
           </div>
         )}
-        <Button
-          color="success"
-          size="sm"
-          className="ms-2"
-          onClick={() => fetchGroupings(String(form.id))}
-        >
-          Generate Groupings
-        </Button>
-      </div>
-      
-      {responses[String(form.id)] && (
-        <div className="mt-3 text-start">
-          <strong>Responses:</strong>
-          <ul>
-          <ul className="list-unstyled">
-              {responses[String(form.id)].map((resp, idx) => (
-                <li key={idx} className="mb-3 p-2 border rounded">
-                  {Object.entries(resp).map(([key, value]) => (
-                    <div key={key}><strong>{key}:</strong> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</div>
-                  ))}
-                </li>
-              ))}
-            </ul>
-          </ul>
-        </div>
-      )}
-      </CardBody> 
+      </CardBody>
     </Card>
   ));
 

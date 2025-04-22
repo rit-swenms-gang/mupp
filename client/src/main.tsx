@@ -7,13 +7,13 @@ import App from './App/App.tsx'
 import FormPage from './forms/FormPage.tsx';
 
 createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
+  <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/form/:formId" element={<FormPage />} />
       </Routes>
     </BrowserRouter>
-  // </StrictMode>
+  </StrictMode>
   
 )

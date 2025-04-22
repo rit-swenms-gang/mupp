@@ -2,6 +2,7 @@ from .utils.db import Database
 import json
 import re
 from MatchingAlgorithms import Leader, Participant, generate_matches, tier_list_optimized_generator, output_schedule
+from json import loads
 
 
 
@@ -75,27 +76,20 @@ def get_uuid_to_column_map(db: Database, form_id: str) -> dict:
 def generate_groupings_for_form(db: Database, form_id: str) -> dict:
     table_name = format_table_name(form_id)
     uuid_to_col = get_uuid_to_column_map(db, form_id)
-
     rows = db.tables[table_name].select()
-    if not rows:
-        raise ValueError("No responses found for this form.")
 
-    # Detect relevant question UUIDs
+    # Infer key fields
     leader_qid = next((uuid for uuid, col in uuid_to_col.items() if 'leader' in col), None)
     name_qid = next((uuid for uuid, col in uuid_to_col.items() if 'name' in col), None)
     email_qid = next((uuid for uuid, col in uuid_to_col.items() if 'email' in col), None)
-
-    if not all([leader_qid, name_qid, email_qid]):
-        raise ValueError("Missing required fields (name, email, leader) in form structure.")
     answer_qids = [uuid for uuid in uuid_to_col if uuid not in {name_qid, email_qid, leader_qid}]
 
-    # Fresh state every call
     leaders, participants = [], []
 
     for row in rows:
         name = row[uuid_to_col[name_qid]]
         email = row[uuid_to_col[email_qid]]
-        is_leader = row[uuid_to_col[leader_qid]]
+        is_leader = str(row[uuid_to_col[leader_qid]]).strip().lower() in ("true", "1", "yes")
         answers = [row[uuid_to_col[qid]] for qid in answer_qids]
 
         if is_leader:
@@ -103,13 +97,16 @@ def generate_groupings_for_form(db: Database, form_id: str) -> dict:
         else:
             participants.append(Participant(name, email, answers))
 
-    if not leaders or not participants:
-        raise ValueError("Insufficient data to generate groupings.")
+    print(f"Leaders: {[l.name for l in leaders]}")
+    print(f"Participants: {[p.name for p in participants]}")
 
     weights = [5] * len(answer_qids)
 
-    # 💡 Don't reuse any match/schedule state — just call the matching pipeline fresh
+    for leader in leaders:
+        for participant in participants:
+            score = leader.match_participant(participant, weights)
+            print(f"{leader.name} vs {participant.name} = {score}")
+
     generate_matches(leaders, participants, weights)
     tier_list_optimized_generator(leaders, participants)
-
     return output_schedule(leaders, participants)

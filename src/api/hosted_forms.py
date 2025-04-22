@@ -8,7 +8,6 @@ from json import dumps, loads
 from api.logins import require_login, get_user_id_from_session_key
 from db.form_hosting import generate_groupings_for_form
 from flask import jsonify
-import traceback
 
 
 
@@ -139,13 +138,11 @@ class FormResponses(Resource):
             return {"message": "Something went wrong"}, 500
     
 class FormGroupings(Resource):
-    @require_login
     def get(self, form_id):
         db = Database(environ.get("DB_SCHEMA", "public"))
         try:
-            result = generate_groupings_for_form(db, form_id)
-            return jsonify(result)
+            grouping_result = generate_groupings_for_form(db, form_id)
+            return jsonify(grouping_result)
         except Exception as e:
-            print("Grouping failed:", str(e))
-            traceback.print_exc()
+            print(e)
             return {"message": "Unable to generate groupings"}, 500
