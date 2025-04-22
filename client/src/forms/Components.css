@@ -1,36 +1,32 @@
-.input-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.input-container > label, .input-container > input {
-  margin: 0;
-}
-
-.number-input {
-  max-width: 4rem;
-}
-
+/* Layout and Card Styling */
 .entity-card {
-  border: 1px solid #dee2e6;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background-color: #ffffff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
 }
 
+.entity-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Section Headers */
 .entity-header {
   font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.75;
-}
-
-.entity-section {
+  font-size: 1.2rem;
   margin-bottom: 1rem;
+  color: #2d3748;
 }
 
+/* Input Section Spacing */
+.entity-section {
+  margin-bottom: 1.5rem;
+}
+
+/* Grouping Inputs */
 .entity-input-group {
   display: flex;
   flex-wrap: wrap;
@@ -39,25 +35,70 @@
 }
 
 .entity-input-group input,
-.entity-input-group label {
+.entity-input-group label,
+.entity-input-group select {
   flex: 1;
-  min-width: 120px;
+  min-width: 140px;
 }
 
+/* Label Styles */
+input[type="text"],
+input[type="number"],
+select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  background-color: #f7fafc;
+  transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: #5c6ac4;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Range Labels */
 .range-label {
   font-weight: 500;
+  font-size: 0.9rem;
+  color: #4a5568;
   margin-bottom: 0.25rem;
 }
 
+/* Value Label */
 .slider-value {
   text-align: center;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #555;
+  color: #718096;
   margin-top: 0.5rem;
 }
 
+/* Delete Button */
 .btn-delete {
   display: block;
-  margin: 1rem auto 0;
+  margin: 1.25rem auto 0;
+  font-weight: 500;
+}
+
+/* Form Builder Page Header */
+.card-header {
+  background-color: #5c6ac4;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* Add + Save Row */
+.form-builder-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
 }

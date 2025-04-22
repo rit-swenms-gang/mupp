@@ -48,51 +48,52 @@ function App() {
     ]
   ); }, []);
 
-  useEffect(() => {
-    const fetchForms = async () => {
-      try {
-        const cookies = getCookies();
-        const res = await fetch(serverUrl + 'forms', {
-          method: 'GET',
-          headers: {
-            'Session-Key': cookies.session || ''
+
+  const fetchForms = async () => {
+    try {
+      const cookies = getCookies();
+      const res = await fetch(serverUrl + 'forms', {
+        method: 'GET',
+        headers: {
+          'Session-Key': cookies.session || ''
+        }
+      });
+  
+      if (res.ok) {
+        const result = await res.json();
+        const forms = result.rows || result;
+  
+        const loadedForms = forms.map((form: any, index: number) => {
+          let parsedStructure;
+          try {
+            parsedStructure = typeof form.form_structure === 'string'
+              ? JSON.parse(form.form_structure)
+              : form.form_structure;
+          } catch (e) {
+            console.error('Failed to parse form_structure:', form.form_structure);
+            parsedStructure = { entities: {} };
           }
+  
+          return {
+            id: form.id,
+            name: `Form ${index + 1}`,
+            category: "Created Forms",
+            summary: Object.values(parsedStructure.entities)
+              .map((e: any) => e.attributes?.label || 'Unnamed')
+              .join(', ')
+          };
         });
   
-        if (res.ok) {
-          const result = await res.json();
-          const forms = result.rows || result;
-  
-          const loadedForms = forms.map((form: any, index: number) => {
-            let parsedStructure;
-            try {
-              parsedStructure = typeof form.form_structure === 'string'
-                ? JSON.parse(form.form_structure)
-                : form.form_structure;
-            } catch (e) {
-              console.error('Failed to parse form_structure:', form.form_structure);
-              parsedStructure = { entities: {} };
-            }
-          
-            return {
-              id: form.id,
-              name: `Form ${index + 1}`,
-              category: "Created Forms",
-              summary: Object.values(parsedStructure.entities)
-                .map((e: any) => e.attributes?.label || 'Unnamed')
-                .join(', ')
-            };
-          });
-  
-          setForms(loadedForms);
-        } else {
-          console.error('Error: Failed to fetch forms from the server:', await res.json());
-        }
-      } catch (err) {
-        console.error('Error: Failed to fetch forms from the server', err);
+        setForms(loadedForms);
+      } else {
+        console.error('Error: Failed to fetch forms from the server:', await res.json());
       }
-    };
-  
+    } catch (err) {
+      console.error('Error: Failed to fetch forms from the server', err);
+    }
+  };
+
+  useEffect(() => {
     fetchForms();
   }, []);
 
@@ -190,21 +191,7 @@ function App() {
 
   return (
     <Authenticator>
-      <div className="d-flex flex-column">
-        <div className="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center">
-          <span className="fw-semibold fs-5">MUPP Dashboard</span>
-          <Button
-            color="light"
-            size="sm"
-            onClick={() => {
-              localStorage.clear();
-              window.location.reload();
-            }}
-          >
-            Sign Out
-          </Button>
-        </div>
-  
+      <div className="d-flex">
         <Container className="py-5">
           <h1 className="text-center display-4 mb-4">Multi-User Project Planner</h1>
   
@@ -268,7 +255,7 @@ function App() {
         <Modal isOpen={formModal} toggle={toggleFormModal}>
           <ModalHeader toggle={toggleFormModal}>Edit Form</ModalHeader>
           <ModalBody>
-            <FormBuilderPage />
+            <FormBuilderPage onFormSaved={fetchForms}/>
           </ModalBody>
         </Modal>
       </div>

@@ -63,7 +63,8 @@ const IsLeaderAttribute = () => {
  * The `FormBuilderPage` component is a form builder page that allows users to create forms using a schema builder.
  * It provides a user interface for adding, editing, and deleting form fields and their attributes.
  */
-export default function FormBuilderPage() {
+export default function FormBuilderPage({ onFormSaved }: { onFormSaved?: () => void }) {
+  
   /**
    * The `useBuilderStore` hook creates a builder store. 
    * This store is responsible for building a schema based on a builder definition.
@@ -126,6 +127,7 @@ export default function FormBuilderPage() {
         if (res.ok) {
           const data = await res.json();
           alert(`Form saved! ID: ${data.form_endpoint}`);
+          onFormSaved?.();
         } else {
           const err = await res.json();
           alert(`Error: ${err.message}`);
@@ -196,9 +198,16 @@ export default function FormBuilderPage() {
         */}
         {(props) => {
           return (
-            <Card>
-              <CardBody>
-                {/* Render the BuilderEntityAttributes input field */}
+            <Card className="entity-card">
+            <CardBody>
+              {/* Render the BuilderEntityAttributes input field */}
+              <div className="entity-header">
+                {props.entity.type === 'textField' && 'Text Field'}
+                {props.entity.type === 'numberScale' && 'Number Scale'}
+                {props.entity.type === 'boolean' && 'Checkbox'}
+              </div>
+      
+              <div className="entity-section">
                 <BuilderEntityAttributes
                   builderStore={builderStore}
                   components={{ 
@@ -209,23 +218,25 @@ export default function FormBuilderPage() {
                   }}
                   entityId={props.entity.id}
                 />
-
-                {/* Represents each rendered arbitrary entity */}
-                {props.children}
-
-                {/* A delete button is rendered next to each entity that removes the entity from the store's schema. */}
-                <Button
-                  type='button'
-                  color='danger'
-                  onClick={() => {
-                    builderStore.deleteEntity(props.entity.id);
-                  }}
-                  hidden={props.entity.id === builderStore.getSchema().root[0]}
-                >
-                  Delete
-                </Button>
-              </CardBody>
-            </Card>
+              </div>
+      
+              {/* Represents each rendered arbitrary entity */}
+              {props.children}
+      
+              {/* A delete button is rendered next to each entity that removes the entity from the store's schema. */}
+              <Button
+                type='button'
+                color='danger'
+                className="btn-delete"
+                onClick={() => {
+                  builderStore.deleteEntity(props.entity.id);
+                }}
+                hidden={props.entity.id === builderStore.getSchema().root[0]}
+              >
+                Delete
+              </Button>
+            </CardBody>
+          </Card>
           );
         }}
       </BuilderEntities>
