@@ -75,7 +75,7 @@ function App() {
             }
           
             return {
-              id: form.id, // <-- Add this line to fix the Shareable Link
+              id: form.id,
               name: `Form ${index + 1}`,
               category: "Created Forms",
               summary: Object.values(parsedStructure.entities)
@@ -173,7 +173,6 @@ function App() {
   return (
     <Authenticator>
       <div className="d-flex flex-column">
-        {/* Top bar */}
         <div className="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center">
           <span className="fw-semibold fs-5">MUPP Dashboard</span>
           <Button
@@ -188,7 +187,6 @@ function App() {
           </Button>
         </div>
   
-        {/* Main content */}
         <Container className="py-5">
           <h1 className="text-center display-4 mb-4">Multi-User Project Planner</h1>
   
@@ -240,7 +238,6 @@ function App() {
           </div>
         </Container>
   
-        {/* Form modal */}
         <Modal isOpen={formModal} toggle={toggleFormModal}>
           <ModalHeader toggle={toggleFormModal}>Edit Form</ModalHeader>
           <ModalBody>

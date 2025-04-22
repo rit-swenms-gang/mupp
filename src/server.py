@@ -35,7 +35,7 @@ api.add_resource(
     GetLoginTable, "/logins"
 )  # This api call is just for testing, and making sure the wrapper function is working correctly
 api.add_resource(Forms, "/forms")
-api.add_resource(Form, "/forms/<string:form_id>")
-
+api.add_resource(Form, "/forms/<string:form_id>", endpoint="form_api")  # API route
+api.add_resource(Form, "/form/<string:form_id>", endpoint="form_view")  # Shareable user-facing route
 if __name__ == "__main__":
     app.run(host="::", port=5001, debug=True)
