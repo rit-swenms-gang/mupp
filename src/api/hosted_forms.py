@@ -4,11 +4,20 @@ from flask_restful import Resource, reqparse
 from psycopg2.errors import ForeignKeyViolation
 from db.utils.db import Database
 from db.form_hosting import generate_form_table, format_table_name
-from json import dumps
+from json import dumps, loads
 from api.logins import require_login, get_user_id_from_session_key
+from db.form_hosting import generate_groupings_for_form
+from flask import jsonify
+
 
 
 class Forms(Resource):
+    @require_login
+    def get(self):        
+        db = Database(environ.get("DB_SCHEMA", "public"))
+        user_id = get_user_id_from_session_key(request.headers.get('Session-Key'))
+        return (db.tables['hosted_forms'].select(where={ 'account_id': user_id }))
+    
     @require_login
     def post(self):
         db = Database(environ.get("DB_SCHEMA", "public"))
@@ -23,6 +32,7 @@ class Forms(Resource):
         args = parser.parse_args()
 
         account_id = get_user_id_from_session_key(request.headers.get('Session-Key'))
+        # print(account_id, args.get('form_structure'))
 
         try:
             # print("Parsed args:", args)
@@ -46,6 +56,25 @@ class Forms(Resource):
 
 
 class Form(Resource):
+    @require_login
+    def delete(self, form_id: str):
+        db = Database(environ.get("DB_SCHEMA", "public"))
+
+        # Delete form table if it exists
+        table_name = format_table_name(form_id)
+        if db.tables.get(table_name):
+            db.exec_commit(f'DROP TABLE IF EXISTS {table_name}')
+
+        # Delete from hosted_forms
+        try:
+            result = db.tables["hosted_forms"].delete({"id": form_id}, ['id'])
+            if result is None:
+                return {"message": "Form not found"}, 404
+            return "", 204
+        except Exception as e:
+            print(e)
+            return {"message": "Failed to delete form"}, 500
+
     def get(self, form_id: str):
         form_name = format_table_name(form_id)
         db = Database(environ.get("DB_SCHEMA", "public"))
@@ -53,8 +82,9 @@ class Form(Resource):
             return {"message": "Form not found"}, 404
         try:
             data = db.tables.get("hosted_forms").select(
-                ["form_structure"], {"id::text": form_id}, 1
+                ["form_structure"], {"id": form_id}, 1
             )
+            data['form_structure'] = loads(data['form_structure'])
             return data, 200
         except Exception as e:
             print(e)
@@ -68,22 +98,51 @@ class Form(Resource):
             return {"message": "Form not found"}, 404
         try:
             valid_fields = db.tables[table_name]._columns
-            schema_fields = {
-                col["column_name"]: col["type"]
-                for col in valid_fields
-                if col["column_name"] != "id"
-            }
+            ordered_columns = [col["column_name"] for col in valid_fields if col["column_name"] != "id"]
 
-            filtered_body = {}
-            for k, v in body.items():
-                if k in schema_fields:
-                    if schema_fields[k] == "json" and not isinstance(v, str):
-                        filtered_body[k] = dumps(v)
-                    else:
-                        filtered_body[k] = v
-            print("Filtered body being inserted:", filtered_body)
-            db.tables[table_name].insert(filtered_body)
+            print("Ordered columns:", ordered_columns)
+            print("Incoming body values:", list(body.values()))
+
+            values = list(body.values())  
+
+            if len(values) != len(ordered_columns):
+                return {"message": "Mismatched fields"}, 400
+
+            insert_dict = {}
+            for col_name, value in zip(ordered_columns, values):
+                col_type = next(col["type"] for col in valid_fields if col["column_name"] == col_name)
+                if col_type == "json" and not isinstance(value, str):
+                    insert_dict[col_name] = dumps(value)
+                else:
+                    insert_dict[col_name] = value
+
+            print("Filtered body being inserted:", insert_dict)
+            db.tables[table_name].insert(insert_dict)
             return "", 201
         except Exception as e:
             print(e)
             return {"message": "Unable to submit"}, 500
+
+class FormResponses(Resource):
+    @require_login
+    def get(self, form_id):
+        form_name = format_table_name(form_id)
+        db = Database(environ.get("DB_SCHEMA", "public"))
+        if db.tables.get(form_name) is None:
+            return {"message": "Form not found"}, 404
+        try:
+            data = db.tables.get(form_name).select()
+            return data, 200
+        except Exception as e:
+            print(e)
+            return {"message": "Something went wrong"}, 500
+    
+class FormGroupings(Resource):
+    def get(self, form_id):
+        db = Database(environ.get("DB_SCHEMA", "public"))
+        try:
+            grouping_result = generate_groupings_for_form(db, form_id)
+            return jsonify(grouping_result)
+        except Exception as e:
+            print(e)
+            return {"message": "Unable to generate groupings"}, 500

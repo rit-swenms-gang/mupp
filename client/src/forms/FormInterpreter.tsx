@@ -3,15 +3,17 @@ import { InterpreterEntities, useInterpreterStore } from '@coltorapps/builder-re
 
 import { BooleanEntity, IsLeaderEntity, NumberScaleEntity, TextFieldEntity } from './Components';
 import { formBuilder } from './builder';
-import { Button, Form } from 'reactstrap';
+import { Button, Card, CardBody, Form } from 'reactstrap';
 
 type FormBuilderSchema = Schema<typeof formBuilder>;
 
 interface FormInterpreterProps {
   schema: FormBuilderSchema;
+  formId: string;
+  onSubmit?: () => void;
 }
 
-export function FormInterpreter({schema}: FormInterpreterProps) {
+export function FormInterpreter({schema, formId, onSubmit}: Readonly<FormInterpreterProps>) {
   /*
    * The `useInterpreterStore` hook creates an interpreter store for us. 
    * This store is used for filling entities values based on a schema and builder definition.
@@ -43,6 +45,24 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
       */
       const formData = validationResult.data;
       console.log('Form data: ', formData);
+
+      try{
+        await fetch(`http://localhost:5001/form/${formId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        onSubmit?.();
+      } catch (error) {
+        console.error('Error while saving the form: ', error);
+        alert('An error occurred while saving the form. Please try again later.');
+      }
+
+      
+
     } else {
       console.error('Form data is invalid: ', validationResult.entitiesErrors);
       alert('Please correct the errors in the form before saving it.');
@@ -59,6 +79,7 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
         void submitForm();
       }}
     >
+      
       {/*
         * The `InterpreterEntities` component renders the entities tree
         * of the schema of our interpreter store. We pass the entity
@@ -72,7 +93,26 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
           numberScale: NumberScaleEntity,
           textField: TextFieldEntity, 
         }}
-      />
+      >
+        {(props) => {
+          return (
+            <Card>
+              <CardBody>
+                {/* Render the BuilderEntityAttributes input field */}
+                <div className="entity-header">
+                  {props.entity.type === 'textField' && 'Text Field'}
+                  {props.entity.type === 'numberScale' && 'Number Scale'}
+                  {props.entity.type === 'boolean' && 'Checkbox'}
+                </div>
+            
+                {/* Represents each rendered arbitrary entity */}
+                {props.children}
+              </CardBody>
+            </Card>
+          );
+        }}
+
+      </InterpreterEntities>
       <Button type='submit'>Submit</Button>
     </Form>
   );

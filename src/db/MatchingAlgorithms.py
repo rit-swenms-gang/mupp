@@ -73,11 +73,12 @@ def generate_matches(leaders, participants, weights):
 def tier_list_optimized_generator(leaders, participants):
     generation_complete = False
     total_slots_available = len(participants) * rounds
-    round_matching_order = []
-    for i in range(rounds):
-        round_matching_order.append(i)
+    round_matching_order = list(range(rounds))
+    attempts = 0
+    max_attempts = 1000  # prevent infinite loops
 
-    while not generation_complete:
+    while not generation_complete and attempts < max_attempts:
+        attempts += 1
         total_slots_scheduled = 0
         k = 0
 
@@ -87,7 +88,7 @@ def tier_list_optimized_generator(leaders, participants):
         for leader in leaders:
             leader.clear_schedule()
 
-        while (k < total_slots_available) and (not generation_complete):
+        while k < total_slots_available and not generation_complete:
             k += 1
             for i in range(total_weights - 1, -1, -1):
                 random.shuffle(leaders)
@@ -95,22 +96,26 @@ def tier_list_optimized_generator(leaders, participants):
                     random.shuffle(leader.matches[i])
                     for participant in leader.matches[i]:
                         if (
-                            (participant.rounds_scheduled < rounds)
-                            and (leader not in participant.schedule)
+                            participant.rounds_scheduled < rounds
+                            and leader not in participant.schedule
                             and leader.slots_open > 0
                         ):
                             random.shuffle(round_matching_order)
                             for round in round_matching_order:
                                 if (
-                                    (len(leader.schedule[round]) < max_group_size)
-                                    and (participant.schedule[round] == None)
-                                    and (leader not in participant.schedule)
+                                    len(leader.schedule[round]) < max_group_size
+                                    and participant.schedule[round] is None
+                                    and leader not in participant.schedule
                                 ):
                                     leader.schedule_participant(round, participant)
                                     participant.schedule_round(round, leader)
                                     total_slots_scheduled += 1
+
         if total_slots_scheduled == total_slots_available:
             generation_complete = True
+
+    if not generation_complete:
+        print("Warning: Could not find a perfect grouping after max attempts.")
 
 def p_sch_name_conversion(participant_schedule):
     return [leader.name if leader else None for leader in participant_schedule]

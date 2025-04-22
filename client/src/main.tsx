@@ -11,7 +11,7 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/forms/:formId" element={<FormPage />} />
+        <Route path="/form/:formId" element={<FormPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

@@ -1,5 +1,5 @@
 import unittest
-from src.MatchingAlgorithms import (
+from src.db.MatchingAlgorithms import (
     Leader,
     Participant,
     generate_matches,
