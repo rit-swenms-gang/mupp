@@ -8,11 +8,13 @@ import { Col, Container, Row,
         ModalBody
         } from 'reactstrap';
 import GroupBox from './Dashboard/GroupBox';
+import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
+import EditDropdown from './Dashboard/EditDropdown';
 import Authenticator from '../Authenticator/Authenticator';
+import FormPage from '../forms/FormPage';
 import { getCookies } from '../services/auth';
 import FormBuilderPage from '../forms/FormBuilder';
 import { Link } from 'react-router';
-import { FormPreviewProps } from './Dashboard/FormPreview';
 
 
 interface Group {
@@ -26,13 +28,13 @@ interface Group {
 const serverUrl = 'http://localhost:5001/';
 
 function App() {
+  const [serverText, setServerText] = useState('yet to access server');
   const [groups, setGroups] = useState(Array<Group>);
   const [forms, setForms] = useState(Array<FormPreviewProps>);
   const [formModal, setformModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const toggleFormModal = () => setformModal(!formModal);
-
-  ////////// TODO: FETCH FROM SERVER //////////
 
   useEffect(() => {setGroups(
     [
@@ -135,15 +137,12 @@ function App() {
     }
   };
 
-
   useEffect(() => {
     fetchForms();
   }, []);
-
-  /////////////////////////////////////////////
+  /////////////////////////
 
   function openEditForm(formId: unknown) {
-    // TODO: open the edit form page/modal
     setformModal(true);
     if(formId == null) {
       
@@ -294,11 +293,39 @@ function App() {
     </Card>
   ));
 
+  useEffect(() => {
+    const ac = new AbortController()
+    setServerText('Calling server')
+
+    fetch('http://localhost:5001', {
+      signal: ac.signal
+    })
+      .then(res => {
+        if (!res.ok) return 'Failed to get response'
+        return res.json() 
+      })
+      .then(text => setServerText(JSON.stringify(text)))
+      .catch(e => {
+        console.error(e)
+        setServerText('Something broke')
+      })
+
+    return () => ac.abort()
+  }, [])
+
   return (
-    <Authenticator>
+    <Authenticator onLogIn={() => setIsLoggedIn(true)} onLogOut={() => setIsLoggedIn(false)}>
       <div className="d-flex">
         <Container className="py-5">
-          <h1 className="text-center display-4 mb-4">Multi-User Project Planner</h1>
+          <h1 className="text-center display-4 mb-4">Multi-User Party Planner</h1>
+
+          <Card className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '800px' }}>
+            <CardBody>
+              <p className="lead mb-1 text-center">
+                Plan your next event by splitting your participants into the right groups.
+              </p>
+            </CardBody>
+          </Card>
 
           <h2 className="h4 text-center flex-column mt-5 mb-4">Project Groups</h2>
           <div className="d-flex flex-column align-items-center">{groupBoxes}</div>
