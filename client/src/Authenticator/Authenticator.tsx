@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Card, CardHeader, Nav, NavItem, TabContent, TabPane } from 'reactstrap'
+import { Button, Card, CardHeader, Container, Nav, NavItem, TabContent, TabPane } from 'reactstrap'
 import NavTab from '../NavTab/NavTab';
 import AuthForm from './AuthForm/AuthForm';
 import { handleSignIn, handleSignOut, handleSignUp, validateSignIn, validateSignUp } from '../services/auth';
@@ -147,7 +147,7 @@ export default function Authenticator({
   // if user is authenticated, show sign out button and children components
   if (isAuthenticated) {
     return (
-      <div className='d-flex flex-column align-items-center justify-content-center vh-100 vw-100'>
+      <div className='d-flex flex-column align-items-center justify-content-center h-100 w-100'>
         <Nav className='navbar w-100 p-4 bg-secondary'>
           <NavItem className='ms-auto'>
             <Button onClick={handleSignOutSubmit}
@@ -163,7 +163,7 @@ export default function Authenticator({
 
   // if user is not authenticated, show sign in and sign up forms
   return (
-    <div className='d-flex justify-content-center align-items-center vh-100 vw-100'>
+    <Container className='d-flex justify-content-center align-items-center h-100 py-5'>
     <Card className='w-50'>
       <CardHeader className='p-2 m-2' tag='h2'>Welcome to MUPP</CardHeader>
       
@@ -239,6 +239,6 @@ export default function Authenticator({
         </TabPane>
       </TabContent>
     </Card>
-    </div>
+    </Container>
   );
 }
