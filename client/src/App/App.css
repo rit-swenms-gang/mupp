@@ -7,3 +7,35 @@
 .card {
   padding: 2em;
 }
+
+
+body {
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+button.btn-primary {
+  background-color: #5c6ac4;
+  border-color: #5c6ac4;
+}
+
+button.btn-primary:hover {
+  background-color: #4b57a2;
+  border-color: #4b57a2;
+}
+
+.bg-dark {
+  background-color: #343a40 !important;
+}
+
+button.btn-light {
+  color: #343a40;
+  font-weight: 500;
+}
+
+button.btn-light:hover {
+  background-color: #dee2e6;
+}

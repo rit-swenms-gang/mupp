@@ -52,21 +52,38 @@ function App() {
     const fetchForms = async () => {
       try {
         const cookies = getCookies();
-        //pass the session-key?
         const res = await fetch(serverUrl + 'forms', {
           method: 'GET',
           headers: {
-            'Session-Key': cookies.session || '' 
+            'Session-Key': cookies.session || ''
           }
         });
-
-        if(res.ok) {
-          const data = await res.json();
-          const loadedForms = data.map((form: any) => ({
-            name: `Form ${form.id}`,
-            category: "Created Forms",
-            summary: Object.values(form.form_structure.entities).map((e: any) => e.attributes.label).join(', ')
-          }));
+  
+        if (res.ok) {
+          const result = await res.json();
+          const forms = result.rows || result;
+  
+          const loadedForms = forms.map((form: any, index: number) => {
+            let parsedStructure;
+            try {
+              parsedStructure = typeof form.form_structure === 'string'
+                ? JSON.parse(form.form_structure)
+                : form.form_structure;
+            } catch (e) {
+              console.error('Failed to parse form_structure:', form.form_structure);
+              parsedStructure = { entities: {} };
+            }
+          
+            return {
+              id: form.id, // <-- Add this line to fix the Shareable Link
+              name: `Form ${index + 1}`,
+              category: "Created Forms",
+              summary: Object.values(parsedStructure.entities)
+                .map((e: any) => e.attributes?.label || 'Unnamed')
+                .join(', ')
+            };
+          });
+  
           setForms(loadedForms);
         } else {
           console.error('Error: Failed to fetch forms from the server:', await res.json());
@@ -75,6 +92,7 @@ function App() {
         console.error('Error: Failed to fetch forms from the server', err);
       }
     };
+  
     fetchForms();
   }, []);
 
@@ -112,21 +130,25 @@ function App() {
     </Row>
   );
 
-  const formList = forms.map((form, i) =>
-    <Card key={i}>
-      <Row>
-        <Col>
-          <FormPreview
-            name={form.name}
-            category={form.category}
-            summary={form.summary}/>
-        </Col>
-        <Col>
-          <EditDropdown formId={form.name} editAction={openEditForm} deleteAction={deleteForm}/>
-        </Col>
-      </Row>
+  const formList = forms.map((form, i) => (
+    <Card key={i} className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '700px' }}>
+      <CardBody>
+        <h5 className="fw-bold text-center">Form {i + 1}</h5>
+        <p className="text-muted text-center mb-1">{form.category}</p>
+        <p className="text-center">{form.summary}</p>
+        <div className="text-center">
+          <a
+            href={`http://localhost:5001/form/${form.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-decoration-none text-primary"
+          >
+            Shareable Link →
+          </a>
+        </div>
+      </CardBody>
     </Card>
-  );
+  ));
 
   useEffect(() => {
     const ac = new AbortController()
@@ -150,46 +172,84 @@ function App() {
 
   return (
     <Authenticator>
-      <Container>
-        <h1>Multi-User Project Planner</h1>
-        <Row className='flex align'>
-          <Col>
-            <Card>
-              <CardBody>
-                <p>
-                  Plan your next event by splitting your participants into the right groups.
-                </p>
-                <p>
-                  Communication with port <code>5001</code> server: {serverText}
-                </p>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {groupBoxes}
-          </Col>
-          <Row>
-            <Col>
-              {formList}
-            </Col>
-          </Row>
-          <Row>
-            <Button onClick={openEditForm}>Create New Form</Button>
-          </Row>
-        </Row>
-        
-      </Container>
-      <Modal isOpen={formModal} toggle={toggleFormModal}>
-        <ModalHeader toggle={toggleFormModal}>Edit Form</ModalHeader>
-        <ModalBody>
-          <FormBuilderPage />
-          <FormPage toggleModal={toggleFormModal}/>
-        </ModalBody>
-      </Modal>
+      <div className="d-flex flex-column">
+        {/* Top bar */}
+        <div className="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center">
+          <span className="fw-semibold fs-5">MUPP Dashboard</span>
+          <Button
+            color="light"
+            size="sm"
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+          >
+            Sign Out
+          </Button>
+        </div>
+  
+        {/* Main content */}
+        <Container className="py-5">
+          <h1 className="text-center display-4 mb-4">Multi-User Project Planner</h1>
+  
+          <Card className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '800px' }}>
+            <CardBody>
+              <p className="lead mb-1 text-center">
+                Plan your next event by splitting your participants into the right groups.
+              </p>
+              <p className="text-center">
+                Communication with port <code>5001</code> server: <strong>{serverText}</strong>
+              </p>
+            </CardBody>
+          </Card>
+  
+          <h2 className="h4 text-center mt-5 mb-4">Project Groups</h2>
+          <div className="d-flex flex-column align-items-center">{groupBoxes}</div>
+  
+          <h2 className="h4 text-center mt-5 mb-4">Created Forms</h2>
+          <div className="d-flex flex-column align-items-center">
+            {forms.length > 0 ? (
+              forms.map((form, i) => (
+                <Card key={i} className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '700px' }}>
+                  <CardBody>
+                    <h5 className="fw-bold text-center">Form {i + 1}</h5>
+                    <p className="text-muted text-center mb-1">{form.category}</p>
+                    <p className="text-center">{form.summary}</p>
+                    <div className="text-center">
+                      <a
+                        href={`http://localhost:5001/form/${form.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-decoration-none text-primary"
+                      >
+                        Shareable Link →
+                      </a>
+                    </div>
+                  </CardBody>
+                </Card>
+              ))
+            ) : (
+              <Card body className="text-center text-muted">No forms created yet.</Card>
+            )}
+          </div>
+  
+          <div className="text-center mt-4">
+            <Button color="primary" size="lg" onClick={openEditForm}>
+              Create New Form
+            </Button>
+          </div>
+        </Container>
+  
+        {/* Form modal */}
+        <Modal isOpen={formModal} toggle={toggleFormModal}>
+          <ModalHeader toggle={toggleFormModal}>Edit Form</ModalHeader>
+          <ModalBody>
+            <FormBuilderPage />
+          </ModalBody>
+        </Modal>
+      </div>
     </Authenticator>
-  )
+  );
 }
 
 export default App
