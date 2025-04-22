@@ -14,6 +14,7 @@ import Authenticator from '../Authenticator/Authenticator';
 import FormPage from '../forms/FormPage';
 import { getCookies } from '../services/auth';
 import FormBuilderPage from '../forms/FormBuilder';
+import { Link } from 'react-router';
 
 
 interface Group {
@@ -48,6 +49,29 @@ function App() {
     ]
   ); }, []);
 
+
+  const [groupings, setGroupings] = useState<Record<string, any>>({});
+
+  const fetchGroupings = async (formId: string) => {
+    try {
+      const cookies = getCookies();
+      const res = await fetch(`${serverUrl}groupings/${formId}`, {
+        method: 'GET',
+        headers: {
+          'Session-Key': cookies.session || ''
+        }
+      });
+  
+      if (res.ok) {
+        const data = await res.json();
+        setGroupings(prev => ({ ...prev, [formId]: data }));
+      } else {
+        console.error('Failed to fetch groupings:', await res.json());
+      }
+    } catch (err) {
+      console.error('Error fetching groupings:', err);
+    }
+  };
 
   const fetchForms = async () => {
     try {
@@ -92,6 +116,29 @@ function App() {
       console.error('Error: Failed to fetch forms from the server', err);
     }
   };
+
+  const [responses, setResponses] = useState<Record<string, any[]>>({});
+  const fetchResponses = async (formId: string) => {
+    try {
+      const cookies = getCookies();
+      const res = await fetch(`${serverUrl}responses/${formId}`, {
+        method: 'GET',
+        headers: {
+          'Session-Key': cookies.session || ''
+        }
+      });
+  
+      if (res.ok) {
+        const data = await res.json();
+        setResponses(prev => ({ ...prev, [formId]: data }));
+      } else {
+        console.error('Failed to fetch responses:', await res.json());
+      }
+    } catch (err) {
+      console.error('Error fetching responses:', err);
+    }
+  };
+
 
   useEffect(() => {
     fetchForms();
@@ -147,24 +194,74 @@ function App() {
         <p className="text-muted text-center mb-1">{form.category}</p>
         <p className="text-center">{form.summary}</p>
         <div className="text-center mb-2">
-          <a
-            href={`http://localhost:5001/form/${form.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to={`/form/${form.id}`}
             className="text-decoration-none text-primary"
           >
             Shareable Link →
-          </a>
+          </Link>
         </div>
-        <div className="text-center">
-          <Button
-            color="danger"
-            size="sm"
-            onClick={() => deleteForm(form.id)}
-          >
-            Delete Form
-          </Button>
+              <div className="text-center">
+        <Button
+          color="danger"
+          size="sm"
+          onClick={() => deleteForm(form.id)}
+        >
+          Delete Form
+        </Button>
+        <Button
+          color="info"
+          size="sm"
+          className="ms-2"
+          onClick={() => fetchResponses(String(form.id))}
+        >
+          Show Responses
+        </Button>
+        {groupings[String(form.id)] && (
+          <div className="mt-3 text-start">
+            <strong>Generated Groups:</strong>
+            <ul className="list-unstyled">
+              {Object.entries(groupings[String(form.id)]).map(([name, schedule]) => (
+                <li key={name} className="mb-3">
+                  <strong>{name}</strong>
+                  <ul className="ps-3">
+                    {(Array.isArray(schedule[0]) ? schedule : [schedule]).map((roundGroup, idx) => (
+                      <li key={idx}>
+                        Round {idx + 1}: {Array.isArray(roundGroup) ? roundGroup.join(', ') : roundGroup}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <Button
+          color="success"
+          size="sm"
+          className="ms-2"
+          onClick={() => fetchGroupings(String(form.id))}
+        >
+          Generate Groupings
+        </Button>
+      </div>
+      
+      {responses[String(form.id)] && (
+        <div className="mt-3 text-start">
+          <strong>Responses:</strong>
+          <ul>
+          <ul className="list-unstyled">
+              {responses[String(form.id)].map((resp, idx) => (
+                <li key={idx} className="mb-3 p-2 border rounded">
+                  {Object.entries(resp).map(([key, value]) => (
+                    <div key={key}><strong>{key}:</strong> {typeof value === 'object' ? JSON.stringify(value) : String(value)}</div>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </ul>
         </div>
+      )}
       </CardBody> 
     </Card>
   ));
@@ -194,7 +291,7 @@ function App() {
       <div className="d-flex">
         <Container className="py-5">
           <h1 className="text-center display-4 mb-4">Multi-User Project Planner</h1>
-  
+
           <Card className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '800px' }}>
             <CardBody>
               <p className="lead mb-1 text-center">
@@ -205,53 +302,24 @@ function App() {
               </p>
             </CardBody>
           </Card>
-  
-          <h2 className="h4 text-center mt-5 mb-4">Project Groups</h2>
+
+          <h2 className="h4 text-center flex-column mt-5 mb-4">Project Groups</h2>
           <div className="d-flex flex-column align-items-center">{groupBoxes}</div>
-  
+
           <h2 className="h4 text-center mt-5 mb-4">Created Forms</h2>
           <div className="d-flex flex-column align-items-center">
-          {forms.length > 0 ? (
-            forms.map((form, i) => (
-              <Card key={i} className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '700px' }}>
-                <CardBody>
-                  <h5 className="fw-bold text-center">Form {i + 1}</h5>
-                  <p className="text-muted text-center mb-1">{form.category}</p>
-                  <p className="text-center">{form.summary}</p>
-                  <div className="text-center mb-2">
-                    <a
-                      href={`http://localhost:5001/form/${form.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-decoration-none text-primary"
-                    >
-                      Shareable Link →
-                    </a>
-                  </div>
-                  <div className="text-center">
-                    <Button
-                      color="danger"
-                      size="sm"
-                      onClick={() => deleteForm(form.id)}
-                    >
-                      Delete Form
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
-            ))
-          ) : (
+          {forms.length > 0 ? formList : (
             <Card body className="text-center text-muted">No forms created yet.</Card>
           )}
           </div>
-  
+
           <div className="text-center mt-4">
             <Button color="primary" size="lg" onClick={openEditForm}>
               Create New Form
             </Button>
           </div>
         </Container>
-  
+
         <Modal isOpen={formModal} toggle={toggleFormModal}>
           <ModalHeader toggle={toggleFormModal}>Edit Form</ModalHeader>
           <ModalBody>

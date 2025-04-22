@@ -6,6 +6,10 @@ from db.utils.db import Database
 from db.form_hosting import generate_form_table, format_table_name
 from json import dumps, loads
 from api.logins import require_login, get_user_id_from_session_key
+from db.form_hosting import generate_groupings_for_form
+from flask import jsonify
+import traceback
+
 
 
 class Forms(Resource):
@@ -53,7 +57,6 @@ class Forms(Resource):
 
 
 class Form(Resource):
-
     @require_login
     def delete(self, form_id: str):
         db = Database(environ.get("DB_SCHEMA", "public"))
@@ -96,22 +99,53 @@ class Form(Resource):
             return {"message": "Form not found"}, 404
         try:
             valid_fields = db.tables[table_name]._columns
-            schema_fields = {
-                col["column_name"]: col["type"]
-                for col in valid_fields
-                if col["column_name"] != "id"
-            }
+            ordered_columns = [col["column_name"] for col in valid_fields if col["column_name"] != "id"]
 
-            filtered_body = {}
-            for k, v in body.items():
-                if k in schema_fields:
-                    if schema_fields[k] == "json" and not isinstance(v, str):
-                        filtered_body[k] = dumps(v)
-                    else:
-                        filtered_body[k] = v
-            print("Filtered body being inserted:", filtered_body)
-            db.tables[table_name].insert(filtered_body)
+            print("Ordered columns:", ordered_columns)
+            print("Incoming body values:", list(body.values()))
+
+            values = list(body.values())  
+
+            if len(values) != len(ordered_columns):
+                return {"message": "Mismatched fields"}, 400
+
+            insert_dict = {}
+            for col_name, value in zip(ordered_columns, values):
+                col_type = next(col["type"] for col in valid_fields if col["column_name"] == col_name)
+                if col_type == "json" and not isinstance(value, str):
+                    insert_dict[col_name] = dumps(value)
+                else:
+                    insert_dict[col_name] = value
+
+            print("Filtered body being inserted:", insert_dict)
+            db.tables[table_name].insert(insert_dict)
             return "", 201
         except Exception as e:
             print(e)
             return {"message": "Unable to submit"}, 500
+
+class FormResponses(Resource):
+    @require_login
+    def get(self, form_id):
+        form_name = format_table_name(form_id)
+        db = Database(environ.get("DB_SCHEMA", "public"))
+        if db.tables.get(form_name) is None:
+            return {"message": "Form not found"}, 404
+        try:
+            data = db.tables.get(form_name).select()
+            return data, 200
+        except Exception as e:
+            print(e)
+            return {"message": "Something went wrong"}, 500
+    
+class FormGroupings(Resource):
+    @require_login
+    def get(self, form_id):
+        db = Database(environ.get("DB_SCHEMA", "public"))
+        try:
+            result = generate_groupings_for_form(db, form_id)
+            return jsonify(result)
+        except Exception as e:
+            print("Grouping failed:", str(e))
+            traceback.print_exc()
+            return {"message": "Unable to generate groupings"}, 500

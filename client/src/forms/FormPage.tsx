@@ -10,18 +10,19 @@ export default function FormPage() {
   const [formSchema, setFormSchema] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const fetchFormSchema = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/forms/${formId}`, { method: 'GET' });
+        const response = await fetch(`http://localhost:5001/form/${formId}`, { method: 'GET' });
 
         if (!response.ok) {
           throw new Error(`Error fetching form: ${response.statusText}`);
         }
 
         const schema = await response.json();
-        setFormSchema(schema);
+        setFormSchema(schema.form_structure);
         setLoading(false);
       } catch (error) {
         const err = error as Error;
@@ -45,6 +46,12 @@ export default function FormPage() {
 
   if (error) {
     return <div>Error: {error}</div>;
+  }
+
+  if (submitted) {
+    return <div>
+      Form submitted successfully! You can now close this tab.
+    </div>;
   }
 
   // THIS IS A MOCKED SCHEMA
@@ -84,5 +91,5 @@ export default function FormPage() {
   //   ]
   // };
 
-  return <FormInterpreter schema={formSchema} />;
+  return <FormInterpreter schema={formSchema} formId={formId} onSubmit={() => setSubmitted(true)} />;
 }

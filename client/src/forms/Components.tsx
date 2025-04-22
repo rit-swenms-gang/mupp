@@ -176,6 +176,9 @@ export const TextFieldEntity = createEntityComponent(
 
     return (
       <div>
+        <Label htmlFor={props.entity.id}>
+          {props.entity.attributes.label}
+        </Label>
         <Input
           id={props.entity.id}
           name={props.entity.id}
@@ -204,6 +207,9 @@ export const NumberScaleEntity = createEntityComponent(
 
     return (
       <div>
+        <Label htmlFor={props.entity.id}>
+          {props.entity.attributes.label}
+        </Label>
         {minMaxError && <p className='text-danger mt-2'>{minMaxError}</p>}
         <Input
           id={props.entity.id}

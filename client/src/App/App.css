@@ -2,6 +2,7 @@
   max-width: 1280px;
   margin: 0 auto;
   text-align: center;
+  max-height: 100px;
 }
 
 .card {
@@ -43,5 +44,4 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: auto;
 }
