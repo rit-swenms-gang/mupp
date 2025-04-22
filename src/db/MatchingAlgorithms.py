@@ -76,116 +76,116 @@ def tier_list_optimized_generator(leaders, participants):
     total_slots_available = len(participants) * rounds
     round_matching_order = []
     for i in range(rounds):
-      roundMatchingOrder.append(i)
+      round_matching_order.append(i)
     
-    while(not generationComplete):
-      totalSlotsScheduled = 0
+    while(not generation_complete):
+      total_slots_scheduled = 0
       k = 0
       
       for participant in participants:
-        participant.clearSchedule()
+        participant.clear_schedule()
       
       for leader in leaders:
-        leader.clearSchedule()
+        leader.clear_schedule()
           
-      while((k < totalSlotsAvailable) and (not generationComplete)):
+      while((k < total_slots_available) and (not generation_complete)):
         k+=1
-        for i in range(totalWeights-1, -1, -1):
+        for i in range(total_weights-1, -1, -1):
           random.shuffle(leaders)
           for leader in leaders:
             random.shuffle(leader.matches[i])
             for participant in leader.matches[i]:
-              if((participant.roundsScheduled < rounds) and (leader not in participant.schedule) and leader.slotsOpen > 0):
-                random.shuffle(roundMatchingOrder)
-                for round in roundMatchingOrder:
-                  if((len(leader.schedule[round]) < maxGroupSize) and (participant.schedule[round] == None) and (leader not in participant.schedule)):
-                    leader.scheduleParticipant(round, participant)
-                    participant.scheduleRound(round, leader)
-                    totalSlotsScheduled +=1
-      if(totalSlotsScheduled == totalSlotsAvailable):
-        generationComplete = True
+              if((participant.rounds_scheduled < rounds) and (leader not in participant.schedule) and leader.slots_open > 0):
+                random.shuffle(round_matching_order)
+                for round in round_matching_order:
+                  if((len(leader.schedule[round]) < max_group_size) and (participant.schedule[round] == None) and (leader not in participant.schedule)):
+                    leader.schedule_participant(round, participant)
+                    participant.schedule_round(round, leader)
+                    total_slots_scheduled +=1
+      if(total_slots_scheduled == total_slots_available):
+        generation_complete = True
     
-    return(geneticOptimizer)
+    return(genetic_optimizer)
 
-def pSchNameConversion(participantSchedule):
-  nameSchedule = []
-  for leader in participantSchedule:
-    nameSchedule.append(leader.name)
-  return(nameSchedule)
+def p_sch_name_conversion(participant_schedule):
+  name_schedule = []
+  for leader in participant_schedule:
+    name_schedule.append(leader.name)
+  return(name_schedule)
     
-def lSchNameConversion(leaderSchedule):
-  nameSchedule = leaderSchedule
-  for i in range(len(nameSchedule)):
-    for j in range(len(nameSchedule[i])):
-      nameSchedule[i][j] = nameSchedule[i][j].name
-  return(nameSchedule)
+def l_sch_name_conversion(leader_schedule):
+  name_schedule = leader_schedule
+  for i in range(len(name_schedule)):
+    for j in range(len(name_schedule[i])):
+      name_schedule[i][j] = name_schedule[i][j].name
+  return(name_schedule)
 
-def outputSchedule(leaders,participants):
-  scheduleDict = {}
+def output_schedule(leaders,participants):
+  schedule_dict = {}
   for leader in leaders:
-    scheduleDict[leader.name] = lSchNameConversion(leader.schedule) 
+    schedule_dict[leader.name] = l_sch_name_conversion(leader.schedule) 
   for participant in participants:
-    scheduleDict[participant.name] = pSchNameConversion(participant.schedule) 
-  return(scheduleDict)
+    schedule_dict[participant.name] = p_sch_name_conversion(participant.schedule) 
+  return(schedule_dict)
             
-def geneEvaluator(gene,weights):
+def gene_evaluator(gene,weights):
   TMSWeight = 1
-  minGSWeight = 0
-  maxGSWeight = 0
-  GSAvgWeight = 0
-  minMSWeight = 0
+  min_gSWeight = 0
+  max_gSWeight = 0
+  GSAvg_weight = 0
+  min_mSWeight = 0
   
   return(TMSWeight*TMSCalc(gene,weights))
 
 def TMSCalc(gene,weights):
-  totalMatchScore = 0
+  total_match_score = 0
   for leader, schedule in gene.items():
     for round in schedule:
       for participant in round:
-        totalMatchScore += leader.matchParticipant(participant,weights)
-  return(totalMatchScore)
+        total_match_score += leader.match_participant(participant,weights)
+  return(total_match_score)
 
-def minGroupSizeCalc(gene):
-    minSize = float('inf')
+def min_group_size_calc(gene):
+    min_size = float('inf')
     for leader in gene:
-        for roundGroup in gene[leader]:
-            groupSize = len(roundGroup)
-            if groupSize < minSize:
-                minSize = groupSize
-    return minSize
+        for round_group in gene[leader]:
+            group_size = len(round_group)
+            if group_size < min_size:
+                min_size = group_size
+    return min_size
 
-def maxGroupSizeCalc(gene):
-    maxSize = 0
+def max_group_size_calc(gene):
+    max_size = 0
     for leader in gene:
-        for roundGroup in gene[leader]:
-            groupSize = len(roundGroup)
-            if groupSize > maxSize:
-                maxSize = groupSize
-    return maxSize
+        for round_group in gene[leader]:
+            group_size = len(round_group)
+            if group_size > max_size:
+                max_size = group_size
+    return max_size
 
-def groupSizeAvgCalc(gene):
+def group_size_avg_calc(gene):
     total = 0
     count = 0
     for leader in gene:
-        for roundGroup in gene[leader]:
-            total += len(roundGroup)
+        for round_group in gene[leader]:
+            total += len(round_group)
             count += 1
     if count == 0:
         return 0
     return total / count
 
-def minMatchScoreCalc(gene):
-    minScore = float('inf')
+def min_match_score_calc(gene):
+    min_score = float('inf')
     for leader in gene:
-        for roundGroup in gene[leader]:
-            for participant in roundGroup:
-                score = leader.matchParticipant(participant, questionWeights)
-                if score < minScore:
-                    minScore = score
-    return minScore
+        for round_group in gene[leader]:
+            for participant in round_group:
+                score = leader.match_participant(participant, question_weights)
+                if score < min_score:
+                    min_score = score
+    return min_score
   
           
-def generateParent(leaders,participants):
+def generate_parent(leaders,participants):
   parent = {}
   i = 0
   for leader in leaders:
@@ -193,20 +193,20 @@ def generateParent(leaders,participants):
     parent[leader] = leader.schedule
   return(parent)
 
-def geneToSchedule(gene,leaders,participants):
+def gene_to_schedule(gene,leaders,participants):
   for participant in participants:
-    participant.clearSchedule()
+    participant.clear_schedule()
     
   for leader in leaders:
-    leader.clearSchedule()
+    leader.clear_schedule()
     
   for leader, schedule in gene.items():
     for i in range(len(schedule)):
       for participant in schedule[i]:
-        leader.scheduleParticipant(i,schedule[i])
-        participant.scheduleRound(i,leader)
+        leader.schedule_participant(i,schedule[i])
+        participant.schedule_round(i,leader)
         
-def checkValidGene(gene):
+def check_valid_gene(gene):
   found = []
   for schedule in gene.values():
     for player in schedule:
@@ -221,81 +221,81 @@ def checkValidGene(gene):
         
 
 def mutation(gene):
-  mutatedGene = copy.deepcopy(gene)
-  leaders = list(mutatedGene.keys())
+  mutated_gene = copy.deepcopy(gene)
+  leaders = list(mutated_gene.keys())
   
   if not leaders: 
-    return (mutatedGene)
+    return (mutated_gene)
   
   leader = random.choice(leaders)
-  roundIndex = random.randint(0, rounds - 1)
-  participants = mutatedGene[leader][roundIndex]
+  round_index = random.randint(0, rounds - 1)
+  participants = mutated_gene[leader][round_index]
   
   if len(participants) >= 2:
     i, j = random.sample(range(len(participants)), 2)
     participants[i], participants[j] = participants[j], participants[i]
   
-  if(checkValidGene):  
-    return (mutatedGene)
+  if(check_valid_gene):  
+    return (mutated_gene)
   else:
     return(gene)
 
 
-def crossover(geneOne, geneTwo):
+def crossover(gene_one, gene_two):
   child = {}
   
-  for leader in geneOne:
-    childSchedule = []
+  for leader in gene_one:
+    child_schedule = []
     for r in range(rounds):
       if random.random() < 0.5:
-        childSchedule.append(copy.deepcopy(geneOne[leader][r]))
+        child_schedule.append(copy.deepcopy(gene_one[leader][r]))
       else:
-        childSchedule.append(copy.deepcopy(geneTwo[leader][r]))
+        child_schedule.append(copy.deepcopy(gene_two[leader][r]))
         
-    child[leader] = childSchedule
+    child[leader] = child_schedule
   
-  if checkValidGene(child):
+  if check_valid_gene(child):
     return (child)
   else:
     if random.random() < 0.5:
-      return(geneOne)
+      return(gene_one)
     else:
-      return(geneTwo)
+      return(gene_two)
 
 
       
-def geneticOptimizer(leaders, participants, weights):
-  maxScore = 0
-  optimalGene = None
-  generationSize = 10
+def genetic_optimizer(leaders, participants, weights):
+  max_score = 0
+  optimal_gene = None
+  generation_size = 10
   iterations = 10
-  generateMatches(leaders, participants, weights)
+  generate_matches(leaders, participants, weights)
   generation = []
-  for i in range(generationSize):
-    generation.append(generateParent(leaders, participants))
+  for i in range(generation_size):
+    generation.append(generate_parent(leaders, participants))
 
 
   for j in range(iterations):
-    scoredGeneration = []
+    scored_generation = []
     for gene in generation:
-      scoredGeneration.append((gene, geneEvaluator(gene, weights)))
+      scored_generation.append((gene, gene_evaluator(gene, weights)))
 
-    scoredGeneration.sort(key=lambda x: x[1], reverse=True)
+    scored_generation.sort(key=lambda x: x[1], reverse=True)
     
-    if scoredGeneration[0][1] > maxScore:
-      maxScore = scoredGeneration[0][1]
-      optimalGene = scoredGeneration[0][0]
-    newGeneration = [scoredGeneration[0][0], scoredGeneration[1][0]]
+    if scored_generation[0][1] > max_score:
+      max_score = scored_generation[0][1]
+      optimal_gene = scored_generation[0][0]
+    new_generation = [scored_generation[0][0], scored_generation[1][0]]
     
-    while len(newGeneration) < generationSize:
-      parentOne = random.choice(scoredGeneration[:5])[0]
-      parentTwo = random.choice(scoredGeneration[:5])[0]
-      child = crossover(parentOne, parentTwo)
+    while len(new_generation) < generation_size:
+      parent_one = random.choice(scored_generation[:5])[0]
+      parent_two = random.choice(scored_generation[:5])[0]
+      child = crossover(parent_one, parent_two)
       
       if random.random() < 0.3:
         child = mutation(child)
         
-      newGeneration.append(child)
-    generation = newGeneration
+      new_generation.append(child)
+    generation = new_generation
     
-    return(optimalGene)
+    return(optimal_gene)
