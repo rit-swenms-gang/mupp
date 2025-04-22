@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Col, Container, Row,
+import { Container, Row,
         Card, CardBody,
         Button,
         Modal,
@@ -8,10 +8,7 @@ import { Col, Container, Row,
         ModalBody
         } from 'reactstrap';
 import GroupBox from './Dashboard/GroupBox';
-import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
-import EditDropdown from './Dashboard/EditDropdown';
 import Authenticator from '../Authenticator/Authenticator';
-import FormPage from '../forms/FormPage';
 import { getCookies } from '../services/auth';
 import FormBuilderPage from '../forms/FormBuilder';
 import { Link } from 'react-router';
@@ -28,11 +25,9 @@ interface Group {
 const serverUrl = 'http://localhost:5001/';
 
 function App() {
-  const [serverText, setServerText] = useState('yet to access server');
   const [groups, setGroups] = useState(Array<Group>);
   const [forms, setForms] = useState(Array<FormPreviewProps>);
   const [formModal, setformModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const toggleFormModal = () => setformModal(!formModal);
 
@@ -293,28 +288,8 @@ function App() {
     </Card>
   ));
 
-  useEffect(() => {
-    const ac = new AbortController()
-    setServerText('Calling server')
-
-    fetch('http://localhost:5001', {
-      signal: ac.signal
-    })
-      .then(res => {
-        if (!res.ok) return 'Failed to get response'
-        return res.json() 
-      })
-      .then(text => setServerText(JSON.stringify(text)))
-      .catch(e => {
-        console.error(e)
-        setServerText('Something broke')
-      })
-
-    return () => ac.abort()
-  }, [])
-
   return (
-    <Authenticator onLogIn={() => setIsLoggedIn(true)} onLogOut={() => setIsLoggedIn(false)}>
+    <Authenticator >
       <div className="d-flex">
         <Container className="py-5">
           <h1 className="text-center display-4 mb-4">Multi-User Party Planner</h1>

@@ -56,8 +56,6 @@ interface AuthenticatorProps {
      */
     validateSignUp?: (data: FormData) => Record<string, string>;
   };
-  onLogIn?: () => void;
-  onLogOut?: () => void;
   /**
    * The child components to render when authenticated.
    */
@@ -73,8 +71,6 @@ export default function Authenticator({
     validateSignIn,
     validateSignUp
   },
-  onLogIn,
-  onLogOut,
   children 
 }: Readonly<AuthenticatorProps>) {
   const [activeTab, setActiveTab] = useState(1);
@@ -137,7 +133,6 @@ export default function Authenticator({
   const handleSuccessfulSignIn = () => {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
-    onLogIn?.();
   }
 
   /**
@@ -146,7 +141,6 @@ export default function Authenticator({
   const handleSuccessfulSignOut = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated');
-    onLogOut?.();
   }
 
   // render content based on authentication status
