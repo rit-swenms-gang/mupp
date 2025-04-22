@@ -7,7 +7,6 @@ from json import dumps
 base_url = "http://localhost:5001"
 endpoint = "/forms"
 
-
 class FormsResourceTest(TestCase):
     def setUp(self):
         self.db = Database("test")
