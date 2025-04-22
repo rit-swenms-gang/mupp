@@ -4,7 +4,7 @@ from flask_restful import Resource, reqparse
 from psycopg2.errors import ForeignKeyViolation
 from db.utils.db import Database
 from db.form_hosting import generate_form_table, format_table_name
-from json import dumps
+from json import dumps, loads
 from api.logins import require_login, get_user_id_from_session_key
 
 
@@ -29,6 +29,7 @@ class Forms(Resource):
         args = parser.parse_args()
 
         account_id = get_user_id_from_session_key(request.headers.get('Session-Key'))
+        print(account_id, args.get('form_structure'))
 
         try:
             # print("Parsed args:", args)
@@ -59,8 +60,9 @@ class Form(Resource):
             return {"message": "Form not found"}, 404
         try:
             data = db.tables.get("hosted_forms").select(
-                ["form_structure"], {"id::text": form_id}, 1
+                ["form_structure"], {"id": form_id}, 1
             )
+            data['form_structure'] = loads(data['form_structure'])
             return data, 200
         except Exception as e:
             print(e)
