@@ -85,3 +85,14 @@ export const booleanEntity = createEntity({
     return context.entity.attributes.defaultValue ?? false;
   },
 });
+
+export const isLeaderEntity = createEntity({
+  name: 'isLeader',
+  attributes: [labelAttribute, defaultValueAttribute],
+  validate: (value) => {
+    return z.boolean().parse(value);
+  },
+  defaultValue(context) {
+    return context.entity.attributes.defaultValue ?? false;
+  }
+});

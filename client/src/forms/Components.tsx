@@ -3,7 +3,7 @@ import { ZodError } from 'zod';
 import { createAttributeComponent, createEntityComponent } from '@coltorapps/builder-react';
 
 import { labelAttribute, maxValueAttribute, minValueAttribute, requiredAttribute, weightAttribute } from './attributes';
-import { booleanEntity, numberScaleEntity, textFieldEntity } from './entities';
+import { booleanEntity, isLeaderEntity, numberScaleEntity, textFieldEntity } from './entities';
 import { Input, Label } from 'reactstrap';
 
 import './Components.css';
@@ -230,6 +230,29 @@ export const NumberScaleEntity = createEntityComponent(
  */
 export const BooleanEntity = createEntityComponent(
   booleanEntity,
+  (props) => {
+
+    return (
+      <div className='input-container justify-content-center'>
+        <Label htmlFor={props.entity.id}>
+          {props.entity.attributes.label}
+        </Label>
+        <Input
+          id={props.entity.id}
+          name={props.entity.id}
+          type='checkbox'
+          defaultChecked={props.entity.attributes.defaultValue ?? false}
+          checked={props.entity.value ?? false}
+          onChange={(e) => props.setValue(e.target.checked)}
+        />
+        <ZodErrorMessage error={props.entity.error} />
+      </div>
+    )
+  },
+);
+
+export const IsLeaderEntity = createEntityComponent(
+  isLeaderEntity,
   (props) => {
 
     return (

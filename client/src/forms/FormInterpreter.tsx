@@ -1,7 +1,7 @@
 import { type Schema } from '@coltorapps/builder';
 import { InterpreterEntities, useInterpreterStore } from '@coltorapps/builder-react';
 
-import { BooleanEntity, NumberScaleEntity, TextFieldEntity } from './Components';
+import { BooleanEntity, IsLeaderEntity, NumberScaleEntity, TextFieldEntity } from './Components';
 import { formBuilder } from './builder';
 import { Button, Form } from 'reactstrap';
 
@@ -67,9 +67,10 @@ export function FormInterpreter({schema}: FormInterpreterProps) {
       <InterpreterEntities
         interpreterStore={interpreterStore}
         components={{
-          textField: TextFieldEntity, 
-          numberScale: NumberScaleEntity,
           boolean: BooleanEntity,
+          isLeader: IsLeaderEntity,
+          numberScale: NumberScaleEntity,
+          textField: TextFieldEntity, 
         }}
       />
       <Button type='submit'>Submit</Button>

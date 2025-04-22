@@ -1,6 +1,6 @@
 import { createBuilder } from '@coltorapps/builder';
 
-import { booleanEntity, numberScaleEntity, textFieldEntity } from './entities';
+import { booleanEntity, isLeaderEntity, numberScaleEntity, textFieldEntity } from './entities';
 
 // Think of builders as collections of supported entities. 
 // For example, you can have a form builder that allows adding text and select fields to a form, 
@@ -8,5 +8,5 @@ import { booleanEntity, numberScaleEntity, textFieldEntity } from './entities';
 // For now, we're going to focus solely on the form builder.
 
 export const formBuilder = createBuilder({
-  entities: [booleanEntity, textFieldEntity, numberScaleEntity],
+  entities: [booleanEntity, isLeaderEntity, numberScaleEntity, textFieldEntity],
 });

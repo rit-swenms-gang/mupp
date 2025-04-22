@@ -20,7 +20,7 @@ export const labelAttribute = createAttribute({
  */
 export const requiredAttribute = createAttribute({
   name: 'required',
-  validate: (value) => z.boolean().optional().parse(value)
+  validate: (value) => z.boolean().optional().parse(value),
 });
 
 /**

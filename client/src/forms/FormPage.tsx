@@ -9,10 +9,9 @@ export default function FormPage() {
   const mockSchema = {
     entities: {
       '51324b32-adc3-4d17-a90e-66b5453935bd': {
-        type: 'boolean' as const,
+        type: 'isLeader' as const,
         'attributes': {
           label: 'Are you a leader?',
-          required: true,
           defaultValue: false
         }
       },

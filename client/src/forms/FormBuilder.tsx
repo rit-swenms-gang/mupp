@@ -1,6 +1,6 @@
 import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@coltorapps/builder-react';
 
-import { BooleanEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
+import { BooleanEntity, IsLeaderEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
 import { formBuilder } from './builder';
 import { Button, Card, CardBody, CardHeader, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 
@@ -54,6 +54,10 @@ const BooleanAttribute = () => {
   )
 }
 
+const IsLeaderAttribute = () => {
+  return (<></>);
+}
+
 /**
  * The `FormBuilderPage` component is a form builder page that allows users to create forms using a schema builder.
  * It provides a user interface for adding, editing, and deleting form fields and their attributes.
@@ -64,14 +68,14 @@ export default function FormBuilderPage() {
    * This store is responsible for building a schema based on a builder definition.
    */
   const builderStore = useBuilderStore(formBuilder, {
+    // provide a default entity that is present on every form
     initialData: {
       schema: {
        entities: {
           '51324b32-adc3-4d17-a90e-66b5453935bd': {
-            type: 'boolean',
+            type: 'isLeader',
             attributes: {
               label: 'Are you a leader?',
-              required: true,
               defaultValue: false,
             }
           }
@@ -138,9 +142,10 @@ export default function FormBuilderPage() {
       <BuilderEntities
         builderStore={builderStore}
         components={{ 
-          textField: TextFieldEntity,
-          numberScale: NumberScaleEntity,
           boolean: BooleanEntity,
+          isLeader: IsLeaderEntity,
+          numberScale: NumberScaleEntity,
+          textField: TextFieldEntity,
         }}
       >
         {/*
@@ -155,9 +160,10 @@ export default function FormBuilderPage() {
                 <BuilderEntityAttributes
                   builderStore={builderStore}
                   components={{ 
-                    textField: TextFieldAttribute,
-                    numberScale: NumberScaleAttribute,
                     boolean: BooleanAttribute,
+                    isLeader: IsLeaderAttribute,
+                    numberScale: NumberScaleAttribute,
+                    textField: TextFieldAttribute,
                   }}
                   entityId={props.entity.id}
                 />
