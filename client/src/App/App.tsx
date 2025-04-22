@@ -8,13 +8,11 @@ import { Col, Container, Row,
         ModalBody
         } from 'reactstrap';
 import GroupBox from './Dashboard/GroupBox';
-import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
-import EditDropdown from './Dashboard/EditDropdown';
 import Authenticator from '../Authenticator/Authenticator';
-import FormPage from '../forms/FormPage';
 import { getCookies } from '../services/auth';
 import FormBuilderPage from '../forms/FormBuilder';
 import { Link } from 'react-router';
+import { FormPreviewProps } from './Dashboard/FormPreview';
 
 
 interface Group {
@@ -28,7 +26,6 @@ interface Group {
 const serverUrl = 'http://localhost:5001/';
 
 function App() {
-  const [serverText, setServerText] = useState('yet to access server');
   const [groups, setGroups] = useState(Array<Group>);
   const [forms, setForms] = useState(Array<FormPreviewProps>);
   const [formModal, setformModal] = useState(false);
