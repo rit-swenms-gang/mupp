@@ -9,10 +9,9 @@ type FormBuilderSchema = Schema<typeof formBuilder>;
 
 interface FormInterpreterProps {
   schema: FormBuilderSchema;
-  toggle: (arg0: any) => void;
 }
 
-export function FormInterpreter({schema, toggle}: FormInterpreterProps) {
+export function FormInterpreter({schema}: FormInterpreterProps) {
   /*
    * The `useInterpreterStore` hook creates an interpreter store for us. 
    * This store is used for filling entities values based on a schema and builder definition.
@@ -74,7 +73,7 @@ export function FormInterpreter({schema, toggle}: FormInterpreterProps) {
           textField: TextFieldEntity, 
         }}
       />
-      <Button onClick={toggle} type='submit'>Submit</Button>
+      <Button type='submit'>Submit</Button>
     </Form>
   );
 }

@@ -107,16 +107,25 @@ function App() {
   }
 
   function deleteForm(formId: unknown) {
-    let newFormList = [];
-    for(const f in forms) {
-      if(forms[f].name != formId) {
-        newFormList.push(forms[f]);
+    try {
+      const cookies = getCookies();
+      const res = await fetch(`${serverUrl}form/${formId}`, {
+        method: 'DELETE',
+        headers: {
+          'Session-Key': cookies.session || ''
+        }
+      });
+  
+      if (res.ok) {
+        setForms(forms.filter(f => f.id !== formId));
+      } else {
+        const err = await res.json();
+        alert(`Error: ${err.message}`);
       }
+    } catch (err) {
+      console.error('Error deleting form:', err);
+      alert('Network error while deleting form.');
     }
-    setForms(newFormList);
-
-    // TODO: delete the form on the server
-    console.log(formId)
   }
 
   const groupBoxes = groups.map(group => 
