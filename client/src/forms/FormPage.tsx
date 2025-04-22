@@ -1,6 +1,10 @@
 import { FormInterpreter } from './FormInterpreter';
 
-export default function FormPage() {
+type FormPageProps = {
+  toggleModal: (arg0: any) => void;
+};
+
+export default function FormPage({toggleModal}: Readonly<FormPageProps>) {
   // TODO: retrieve form schema from the server
   // i.e. const form = await fetch('localhost:5001/forms-endpoint', { method: 'GET' })
   // the endpoint must return a JSON object with a similar structure to the mocked one below
@@ -42,5 +46,5 @@ export default function FormPage() {
     ]
   };
 
-  return <FormInterpreter schema={mockSchema} />;
+  return <FormInterpreter schema={mockSchema} toggle={toggleModal}/>;
 }

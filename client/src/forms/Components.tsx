@@ -242,7 +242,6 @@ export const BooleanEntity = createEntityComponent(
           name={props.entity.id}
           type='checkbox'
           defaultChecked={props.entity.attributes.defaultValue ?? false}
-          checked={props.entity.value ?? false}
           onChange={(e) => props.setValue(e.target.checked)}
         />
         <ZodErrorMessage error={props.entity.error} />
@@ -265,7 +264,6 @@ export const IsLeaderEntity = createEntityComponent(
           name={props.entity.id}
           type='checkbox'
           defaultChecked={props.entity.attributes.defaultValue ?? false}
-          checked={props.entity.value ?? false}
           onChange={(e) => props.setValue(e.target.checked)}
         />
         <ZodErrorMessage error={props.entity.error} />

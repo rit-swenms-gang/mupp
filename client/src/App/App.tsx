@@ -13,6 +13,7 @@ import EditDropdown from './Dashboard/EditDropdown';
 import Authenticator from '../Authenticator/Authenticator';
 import FormPage from '../forms/FormPage';
 import { getCookies } from '../services/auth';
+import FormBuilderPage from '../forms/FormBuilder';
 
 
 interface Group {
@@ -183,7 +184,8 @@ function App() {
       <Modal isOpen={formModal} toggle={toggleFormModal}>
         <ModalHeader toggle={toggleFormModal}>Edit Form</ModalHeader>
         <ModalBody>
-          <FormPage/>
+          <FormBuilderPage />
+          <FormPage toggleModal={toggleFormModal}/>
         </ModalBody>
       </Modal>
     </Authenticator>
