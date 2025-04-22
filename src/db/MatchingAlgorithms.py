@@ -20,11 +20,11 @@ class Leader:  # Leader class
         self.slots_open = max_group_size * rounds
 
         self.schedule = []
-        for i in range(rounds):
+        for _ in range(rounds):
             self.schedule.append([])
 
         self.matches = []
-        for j in range(total_weights):
+        for _ in range(total_weights):
             self.matches.append([])
 
     def match_participant(self, participant, weights):
@@ -36,7 +36,7 @@ class Leader:  # Leader class
 
     def clear_schedule(self):
         self.schedule = []
-        for i in range(rounds):
+        for _ in range(rounds):
             self.schedule.append([])
         self.slots_open = max_group_size * rounds
 
@@ -185,11 +185,9 @@ def min_match_score_calc(gene):
     return min_score
   
           
-def generate_parent(leaders,participants):
+def generate_parent(leaders):
   parent = {}
-  i = 0
   for leader in leaders:
-    i+=1
     parent[leader] = leader.schedule
   return(parent)
 
@@ -271,7 +269,7 @@ def genetic_optimizer(leaders, participants, weights):
   iterations = 10
   generate_matches(leaders, participants, weights)
   generation = []
-  for i in range(generation_size):
+  for _ in range(generation_size):
     generation.append(generate_parent(leaders, participants))
 
 
