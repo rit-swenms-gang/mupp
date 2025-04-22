@@ -282,8 +282,8 @@ function App() {
           <div className="mt-3 text-start">
             <strong>Responses:</strong>
             <ul className="list-unstyled">
-              {responses[String(form.id)].map((resp, idx) => (
-                <li key={idx} className="mb-3 p-2 border rounded">
+              {responses[String(form.id)].map((resp) => (
+                <li key={resp.id} className="mb-3 p-2 border rounded">
                   {Object.entries(resp).map(([key, value]) => (
                     <div key={key}>
                       <strong>{key}:</strong> {typeof value === 'object' ? JSON.stringify(value) : String(value)}
