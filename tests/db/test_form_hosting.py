@@ -18,7 +18,29 @@ class FormUtilsTest(TestCase):
             "SELECT id FROM accounts WHERE email = %s;", [user_data["email"]]
         )[0][0]
         # form_data = '{ "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : null } }'
-        form_data = {"key1": "text", "key2": "int", "key3": "json"}
+        form_data = {
+            'entities': {
+            '7a77959a-eb84-447c-9ed7-200e2a674eea': {
+                'type': 'textField',
+                'attributes': {
+                'label': 'Name',
+                'required': True
+                },
+                
+            },
+            '7a49f550-5966-4c8c-89eb-a0797940fff3': {
+                'type': 'numberScale',
+                'attributes': {
+                    'label': 'Age',
+                    'weight': 1,
+                    'min': 1,
+                    'max': 100
+                },
+                
+            }
+            },
+            'root': ['7a77959a-eb84-447c-9ed7-200e2a674eea', '7a49f550-5966-4c8c-89eb-a0797940fff3']
+        }
         self.form_id = self.db.exec_commit(
             "INSERT INTO hosted_forms (account_id, form_structure) VALUES (%s, %s) RETURNING id;",
             [account_id, dumps(form_data)],

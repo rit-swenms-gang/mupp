@@ -5,7 +5,7 @@ from psycopg2.errors import ForeignKeyViolation
 from db.utils.db import Database
 from db.form_hosting import generate_form_table, format_table_name
 from json import dumps
-from api.logins import require_login
+from api.logins import require_login, get_user_id_from_session_key
 
 
 class Forms(Resource):
@@ -15,12 +15,6 @@ class Forms(Resource):
         # TODO: Form structure validation, login and posting to database
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument(
-            "account_id",
-            type=int,
-            help="Forms must have an owner 'account_id'",
-            required=True,
-        )
-        parser.add_argument(
             "form_structure",
             type=dict,
             help="Forms must have form data 'form_structure'",
@@ -28,17 +22,19 @@ class Forms(Resource):
         )
         args = parser.parse_args()
 
+        account_id = get_user_id_from_session_key(request.headers.get('Session-Key'))
+
         try:
-            print("Parsed args:", args)
+            # print("Parsed args:", args)
             form = db.tables["hosted_forms"].insert(
                 {
-                    "account_id": args["account_id"],
+                    "account_id": account_id,
                     "form_structure": dumps(args["form_structure"]),
                 },
                 ["id"],
             )
 
-            print("Inserted into hosted_forms, new form id:", form["id"])
+            # print("Inserted into hosted_forms, new form id:", form["id"])
             generate_form_table(db, form["id"])
             # TODO: Consider returning formatted id
             return {"form_endpoint": form["id"]}, 201
