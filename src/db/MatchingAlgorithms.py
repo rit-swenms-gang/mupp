@@ -270,7 +270,7 @@ def genetic_optimizer(leaders, participants, weights):
   generate_matches(leaders, participants, weights)
   generation = []
   for _ in range(generation_size):
-    generation.append(generate_parent(leaders, participants))
+    generation.append(generate_parent(leaders))
 
 
   for j in range(iterations):

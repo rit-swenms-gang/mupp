@@ -149,7 +149,7 @@ class TestMatchingSystem(unittest.TestCase):
     def test_generate_parent(
         self,
     ):  # This tests the parent generation code for the genetic algorithm
-        parent = generate_parent(self.leaders, self.participants)
+        parent = generate_parent(self.leaders)
         self.assertIsInstance(parent, dict)
         self.assertEqual(set(parent.keys()), set(self.leaders))
         for schedule in parent.values():
@@ -158,7 +158,7 @@ class TestMatchingSystem(unittest.TestCase):
     def test_gene_to_schedule(
         self,
     ):  # This tests if the conversion from a gene into a specified schedule works
-        parent = generate_parent(self.leaders, self.participants)
+        parent = generate_parent(self.leaders)
         gene_to_schedule(parent, self.leaders, self.participants)
         for leader in self.leaders:
             self.assertEqual(leader.schedule, parent[leader])
