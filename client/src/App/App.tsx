@@ -1,4 +1,4 @@
-import { useState, useEffect, Key } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { Container, Row,
         Card, CardBody,
@@ -50,7 +50,7 @@ function App() {
     ]
   ); }, []);
 
-  const [groupings, setGroupings] = useState<Record<string, any>>({});
+  const [groupings, setGroupings] = useState<Record<string, (string | null)[] | (string | null)[][]>>({});
   const fetchGroupings = async (formId: string) => {
     try {
       const cookies = getCookies();
@@ -84,7 +84,7 @@ function App() {
   
       if (res.ok) {
         const result = await res.json();
-        const forms = result.rows || result;
+        const forms = result.rows ?? result;
   
         const loadedForms = forms.map((form: Form, index: number) => {
           let parsedStructure;
@@ -103,7 +103,7 @@ function App() {
             name: `Form ${index + 1}`,
             category: "Created Forms",
             summary: Object.values(parsedStructure.entities)
-              .map((e: any) => e.attributes?.label || 'Unnamed')
+              .map((e: any) => e.attributes?.label ?? 'Unnamed')
               .join(', ')
           };
         });
@@ -148,7 +148,7 @@ function App() {
   function openEditForm(formId: unknown) {
     setformModal(true);
     if(formId == null) {
-      
+      // TODO
     }
   }
 
@@ -217,11 +217,11 @@ function App() {
           </Button>
           {groupings[String(form.id)] && (() => {
             const groupingsData = groupings[String(form.id)];
-            const leaders = [];
-            const participants = [];
+            const leaders: { name: string, schedule: string[][] }[] = [];
+            const participants: { name: string, schedule: string[] }[] = [];
   
             for (const [name, schedule] of Object.entries(groupingsData)) {
-              if (Array.isArray((schedule as Array<string>)[0])) {
+              if (Array.isArray(schedule[0])) {
                 leaders.push({ name, schedule });
               } else {
                 participants.push({ name, schedule });
@@ -238,8 +238,9 @@ function App() {
                     <li key={name} className="mb-3">
                       <strong>{name}</strong>
                       <ul className="ps-3">
-                        {(schedule as Array<Array<Group>>).map((roundGroup, idx) => (
-                          <li key={idx}>
+                        {schedule.map((roundGroup, idx) => (
+                          // Currently no unique identfier from grouping backend, praying this is unique
+                          <li key={JSON.stringify(roundGroup)}> 
                             Round {idx + 1}: {roundGroup.join(', ')}
                           </li>
                         ))}
@@ -254,9 +255,10 @@ function App() {
                     <li key={name} className="mb-3">
                       <strong>{name}</strong>
                       <ul className="ps-3">
-                        {(schedule as Array<string>).map((leaderName: string, idx: Key | null | undefined) => (
-                          <li key={idx}>
-                            {idx === 0 ? "Group leader order" : `Round ${idx as number + 1}`}: {leaderName || "—"}
+                        {schedule.map((leaderName, idx) => (
+                          // currently no unique identifier, hopefully name and and leader name are enough
+                          <li key={name+leaderName}>
+                            {idx === 0 ? "Group leader order" : `Round ${idx + 1}`}: {leaderName || "—"}
                           </li>
                         ))}
                       </ul>

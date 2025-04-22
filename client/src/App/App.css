@@ -5,14 +5,11 @@
 
 .card {
   padding: 2em;
+  border-radius: 12px;
 }
 
 body {
   background-color: #f8f9fa;
-}
-
-.card {
-  border-radius: 12px;
 }
 
 button.btn-primary {
