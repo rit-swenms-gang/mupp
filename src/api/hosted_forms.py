@@ -53,6 +53,26 @@ class Forms(Resource):
 
 
 class Form(Resource):
+
+    @require_login
+    def delete(self, form_id: str):
+        db = Database(environ.get("DB_SCHEMA", "public"))
+
+        # Delete form table if it exists
+        table_name = format_table_name(form_id)
+        if db.tables.get(table_name):
+            db.exec_commit(f'DROP TABLE IF EXISTS {table_name}')
+
+        # Delete from hosted_forms
+        try:
+            result = db.tables["hosted_forms"].delete(where={"id": form_id})
+            if result == 0:
+                return {"message": "Form not found"}, 404
+            return "", 204
+        except Exception as e:
+            print(e)
+            return {"message": "Failed to delete form"}, 500
+
     def get(self, form_id: str):
         form_name = format_table_name(form_id)
         db = Database(environ.get("DB_SCHEMA", "public"))

@@ -3,10 +3,6 @@ import { FormInterpreter } from './FormInterpreter';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'reactstrap';
 
-type FormPageProps = {
-  toggleModal: (arg0: any) => void;
-};
-
 export default function FormPage() {
   const params = useParams();
   const formId = params.formId as string;
@@ -38,7 +34,13 @@ export default function FormPage() {
   }, [formId]); // Re-run the effect if formId changes
 
   if (loading) {
-    return <Spinner color='secondary'>Loading the form...</Spinner>;
+    return <>
+      <div className='d-flex flex-column align-items-center'>
+        <Spinner color='secondary'>Loading the form...</Spinner>
+        <p>Loading your form...</p>
+      </div>
+      
+      </>;
   }
 
   if (error) {

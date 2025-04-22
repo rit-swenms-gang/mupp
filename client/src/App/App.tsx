@@ -106,7 +106,7 @@ function App() {
     }
   }
 
-  function deleteForm(formId: unknown) {
+  async function deleteForm(formId: unknown) {
     try {
       const cookies = getCookies();
       const res = await fetch(`${serverUrl}form/${formId}`, {
@@ -117,7 +117,7 @@ function App() {
       });
   
       if (res.ok) {
-        setForms(forms.filter(f => f.id !== formId));
+        setForms(forms.filter(f => String(f.id) !== String(formId)));
       } else {
         const err = await res.json();
         alert(`Error: ${err.message}`);
@@ -145,7 +145,7 @@ function App() {
         <h5 className="fw-bold text-center">Form {i + 1}</h5>
         <p className="text-muted text-center mb-1">{form.category}</p>
         <p className="text-center">{form.summary}</p>
-        <div className="text-center">
+        <div className="text-center mb-2">
           <a
             href={`http://localhost:5001/form/${form.id}`}
             target="_blank"
@@ -155,7 +155,16 @@ function App() {
             Shareable Link →
           </a>
         </div>
-      </CardBody>
+        <div className="text-center">
+          <Button
+            color="danger"
+            size="sm"
+            onClick={() => deleteForm(form.id)}
+          >
+            Delete Form
+          </Button>
+        </div>
+      </CardBody> 
     </Card>
   ));
 
@@ -215,29 +224,38 @@ function App() {
   
           <h2 className="h4 text-center mt-5 mb-4">Created Forms</h2>
           <div className="d-flex flex-column align-items-center">
-            {forms.length > 0 ? (
-              forms.map((form, i) => (
-                <Card key={i} className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '700px' }}>
-                  <CardBody>
-                    <h5 className="fw-bold text-center">Form {i + 1}</h5>
-                    <p className="text-muted text-center mb-1">{form.category}</p>
-                    <p className="text-center">{form.summary}</p>
-                    <div className="text-center">
-                      <a
-                        href={`http://localhost:5001/form/${form.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-decoration-none text-primary"
-                      >
-                        Shareable Link →
-                      </a>
-                    </div>
-                  </CardBody>
-                </Card>
-              ))
-            ) : (
-              <Card body className="text-center text-muted">No forms created yet.</Card>
-            )}
+          {forms.length > 0 ? (
+            forms.map((form, i) => (
+              <Card key={i} className="mb-4 shadow-sm mx-auto" style={{ maxWidth: '700px' }}>
+                <CardBody>
+                  <h5 className="fw-bold text-center">Form {i + 1}</h5>
+                  <p className="text-muted text-center mb-1">{form.category}</p>
+                  <p className="text-center">{form.summary}</p>
+                  <div className="text-center mb-2">
+                    <a
+                      href={`http://localhost:5001/form/${form.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-decoration-none text-primary"
+                    >
+                      Shareable Link →
+                    </a>
+                  </div>
+                  <div className="text-center">
+                    <Button
+                      color="danger"
+                      size="sm"
+                      onClick={() => deleteForm(form.id)}
+                    >
+                      Delete Form
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
+            ))
+          ) : (
+            <Card body className="text-center text-muted">No forms created yet.</Card>
+          )}
           </div>
   
           <div className="text-center mt-4">
