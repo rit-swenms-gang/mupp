@@ -67,11 +67,17 @@ class FormsResourceTest(TestCase):
     def tearDown(self):
         self.db.cleanup(True)
 
-    def test_get_not_allowed_at_endpoint(self):
+    def test_get_returns_users_forms(self):
         """
-        GET requests to the /forms endpoint returns a 405 message
+        GET requests to the /forms returns a list of the logged-in user.
         """
-        test_get(self, base_url + endpoint, expected_status=405)
+        self.db.tables['hosted_forms'].insert({ 
+            'account_id': self.account_ids[0],
+            'form_structure': dumps(self.dummy_form_data)
+        })
+        expected = self.db.tables['hosted_forms'].select(where={ 'account_id': self.account_ids[0] })
+        data = test_get(self, base_url + endpoint, header=self.session_headers, expected_status=200)
+        self.assertEqual(expected, data, 'Expected to receive form data back')
 
     def test_post_adds_form_table_to_database(self):
         """
@@ -194,11 +200,11 @@ class FormResourceTest(TestCase):
 
         self.endpoints = self.db.exec_commit(
             """
-      INSERT INTO hosted_forms
-        (account_id, form_structure)
-      VALUES (%s, %s), (%s, %s)
-      RETURNING id;
-    """,
+            INSERT INTO hosted_forms
+                (account_id, form_structure)
+            VALUES (%s, %s), (%s, %s)
+            RETURNING id;
+            """,
             [
                 self.account_ids[0][0],
                 dumps(self.dummy_form_data),
@@ -208,6 +214,16 @@ class FormResourceTest(TestCase):
         )
         for ep in self.endpoints:
             generate_form_table(self.db, ep[0])
+
+        self.session_headers = {"session-key": "session_key"}
+
+        self.db.exec_commit(
+            """
+        INSERT INTO logins (user_id, session_key)
+        VALUES (%s, %s);
+        """,
+            (self.account_ids[0][0], self.session_headers.get("session-key")),
+        )
 
     def tearDown(self):
         self.db.cleanup()
@@ -249,6 +265,7 @@ class FormResourceTest(TestCase):
     def test_post_returns_error_when_missing_expected_data(self):
         """
         POST requests to the /forms/<string:form_id> endpoint does not add subbmission when missing data
+        and return 400
         """
         param_endpoint = "/" + self.endpoints[0][0]
         formatted_name = format_table_name(self.endpoints[0][0])
@@ -259,7 +276,7 @@ class FormResourceTest(TestCase):
             self,
             base_url + endpoint + param_endpoint,
             json={"wrong_field": "dummy_data"},
-            expected_status=500,
+            expected_status=400,
         )
         updated_count = self.db.exec_commit(
             "SELECT COUNT(*) FROM {}".format(formatted_name)
@@ -277,9 +294,23 @@ class FormResourceTest(TestCase):
         param_endpoint = "/" + self.endpoints[0][0]
         test_put(self, base_url + endpoint + param_endpoint, expected_status=405)
 
-    def test_delete_not_allowed_at_endpoint(self):
+    def test_delete_deletes_users_form(self):
         """
-        DELETE requests to the /forms/<string:form_id> endpoint returns a 405 message
+        DELETE requests to the /forms/<string:form_id> endpoint 204 and removes form
         """
         param_endpoint = "/" + self.endpoints[0][0]
-        test_delete(self, base_url + endpoint + param_endpoint, expected_status=405)
+        test_delete(
+            self, base_url + endpoint + param_endpoint, 
+            header=self.session_headers,expected_status=204
+        )
+        results = self.db.tables['hosted_forms'].select(where={'id':self.endpoints[0][0]})
+        self.assertEqual(0, len(results))
+
+    def test_delete_requires_session(self):
+        """
+        DELETE requests to the /forms/<string:form_id> endpoint missing session returns a 401
+        """
+        param_endpoint = "/" + self.endpoints[0][0]
+        test_delete(
+            self, base_url + endpoint + param_endpoint,expected_status=401
+        )
