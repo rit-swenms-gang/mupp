@@ -29,6 +29,7 @@ class Forms(Resource):
         args = parser.parse_args()
 
         account_id = get_user_id_from_session_key(request.headers.get('Session-Key'))
+        print(account_id, args.get('form_structure'))
 
         try:
             # print("Parsed args:", args)
@@ -59,7 +60,7 @@ class Form(Resource):
             return {"message": "Form not found"}, 404
         try:
             data = db.tables.get("hosted_forms").select(
-                ["form_structure"], {"id::text": form_id}, 1
+                ["form_structure"], {"id": form_id}, 1
             )
             return data, 200
         except Exception as e:
