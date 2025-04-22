@@ -2,75 +2,79 @@ import random
 import copy
 
 rounds = 3
-maxGroupSize = 5
-numQuestions = 5
-questionWeights = [5, 2, 1, 1, 1]
+max_group_size = 5
+num_questions = 5
+question_weights = [5, 2, 1, 1, 1]
 
-totalWeights = 0
-for weight in questionWeights:
-    totalWeights+=weight
+total_weights = 0
+for weight in question_weights:
+    total_weights += weight
 
-class Leader():  #Leader class
-  def __init__(self, name, email, preferenceList):
-    self.name = name
-    self.email = email
-    self.preferenceList = preferenceList
-    
-    self.slotsOpen = maxGroupSize * rounds
-    
-    self.schedule = []
-    for i in range(rounds):
-        self.schedule.append([])
-        
-    self.matches = []
-    for j in range(totalWeights):
-        self.matches.append([])
-        
-  def matchParticipant(self, participant, weights):
-    matchScore = 0  #the overall score of how many questions matched up
-    for i in range(len(self.preferenceList)):
-      if self.preferenceList[i] == participant.preferenceList[i]:
-        matchScore += 1*weights[i]
-    return (matchScore)
 
-  def clearSchedule(self):
-    self.schedule = []
-    for i in range(rounds):
-        self.schedule.append([])
-    self.slotsOpen = maxGroupSize * rounds
+class Leader:  # Leader class
+    def __init__(self, name, email, preference_list):
+        self.name = name
+        self.email = email
+        self.preference_list = preference_list
 
-  def scheduleParticipant(self, roundNumber, participant):
-    self.schedule[roundNumber].append(participant)
-    self.slotsOpen -= 1
-    
-class Participant():  #Participant class
+        self.slots_open = max_group_size * rounds
 
-  def __init__(self, name, email, preferenceList):
-    self.name = name
-    self.email = email
-    self.preferenceList = preferenceList
+        self.schedule = []
+        for i in range(rounds):
+            self.schedule.append([])
 
-    self.schedule = [None] * rounds
-    self.roundsScheduled = 0
-    
-  def clearSchedule(self):
-      self.schedule = [None] * rounds
-      self.roundsScheduled = 0
+        self.matches = []
+        for j in range(total_weights):
+            self.matches.append([])
 
-  def scheduleRound(self, roundNumber, leader):
-      self.schedule[roundNumber] = leader
-      self.roundsScheduled += 1
+    def match_participant(self, participant, weights):
+        match_score = 0  # the overall score of how many questions matched up
+        for i in range(len(self.preference_list)):
+            if self.preference_list[i] == participant.preference_list[i]:
+                match_score += 1 * weights[i]
+        return match_score
 
-def generateMatches(leaders, participants, weights):
+    def clear_schedule(self):
+        self.schedule = []
+        for i in range(rounds):
+            self.schedule.append([])
+        self.slots_open = max_group_size * rounds
+
+    def schedule_participant(self, round_number, participant):
+        self.schedule[round_number].append(participant)
+        self.slots_open -= 1
+
+
+class Participant:  # Participant class
+
+    def __init__(self, name, email, preference_list):
+        self.name = name
+        self.email = email
+        self.preference_list = preference_list
+
+        self.schedule = [None] * rounds
+        self.rounds_scheduled = 0
+
+    def clear_schedule(self):
+        self.schedule = [None] * rounds
+        self.rounds_scheduled = 0
+
+    def schedule_round(self, round_number, leader):
+        self.schedule[round_number] = leader
+        self.rounds_scheduled += 1
+
+
+def generate_matches(leaders, participants, weights):
     for leader in leaders:
         for participant in participants:
-            matchScore = leader.matchParticipant(participant, weights)
-            leader.matches[matchScore].append(participant)
-            
-def tierListOptimizedGenerator(leaders, participants):
-    generationComplete = False
-    totalSlotsAvailable = len(participants) * rounds
-    roundMatchingOrder = []
+            match_score = leader.match_participant(participant, weights)
+            leader.matches[match_score].append(participant)
+
+
+def tier_list_optimized_generator(leaders, participants):
+    generation_complete = False
+    total_slots_available = len(participants) * rounds
+    round_matching_order = []
     for i in range(rounds):
       roundMatchingOrder.append(i)
     
@@ -295,6 +299,3 @@ def geneticOptimizer(leaders, participants, weights):
     generation = newGeneration
     
     return(optimalGene)
-
-    
-  

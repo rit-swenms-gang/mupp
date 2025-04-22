@@ -1,15 +1,35 @@
 import unittest
-from src.MatchingAlgorithms import *
+from src.MatchingAlgorithms import (
+    Leader,
+    Participant,
+    generate_matches,
+    generate_parent,
+    tier_list_optimized_generator,
+    p_sch_name_conversion,
+    l_sch_name_conversion,
+    output_schedule,
+    gene_to_schedule,
+    gene_evaluator,
+    rounds,
+    max_group_size,
+)
+
 
 class TestMatchingSystem(unittest.TestCase):
-    
-    def setUp(self): #Initialize the data
+
+    def setUp(self):  # Initialize the data
         self.leader1 = Leader("Andrew", "andrew@example.com", [2, 0, 1, 3, 2])
         self.leader2 = Leader("Shahmir", "shahmir@example.com", [1, 3, 0, 2, 1])
         self.leader3 = Leader("JoJo", "jojo@example.com", [3, 2, 3, 0, 1])
         self.leader4 = Leader("Christian", "christian@example.com", [0, 1, 2, 3, 0])
         self.leader5 = Leader("Tyler", "tyler@example.com", [2, 3, 1, 1, 3])
-        self.leaders = [self.leader1, self.leader2, self.leader3, self.leader4, self.leader5]
+        self.leaders = [
+            self.leader1,
+            self.leader2,
+            self.leader3,
+            self.leader4,
+            self.leader5,
+        ]
 
         self.participants = [
             Participant("Kermit", "kermit@themuppets.com", [2, 1, 3, 0, 1]),
@@ -31,65 +51,76 @@ class TestMatchingSystem(unittest.TestCase):
             Participant("Camilla", "camilla@themuppets.com", [2, 0, 1, 2, 3]),
             Participant("The count", "TheCount@notthemuppets.com", [3, 1, 0, 0, 2]),
             Participant("Zoot", "zoot@themuppets.com", [1, 2, 2, 1, 3]),
-            Participant("Janice", "janice@themuppets.com", [0, 3, 1, 3, 2])
+            Participant("Janice", "janice@themuppets.com", [0, 3, 1, 3, 2]),
         ]
 
         self.weights = [5, 2, 1, 1, 1]
-        
-    def test_match_scores_are_within_expected_range(self): #this tests the individual matches between leaders and participants and ensures they're within the correct range
+
+    def test_match_scores_are_within_expected_range(
+        self,
+    ):  # this tests the individual matches between leaders and participants and ensures they're within the correct range
         for leader in self.leaders:
             for participant in self.participants:
-                score = leader.matchParticipant(participant, self.weights)
+                score = leader.match_participant(participant, self.weights)
                 self.assertGreaterEqual(score, 0)
                 self.assertLessEqual(score, sum(self.weights))
 
-    def test_generate_matches_fills_leader_matches(self): #this test makes sure that the tier list used for optimization is full
-        generateMatches(self.leaders, self.participants, self.weights)
+    def test_generate_matches_fills_leader_matches(
+        self,
+    ):  # this test makes sure that the tier list used for optimization is full
+        generate_matches(self.leaders, self.participants, self.weights)
         for leader in self.leaders:
             total_matched = sum(len(match) for match in leader.matches)
             self.assertEqual(total_matched, len(self.participants))
 
-
-    def test_leader_schedule_constraints(self): #This ensures that no leader gets overscheduled
-        generateMatches(self.leaders, self.participants, self.weights)
-        tierListOptimizedGenerator(self.leaders, self.participants)
+    def test_leader_schedule_constraints(
+        self,
+    ):  # This ensures that no leader gets overscheduled
+        generate_matches(self.leaders, self.participants, self.weights)
+        tier_list_optimized_generator(self.leaders, self.participants)
         for leader in self.leaders:
             for session in leader.schedule:
-                self.assertLessEqual(len(session), maxGroupSize)
-                
-    def test_schedule_runs_to_completion(self): #This checks that the schedule is fully complete after running the generation
-        generateMatches(self.leaders, self.participants, self.weights)
-        tierListOptimizedGenerator(self.leaders, self.participants)
-        total_slots_filled = sum(p.roundsScheduled for p in self.participants)
+                self.assertLessEqual(len(session), max_group_size)
+
+    def test_schedule_runs_to_completion(
+        self,
+    ):  # This checks that the schedule is fully complete after running the generation
+        generate_matches(self.leaders, self.participants, self.weights)
+        tier_list_optimized_generator(self.leaders, self.participants)
+        total_slots_filled = sum(p.rounds_scheduled for p in self.participants)
         expected_slots = len(self.participants) * rounds
         self.assertEqual(total_slots_filled, expected_slots)
 
-    def test_participant_schedule_constraints(self): #This makes sure that the participants don't get overbooked
-        generateMatches(self.leaders, self.participants, self.weights)
-        tierListOptimizedGenerator(self.leaders, self.participants)
+    def test_participant_schedule_constraints(
+        self,
+    ):  # This makes sure that the participants don't get overbooked
+        generate_matches(self.leaders, self.participants, self.weights)
+        tier_list_optimized_generator(self.leaders, self.participants)
         for participant in self.participants:
-            self.assertEqual(len([s for s in participant.schedule if s is not None]), rounds) 
-            
-    def test_pSchNameConversion(self): #this tests the conversion of the player schedule with instances of the player class to their names
+            self.assertEqual(
+                len([s for s in participant.schedule if s is not None]), rounds
+            )
+
+    def test_p_sch_name_conversion(
+        self,
+    ):  # this tests the conversion of the player schedule with instances of the player class to their names
         self.participants[0].schedule = [self.leader1, self.leader2, self.leader3]
-        result = pSchNameConversion(self.participants[0].schedule)
+        result = p_sch_name_conversion(self.participants[0].schedule)
         self.assertEqual(result, ["Andrew", "Shahmir", "JoJo"])
 
-    def test_lSchNameConversion(self): #This does the same, but for leaders
+    def test_l_sch_name_conversion(self):  # This does the same, but for leaders
         self.leader1.schedule = [
             [self.participants[0], self.participants[1]],
             [self.participants[2]],
-            []
+            [],
         ]
-        result = lSchNameConversion(self.leader1.schedule)
-        expected = [
-            ["Kermit", "Miss Piggy"],
-            ["Fozzie"],
-            []
-        ]
+        result = l_sch_name_conversion(self.leader1.schedule)
+        expected = [["Kermit", "Miss Piggy"], ["Fozzie"], []]
         self.assertEqual(result, expected)
 
-    def test_outputSchedule(self): #This tests how to ensure that the returned version of the schedule is what is expected from the input data
+    def test_outputSchedule(
+        self,
+    ):  # This tests how to ensure that the returned version of the schedule is what is expected from the input data
         self.participants[0].schedule = [self.leader1, self.leader2, self.leader3]
         self.participants[1].schedule = [self.leader2, self.leader3, self.leader4]
 
@@ -98,34 +129,40 @@ class TestMatchingSystem(unittest.TestCase):
         self.leader2.schedule[0].append(self.participants[1])
         self.leader3.schedule[2].append(self.participants[1])
 
-        result = outputSchedule([self.leader1, self.leader2, self.leader3], self.participants[:2])
+        result = output_schedule(
+            [self.leader1, self.leader2, self.leader3], self.participants[:2]
+        )
         self.assertIn("Kermit", result)
         self.assertIn("Miss Piggy", result)
         self.assertIn("Andrew", result)
-        
-    def test_geneEvaluator(self): #This tests the function used to evaluate iterations of the genetic algorithm
+
+    def test_gene_evaluator(
+        self,
+    ):  # This tests the function used to evaluate iterations of the genetic algorithm
         leader = self.leader1
         participant = self.participants[0]
-        score = leader.matchParticipant(participant, self.weights)
+        score = leader.match_participant(participant, self.weights)
         gene = {leader: [[participant], [], []]}
-        evaluated = geneEvaluator(gene, self.weights)
+        evaluated = gene_evaluator(gene, self.weights)
         self.assertEqual(evaluated, score)
-        
-    
-    def test_generateParent(self): #This tests the parent generation code for the genetic algorithm
-        parent = generateParent(self.leaders, self.participants)
+
+    def test_generate_parent(
+        self,
+    ):  # This tests the parent generation code for the genetic algorithm
+        parent = generate_parent(self.leaders, self.participants)
         self.assertIsInstance(parent, dict)
         self.assertEqual(set(parent.keys()), set(self.leaders))
         for schedule in parent.values():
             self.assertEqual(len(schedule), rounds)
-            
-    def test_geneToSchedule(self): #This tests if the conversion from a gene into a specified schedule works
-        parent = generateParent(self.leaders, self.participants)
-        geneToSchedule(parent, self.leaders, self.participants)
+
+    def test_gene_to_schedule(
+        self,
+    ):  # This tests if the conversion from a gene into a specified schedule works
+        parent = generate_parent(self.leaders, self.participants)
+        gene_to_schedule(parent, self.leaders, self.participants)
         for leader in self.leaders:
             self.assertEqual(leader.schedule, parent[leader])
 
-            
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
