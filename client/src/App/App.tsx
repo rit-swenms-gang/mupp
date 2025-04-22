@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Key } from 'react'
 import './App.css'
 import { Container, Row,
         Card, CardBody,
@@ -22,11 +22,18 @@ interface Group {
 	members: string [];
 }
 
+type Form = {
+  id: string,
+  form_structure: object,
+  summary: string,
+  category: string
+}
+
 const serverUrl = 'http://localhost:5001/';
 
 function App() {
   const [groups, setGroups] = useState(Array<Group>);
-  const [forms, setForms] = useState(Array<FormPreviewProps>);
+  const [forms, setForms] = useState(Array<Form>);
   const [formModal, setformModal] = useState(false);
 
   const toggleFormModal = () => setformModal(!formModal);
@@ -79,7 +86,7 @@ function App() {
         const result = await res.json();
         const forms = result.rows || result;
   
-        const loadedForms = forms.map((form: any, index: number) => {
+        const loadedForms = forms.map((form: Form, index: number) => {
           let parsedStructure;
           try {
             parsedStructure = typeof form.form_structure === 'string'
@@ -87,6 +94,7 @@ function App() {
               : form.form_structure;
           } catch (e) {
             console.error('Failed to parse form_structure:', form.form_structure);
+            console.error(e);
             parsedStructure = { entities: {} };
           }
   
@@ -213,7 +221,7 @@ function App() {
             const participants = [];
   
             for (const [name, schedule] of Object.entries(groupingsData)) {
-              if (Array.isArray(schedule[0])) {
+              if (Array.isArray((schedule as Array<string>)[0])) {
                 leaders.push({ name, schedule });
               } else {
                 participants.push({ name, schedule });
@@ -230,7 +238,7 @@ function App() {
                     <li key={name} className="mb-3">
                       <strong>{name}</strong>
                       <ul className="ps-3">
-                        {schedule.map((roundGroup, idx) => (
+                        {(schedule as Array<Array<Group>>).map((roundGroup, idx) => (
                           <li key={idx}>
                             Round {idx + 1}: {roundGroup.join(', ')}
                           </li>
@@ -246,9 +254,9 @@ function App() {
                     <li key={name} className="mb-3">
                       <strong>{name}</strong>
                       <ul className="ps-3">
-                        {schedule.map((leaderName, idx) => (
+                        {(schedule as Array<string>).map((leaderName: string, idx: Key | null | undefined) => (
                           <li key={idx}>
-                            {idx === 0 ? "Group leader order" : `Round ${idx + 1}`}: {leaderName || "—"}
+                            {idx === 0 ? "Group leader order" : `Round ${idx as number + 1}`}: {leaderName || "—"}
                           </li>
                         ))}
                       </ul>
