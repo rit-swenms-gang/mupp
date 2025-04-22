@@ -3,6 +3,7 @@ import { BuilderEntities, BuilderEntityAttributes, useBuilderStore } from '@colt
 import { BooleanEntity, IsLeaderEntity, LabelAttribute, MaxNumberAttribute, MinNumberAttribute, NumberScaleEntity, RequiredAttribute, TextFieldEntity, WeightAttribute } from './Components';
 import { formBuilder } from './builder';
 import { Button, Card, CardBody, CardHeader, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
+import { getCookies } from '../services/auth';
 
 const LabelRequiredSection = () => {
   return (
@@ -98,36 +99,77 @@ export default function FormBuilderPage() {
     },
   });
 
+
   const submitFormSchema = async () => {
-    /*
-     * Validate the schema once again on the client
-     * to trigger all the validations and provide the user
-     * with feedback on what needs to be corrected.
-     */
     const validationResult = await builderStore.validateSchema();
-
-    if(validationResult.success) {
-
-      // check if schema is empty
-      if(Object.keys(validationResult.data.entities).length <= 1) {
+  
+    if (validationResult.success) {
+      if (Object.keys(validationResult.data.entities).length <= 1) {
         alert('Please add at least one entity to the form.');
-        return;
+        return 400;
       }
 
-      // TODO: save form in the server 
-      // (i.e. fetch('localhost:5001/forms-endpoint', { method: 'POST', body: JSON.stringify(validationResult.data) }))
-      // the endpoint will have to validate the incoming schema based on the builder used to create it.
-      // a python library like `jsonschema` or `pydantic` can be used to validate the schema.
-      // It should return a 200 status code if the schema is valid and save the form in the DB.
-      // If the schema is invalid send back a 400 code and do not save.
-      
-      // validationResult.data; // This is the form's schema
-      console.log('Form schema is valid: ', validationResult.data);
+      const cookies = getCookies();
+  
+      try {
+        const res = await fetch('http://localhost:5001/forms', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Session-Key': cookies.session || '' 
+          },
+          body: JSON.stringify({
+            form_structure: validationResult.data
+          })
+        });
+  
+        if (res.ok) {
+          const data = await res.json();
+          alert(`Form saved! ID: ${data.form_endpoint}`);
+        } else {
+          const err = await res.json();
+          alert(`Error: ${err.message}`);
+        }
+      } catch (err) {
+        console.error('Error posting form:', err);
+        alert('Network error while saving form.');
+      }
     } else {
-      console.error('Form schema is invalid: ', validationResult.reason);
-      alert('Please correct the errors in the form before saving it.');
+      alert('Please fix errors in the form before saving.');
     }
-  }
+  };
+
+  // const submitFormSchema = async () => {
+  //   /*
+  //    * Validate the schema once again on the client
+  //    * to trigger all the validations and provide the user
+  //    * with feedback on what needs to be corrected.
+  //    */
+
+  //   const validationResult = await builderStore.validateSchema();
+
+  //   if(validationResult.success) {
+
+  //     // check if schema is empty
+  //     if(Object.keys(validationResult.data.entities).length <= 1) {
+  //       alert('Please add at least one entity to the form.');
+  //       return;
+  //     }
+
+  //     // TODO: save form in the server 
+  //     // (i.e. fetch('localhost:5001/forms-endpoint', { method: 'POST', body: JSON.stringify(validationResult.data) }))
+  //     // the endpoint will have to validate the incoming schema based on the builder used to create it.
+  //     // a python library like `jsonschema` or `pydantic` can be used to validate the schema.
+  //     // It should return a 200 status code if the schema is valid and save the form in the DB.
+  //     // If the schema is invalid send back a 400 code and do not save.
+      
+  //     // validationResult.data; // This is the form's schema
+  //     console.log('Form schema is valid: ', validationResult.data);
+  //   } else {
+  //     console.error('Form schema is invalid: ', validationResult.reason);
+  //     alert('Please correct the errors in the form before saving it.');
+  //   }
+  // }
 
   return (
     <Card>

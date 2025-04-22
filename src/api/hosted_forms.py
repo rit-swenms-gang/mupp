@@ -10,6 +10,12 @@ from api.logins import require_login, get_user_id_from_session_key
 
 class Forms(Resource):
     @require_login
+    def get(self):        
+        db = Database(environ.get("DB_SCHEMA", "public"))
+        user_id = get_user_id_from_session_key(request.headers.get('Session-Key'))
+        return (db.tables['hosted_forms'].select(where={ 'account_id': user_id }))
+    
+    @require_login
     def post(self):
         db = Database(environ.get("DB_SCHEMA", "public"))
         # TODO: Form structure validation, login and posting to database

@@ -1,40 +1,42 @@
-import { useState } from 'react';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
+import React from 'react';
 import styled from 'styled-components';
 
-type EditDropdownProps = {
-	formId: any;
-	editAction: (arg0: any) => void;
-	deleteAction: (arg0: any) => void;
-};
-
-export default function EditDropdown({formId, editAction, deleteAction}: Readonly<EditDropdownProps>) {
-	const [dropdownOpen, setDropdownOpen] = useState(false);
-	const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
-	
-	return (
+const Hamburger = () => {
+  return (
     <StyledWrapper>
-      <Dropdown className='burger' isOpen={dropdownOpen} toggle={toggleDropdown}>
-        <DropdownToggle caret>...</DropdownToggle>
-        <DropdownMenu className='popup-window'>
-          <DropdownItem onClick={() => editAction(formId)}>
-            <svg strokeLinejoin="round" strokeLinecap="round" strokeWidth={2} stroke="currentColor" fill="none" viewBox="0 0 24 24" height={14} width={14} xmlns="http://www.w3.org/2000/svg">
-              <line y2={18} x2={6} y1={6} x1={18} />
-              <line y2={18} x2={18} y1={6} x1={6} />
-            </svg>
-            <span>Edit</span>
-            </DropdownItem>
-          <DropdownItem onClick={() => deleteAction(formId)}>
-            <svg strokeLinejoin="round" strokeLinecap="round" strokeWidth={2} stroke="currentColor" fill="none" viewBox="0 0 24 24" height={14} width={14} xmlns="http://www.w3.org/2000/svg">
-              <line y2={18} x2={6} y1={6} x1={18} />
-              <line y2={18} x2={18} y1={6} x1={6} />
-            </svg>
-            <span>Delete</span>
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+      <label className="popup">
+        <input type="checkbox" />
+        <div className="burger" tabIndex={0}>
+          <span />
+          <span />
+          <span />
+        </div>
+        <nav className="popup-window">
+          <legend>Actions</legend>
+          <ul>
+            <li>
+              <button>
+                <svg strokeLinejoin="round" strokeLinecap="round" strokeWidth={2} stroke="currentColor" fill="none" viewBox="0 0 24 24" height={14} width={14} xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="16 3 21 8 8 21 3 21 3 16 16 3" />
+                </svg>
+                <span>Edit</span>
+              </button>
+            </li>
+            <hr />
+            <li>
+              <button>
+                <svg strokeLinejoin="round" strokeLinecap="round" strokeWidth={2} stroke="currentColor" fill="none" viewBox="0 0 24 24" height={14} width={14} xmlns="http://www.w3.org/2000/svg">
+                  <line y2={18} x2={6} y1={6} x1={18} />
+                  <line y2={18} x2={18} y1={6} x1={6} />
+                </svg>
+                <span>Delete</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </label>
     </StyledWrapper>
-	);
+  );
 }
 
 const StyledWrapper = styled.div`
@@ -252,3 +254,5 @@ const StyledWrapper = styled.div`
     visibility: visible;
     opacity: 1;
   }`;
+
+export default Hamburger;

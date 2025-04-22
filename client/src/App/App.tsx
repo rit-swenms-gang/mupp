@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Col, Container, Row,
-        Card, CardBody
+        Card, CardBody,
+        Button,
+        Modal,
+        ModalHeader,
+        ModalBody
         } from 'reactstrap';
 import GroupBox from './Dashboard/GroupBox';
 import FormPreview, {FormPreviewProps} from './Dashboard/FormPreview';
 import EditDropdown from './Dashboard/EditDropdown';
 import Authenticator from '../Authenticator/Authenticator';
+import FormPage from '../forms/FormPage';
+import { getCookies } from '../services/auth';
+
 
 interface Group {
   id: number
@@ -16,12 +23,15 @@ interface Group {
 	members: string [];
 }
 
-// const serverUrl = 'http://localhost:5001/';
+const serverUrl = 'http://localhost:5001/';
 
 function App() {
   const [serverText, setServerText] = useState('yet to access server');
   const [groups, setGroups] = useState(Array<Group>);
   const [forms, setForms] = useState(Array<FormPreviewProps>);
+  const [formModal, setformModal] = useState(false);
+
+  const toggleFormModal = () => setformModal(!formModal);
 
   ////////// TODO: FETCH FROM SERVER //////////
 
@@ -37,21 +47,44 @@ function App() {
     ]
   ); }, []);
 
-  useEffect(() => {setForms(
-    [
-      {
-        name: "Sample Form 1",
-        category: "Sample Forms",
-        summary: "A template form to help you get started!"
+  useEffect(() => {
+    const fetchForms = async () => {
+      try {
+        const cookies = getCookies();
+        //pass the session-key?
+        const res = await fetch(serverUrl + 'forms', {
+          method: 'GET',
+          headers: {
+            'Session-Key': cookies.session || '' 
+          }
+        });
+
+        if(res.ok) {
+          const data = await res.json();
+          const loadedForms = data.map((form: any) => ({
+            name: `Form ${form.id}`,
+            category: "Created Forms",
+            summary: Object.values(form.form_structure.entities).map((e: any) => e.attributes.label).join(', ')
+          }));
+          setForms(loadedForms);
+        } else {
+          console.error('Error: Failed to fetch forms from the server:', await res.json());
+        }
+      } catch (err) {
+        console.error('Error: Failed to fetch forms from the server', err);
       }
-    ]
-  ); }, []);
+    };
+    fetchForms();
+  }, []);
 
   /////////////////////////////////////////////
 
   function openEditForm(formId: unknown) {
     // TODO: open the edit form page/modal
-    console.log(formId)
+    setformModal(true);
+    if(formId == null) {
+      
+    }
   }
 
   function deleteForm(formId: unknown) {
@@ -136,12 +169,23 @@ function App() {
           <Col>
             {groupBoxes}
           </Col>
-          <Col>
-            {formList}
-          </Col>
+          <Row>
+            <Col>
+              {formList}
+            </Col>
+          </Row>
+          <Row>
+            <Button onClick={openEditForm}>Create New Form</Button>
+          </Row>
         </Row>
         
       </Container>
+      <Modal isOpen={formModal} toggle={toggleFormModal}>
+        <ModalHeader toggle={toggleFormModal}>Edit Form</ModalHeader>
+        <ModalBody>
+          <FormPage/>
+        </ModalBody>
+      </Modal>
     </Authenticator>
   )
 }

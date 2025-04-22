@@ -1,5 +1,19 @@
 import { printDebugLog } from './util';
 
+
+/**
+ * Parse cookie string from document into key-value format.
+ */
+export const getCookies = () => (
+  document.cookie.split(';').reduce(
+    (acc: Record<string, string>, cookieStr: string) => {
+      const [key, value] = cookieStr.trim().split('=');
+      acc[key] = value;
+      return acc;
+    },
+    {})
+)
+
 /**
  * Signs out a user by invalidating their session on the server and clearing the session cookie.
  * @param fetchLogout A function to make the logout request (default is makeAuthFetch).
@@ -10,13 +24,7 @@ import { printDebugLog } from './util';
 export const handleSignOut = async (fetchLogout = makeAuthFetch) => {
   printDebugLog('Handle sign out');
 
-  const cookies = document.cookie.split(';').reduce(
-    (acc: Record<string, string>, cookieStr: string) => {
-      const [key, value] = cookieStr.trim().split('=');
-      acc[key] = value;
-      return acc;
-    },
-    {});
+  const cookies = getCookies();
 
   const sessionKey = cookies.session;
 
