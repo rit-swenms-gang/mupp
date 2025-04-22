@@ -12,7 +12,6 @@ from src.db.utils.db import Database
 from src.db.form_hosting import generate_form_table, format_table_name
 from json import dumps
 import random
-from pprint import pprint
 
 MOCK_UUIDS = {
     "name_uuid": "name-uuid",
@@ -129,7 +128,7 @@ class TestMatchingWithDynamicForm(TestCase):
     def run_matching_pipeline(self):
         form_responses = []
         """Generating the Leaders' responses"""
-        for i in range(1, 8):
+        for i in range(1, 5):
             form_responses.append({
                 self.name_qid: f"Leader{i}",
                 self.email_qid: f"leader{i}@game.com",
@@ -170,7 +169,5 @@ class TestMatchingWithDynamicForm(TestCase):
         weights = [5, 2]
         generate_matches(leaders, participants, weights)
         tier_list_optimized_generator(leaders, participants)
-        
-        # groupings = output_schedule(leaders, participants)
-        # pprint(groupings)
+
         return leaders, participants

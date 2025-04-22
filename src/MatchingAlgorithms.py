@@ -112,21 +112,6 @@ def tier_list_optimized_generator(leaders, participants):
         if total_slots_scheduled == total_slots_available:
             generation_complete = True
 
-
-# def p_sch_name_conversion(participant_schedule):
-#     name_schedule = []
-#     for leader in participant_schedule:
-#         name_schedule.append(leader.name)
-#     return name_schedule
-
-
-# def l_sch_name_conversion(leader_schedule):
-#     name_schedule = leader_schedule
-#     for i in range(len(name_schedule)):
-#         for j in range(len(name_schedule[i])):
-#             name_schedule[i][j] = name_schedule[i][j].name
-#     return name_schedule
-
 def p_sch_name_conversion(participant_schedule):
     return [leader.name if leader else None for leader in participant_schedule]
 
