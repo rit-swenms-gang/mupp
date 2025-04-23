@@ -12,6 +12,9 @@ export default defineConfig({
     globals: true,
     coverage: {
       // include: ['src/**', 'tests/**'],
+      exclude: [
+        'src/**/*.tsx'
+      ],
       reporter: ['lcov', 'json', 'text'],
     },
     // reporters: [
