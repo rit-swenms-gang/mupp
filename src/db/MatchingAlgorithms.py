@@ -129,11 +129,16 @@ def output_schedule(leaders,participants):
   return(schedule_dict)
             
 def gene_evaluator(gene,weights):
-  TMSWeight = 1
+  """
+  Weights for future implementation of genetic algorithm variance to be tied to front end
+  
   min_gSWeight = 0
   max_gSWeight = 0
   GSAvg_weight = 0
   min_mSWeight = 0
+  """
+  
+  TMSWeight = 1
   
   return(TMSWeight*TMSCalc(gene,weights))
 
@@ -244,11 +249,8 @@ def crossover(gene_one, gene_two):
   for leader in gene_one:
     child_schedule = []
     for r in range(rounds):
-      if random.random() < 0.5:
         child_schedule.append(copy.deepcopy(gene_one[leader][r]))  
-      else:
-        child_schedule.append(copy.deepcopy(gene_one[leader][r]))
-        
+               
     child[leader] = child_schedule
   
   if check_valid_gene(child):
