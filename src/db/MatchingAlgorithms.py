@@ -207,16 +207,15 @@ def gene_to_schedule(gene,leaders,participants):
 def check_valid_gene(gene):
   found = []
   for schedule in gene.values():
-    for player in schedule:
-      if player in found:
-        return(False)
-      else:
-        found.append(player)
+    for round in schedule:
+      for player in round:
+        if ((player in found)):
+          return(False)
+        else:
+          found.append(player)
   
   return(True)
     
-    
-        
 
 def mutation(gene):
   mutated_gene = copy.deepcopy(gene)
@@ -246,9 +245,9 @@ def crossover(gene_one, gene_two):
     child_schedule = []
     for r in range(rounds):
       if random.random() < 0.5:
-        child_schedule.append(copy.deepcopy(gene_one[leader][r]))
+        child_schedule.append(copy.deepcopy(gene_one[leader][r]))  
       else:
-        child_schedule.append(copy.deepcopy(gene_two[leader][r]))
+        child_schedule.append(copy.deepcopy(gene_one[leader][r]))
         
     child[leader] = child_schedule
   
@@ -270,7 +269,7 @@ def genetic_optimizer(leaders, participants, weights):
   generate_matches(leaders, participants, weights)
   generation = []
   for _ in range(generation_size):
-    generation.append(generate_parent(leaders, participants))
+    generation.append(generate_parent(leaders))
 
 
   for j in range(iterations):
@@ -296,4 +295,4 @@ def genetic_optimizer(leaders, participants, weights):
       new_generation.append(child)
     generation = new_generation
     
-    return(optimal_gene)
+  return(optimal_gene)
