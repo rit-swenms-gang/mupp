@@ -23,9 +23,7 @@ const LabelRequiredSection = () => {
  */
 const TextFieldAttribute = () => {
   return (
-    <>
-      <LabelRequiredSection />
-    </>
+    <LabelRequiredSection />
   )
 }
 
@@ -49,9 +47,7 @@ const NumberScaleAttribute = () => {
 
 const BooleanAttribute = () => {
   return (
-    <>
-      <LabelRequiredSection />  
-    </>
+    <LabelRequiredSection />  
   )
 }
 
