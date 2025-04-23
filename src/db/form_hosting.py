@@ -1,7 +1,6 @@
 from .utils.db import Database
 import json
 import re
-from json import loads
 from .MatchingAlgorithms import Leader, Participant, generate_matches, tier_list_optimized_generator, output_schedule
 
 
@@ -11,7 +10,7 @@ def format_table_name(uuid: str) -> str:
     return "f" + uuid.replace("-", "")
 
 
-def generate_form_table(db: Database, form_id: str) -> None:
+def generate_form_table(db: Database, form_id: str):
     """This will generate a form table based on the form_structure"""
     table_name = format_table_name(form_id)
 
@@ -28,12 +27,12 @@ def generate_form_table(db: Database, form_id: str) -> None:
     uuid_to_col = {}
 
     for uuid, entity in form_structure['entities'].items():
-        type = entity['type']
+        entity_type = entity['type']
         label = entity['attributes']['label']
         safe_label = re.sub(r'\W+', '_', label.lower()).strip('_')  # sanitize to valid SQL identifier
         uuid_to_col[uuid] = safe_label
         required = entity['attributes'].get('required',False)
-        if type == 'textField':
+        if entity_type == 'textField':
             pg_type = 'VARCHAR'
         elif type == 'boolean':
             pg_type = 'BOOLEAN'
