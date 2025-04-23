@@ -1,5 +1,5 @@
 import unittest
-from src.MatchingAlgorithms import (
+from src.db.MatchingAlgorithms import (
     Leader,
     Participant,
     generate_matches,
@@ -12,6 +12,15 @@ from src.MatchingAlgorithms import (
     gene_evaluator,
     rounds,
     max_group_size,
+    min_group_size_calc,
+    TMSCalc,
+    max_group_size_calc,
+    group_size_avg_calc,
+    min_match_score_calc,
+    check_valid_gene,
+    mutation,
+    crossover,
+    genetic_optimizer,
 )
 
 
@@ -149,7 +158,7 @@ class TestMatchingSystem(unittest.TestCase):
     def test_generate_parent(
         self,
     ):  # This tests the parent generation code for the genetic algorithm
-        parent = generate_parent(self.leaders, self.participants)
+        parent = generate_parent(self.leaders)
         self.assertIsInstance(parent, dict)
         self.assertEqual(set(parent.keys()), set(self.leaders))
         for schedule in parent.values():
@@ -158,11 +167,119 @@ class TestMatchingSystem(unittest.TestCase):
     def test_gene_to_schedule(
         self,
     ):  # This tests if the conversion from a gene into a specified schedule works
-        parent = generate_parent(self.leaders, self.participants)
+        parent = generate_parent(self.leaders)
         gene_to_schedule(parent, self.leaders, self.participants)
         for leader in self.leaders:
             self.assertEqual(leader.schedule, parent[leader])
+            
+    def test_min_group_size_calc(self):
+        # This tests that the minimum group size function works
+        gene = {
+            self.leader1: [[self.participants[0]], [self.participants[1], self.participants[2]], []],
+            self.leader2: [[self.participants[3], self.participants[4]], [], [self.participants[5]]],
+            self.leader3: [[], [], [self.participants[6], self.participants[7], self.participants[8]]]
+        }
 
+        min_size = min_group_size_calc(gene)
+        self.assertEqual(min_size, 0)
+        
+    def test_TMSCalc(self):
+        # Tests that TMSCalc returns the correct total match score for a simple schedule
+        leader = self.leader1
+        participants = self.participants[:3]
+        gene = {
+            leader: [participants, [], []]
+        }
+        expected_score = sum(leader.match_participant(p, self.weights) for p in participants)
+        self.assertEqual(TMSCalc(gene, self.weights), expected_score)
+    
+    def test_min_group_size_calc(self):
+        # Tests that min_group_size_calc returns the correct minimum group size in a schedule
+        leader = self.leader1
+        participants = self.participants
+        gene = {
+            leader: [participants[:2], participants[2:4], participants[4:]]
+        }
+        self.assertEqual(min_group_size_calc(gene), 2)
+        
+    def test_max_group_size_calc(self):
+        # Tests that max_group_size_calc returns the correct maximum group size in a schedule
+        leader = self.leader1
+        participants = self.participants
+        gene = {
+            leader: [participants[:3], participants[3:4], participants[4:6]]
+        }
+        self.assertEqual(max_group_size_calc(gene), 3)
+    
+    def test_group_size_avg_calc(self):
+        # Tests that group_size_avg_calc returns the correct average group size in a schedule
+        leader = self.leader1
+        participants = self.participants
+        gene = {
+            leader: [participants[:2], participants[2:4], participants[4:6]]
+        }
+        self.assertEqual(group_size_avg_calc(gene), 2.0)
+    
+    def test_min_match_score_calc(self):
+        # Tests that min_match_score_calc returns the minimum match score in a schedule
+        leader = self.leader1
+        participants = self.participants
+        gene = {
+            leader: [
+                [participants[0], participants[1]],
+                [participants[2], participants[3]],
+                [participants[4]]
+            ]
+        }
+        self.assertEqual(min_match_score_calc(gene), 0)
+        
+    def test_check_valid_gene(self):
+        # Tests that check_valid_gene correctly identifies valid and invalid genes
+        valid_gene = {
+            self.leader1: [[self.participants[0], self.participants[1]], [], []],
+            self.leader2: [[self.participants[2], self.participants[3]], [], []]
+        }
+        invalid_gene = {
+            self.leader1: [[self.participants[0], self.participants[1]], [], []],
+            self.leader2: [[self.participants[0], self.participants[3]], [], []]  # Duplicate participant
+        }
+        self.assertTrue(check_valid_gene(valid_gene))
+        self.assertFalse(check_valid_gene(invalid_gene))
+
+    def test_mutation(self):
+        # Tests that mutation correctly alters a gene without violating validity
+        gene = {
+            self.leader1: [[self.participants[0], self.participants[1]], [], []],
+            self.leader2: [[self.participants[2], self.participants[3]], [], []]
+        }
+        mutated_gene = mutation(gene)
+        self.assertNotEqual(mutated_gene, gene)  # The gene should be mutated
+        self.assertTrue(check_valid_gene(mutated_gene))  # The mutated gene should still be valid
+    
+    def test_crossover(self):
+        # Tests that crossover correctly combines two genes and maintains validity
+        gene_one = {
+            self.leader1: [[self.participants[0], self.participants[1]], [], []],
+            self.leader2: [[self.participants[2], self.participants[3]], [], []]
+        }
+        gene_two = {
+            self.leader1: [[self.participants[4], self.participants[5]], [], []],
+            self.leader2: [[self.participants[6], self.participants[7]], [], []]
+        }
+        child_gene = crossover(gene_one, gene_two)
+        self.assertNotEqual(child_gene, gene_one) 
+        self.assertNotEqual(child_gene, gene_two) 
+        self.assertTrue(check_valid_gene(child_gene))  
+
+
+    def test_genetic_optimizer(self):
+        # Tests that genetic_optimizer generates a valid optimal gene
+        generate_matches(self.leaders, self.participants, self.weights)
+        tier_list_optimized_generator(self.leaders, self.participants)
+        optimal_gene = genetic_optimizer(self.leaders, self.participants, self.weights)
+        self.assertIsInstance(optimal_gene, dict)  
+        self.assertTrue(all(isinstance(leader, Leader) for leader in optimal_gene))   
+    
 
 if __name__ == "__main__":
     unittest.main()

@@ -102,3 +102,12 @@ def get_username_by_ID(user_id):
         user = result[0] if isinstance(result, list) else result
         return user["username"]
     return None
+
+def get_user_id_from_session_key(session_key):
+    """Helper function that returns a username from the session key"""
+    db = Database(environ.get("DB_SCHEMA", "public"))
+    result = db.tables["logins"].select(where={"session_key": session_key})
+    if result:
+        user_id = result[0] if isinstance(result, list) else result
+        return user_id["user_id"]
+    return {"message": "Error: Invalid Session Key"}, 401

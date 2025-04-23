@@ -11,7 +11,8 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     globals: true,
     coverage: {
-      // include: ['src/**', 'tests/**'],
+      include: ['src/**/*.ts',],
+      exclude: ['src/forms/entities.ts'],
       reporter: ['lcov', 'json', 'text'],
     },
     // reporters: [

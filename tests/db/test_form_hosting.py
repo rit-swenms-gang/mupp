@@ -1,8 +1,9 @@
 from unittest import TestCase
 from tests.api.test_req_utils import test_post
 from src.db.utils.db import Database
-from src.db.form_hosting import generate_form_table, format_table_name
+from src.db.form_hosting import generate_form_table, format_table_name, get_uuid_to_column_map
 from json import dumps
+
 
 
 class FormUtilsTest(TestCase):
@@ -18,7 +19,29 @@ class FormUtilsTest(TestCase):
             "SELECT id FROM accounts WHERE email = %s;", [user_data["email"]]
         )[0][0]
         # form_data = '{ "key1" : "value", "key2": [1, 2, 3], "key3": { "nestedKey" : null } }'
-        form_data = {"key1": "text", "key2": "int", "key3": "json"}
+        form_data = {
+            'entities': {
+            '7a77959a-eb84-447c-9ed7-200e2a674eea': {
+                'type': 'textField',
+                'attributes': {
+                'label': 'Name',
+                'required': True
+                },
+                
+            },
+            '7a49f550-5966-4c8c-89eb-a0797940fff3': {
+                'type': 'numberScale',
+                'attributes': {
+                    'label': 'Age',
+                    'weight': 1,
+                    'min': 1,
+                    'max': 100
+                },
+                
+            }
+            },
+            'root': ['7a77959a-eb84-447c-9ed7-200e2a674eea', '7a49f550-5966-4c8c-89eb-a0797940fff3']
+        }
         self.form_id = self.db.exec_commit(
             "INSERT INTO hosted_forms (account_id, form_structure) VALUES (%s, %s) RETURNING id;",
             [account_id, dumps(form_data)],
@@ -51,3 +74,27 @@ class FormUtilsTest(TestCase):
             self.db.tables[formatted_name],
             f'Expected form table "{formatted_name}" to be generated.',
         )
+
+    def test_format_table_name_invalid(self):
+        """
+        format_table_name should still generate a string for weird IDs.
+        """
+        malformed_id = "123_invalid_uuid"
+        formatted = format_table_name(malformed_id)
+        self.assertTrue(formatted.startswith("f") and len(formatted) > 1)
+
+    def test_get_uuid_to_column_map_structure(self):
+        # First generate the form table
+        generate_form_table(self.db, self.form_id)
+        col_map = get_uuid_to_column_map(self.db, self.form_id)
+
+        self.assertIsInstance(col_map, dict)
+        self.assertGreater(len(col_map), 0)
+        for k, v in col_map.items():
+            self.assertIsInstance(k, str)
+            self.assertIsInstance(v, str)
+
+    def test_format_table_name_no_hyphens(self):
+        clean_id = "abc123xyz"
+        result = format_table_name(clean_id)
+        self.assertEqual(result, "fabc123xyz")
